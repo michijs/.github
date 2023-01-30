@@ -23,7 +23,6 @@ on:
         type: string
         default: "build"
 env:
-  BUILD_SCRIPT: ${{ github.event.inputs.build-script }}
   RELEASE_TYPE: ${{ github.event.inputs.release-type }}
   NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -53,7 +52,7 @@ jobs:
 
       # Build
       - name: Build
-        run: npm run $BUILD_SCRIPT
+        run: npm run ${{ inputs.build-script }}
 
       # Configure Git
       - name: Git configuration
