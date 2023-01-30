@@ -22,6 +22,12 @@ on:
         description: "Build script to execute"
         type: string
         default: "build"
+    secrets:
+      NPM_ACCESS_TOKEN:
+        required: true
+      GITHUB_TOKEN:
+        required: true
+
 env:
   RELEASE_TYPE: ${{ github.event.inputs.release-type }}
   NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
