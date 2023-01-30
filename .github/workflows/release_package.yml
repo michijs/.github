@@ -45,6 +45,7 @@ jobs:
           node-version: 16.17.0
           # Important!
           registry-url: https://registry.npmjs.org/
+          always-auth: true
 
       - name: Install dependencies
         run: npm install
