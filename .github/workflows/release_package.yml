@@ -25,13 +25,13 @@ on:
     secrets:
       NPM_ACCESS_TOKEN:
         required: true
-      GITHUB_TOKEN:
+      GITHUB_ACCESS_TOKEN:
         required: true
 
 env:
   RELEASE_TYPE: ${{ github.event.inputs.release-type }}
   NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
 
 jobs:
   Release:
