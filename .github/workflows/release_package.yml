@@ -53,7 +53,7 @@ jobs:
 
       # Build
       - name: Build
-        run: npm run ${{ env.BUILD_SCRIPT }}
+        run: npm run ${env.BUILD_SCRIPT}
 
       # Configure Git
       - name: Git configuration
