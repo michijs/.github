@@ -18,10 +18,10 @@ on:
       release-notes:
         description: "Release notes"
         type: string
-      build-script:
-        description: "Build script to execute"
+      dist-script:
+        description: "Distribution script to execute"
         type: string
-        default: "build"
+        default: "dist"
     secrets:
       NPM_ACCESS_TOKEN:
         required: true
@@ -58,7 +58,7 @@ jobs:
 
       # Build
       - name: Build
-        run: npm run ${{ inputs.build-script }}
+        run: npm run ${{ inputs.dist-script }}
 
       # Configure Git
       - name: Git configuration
