@@ -1,5 +1,3 @@
-# Michijs
-
 Hi 👋, I'm Lucas! And this is my main project. I have been working on it for more than two years. 
 
 ## FAQ
