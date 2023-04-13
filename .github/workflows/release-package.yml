@@ -54,7 +54,7 @@ jobs:
           always-auth: true
 
       - name: Install dependencies
-        run: npm install --save --legacy-peer-deps
+        run: npm install --legacy-peer-deps
 
       # Build
       - name: Build
