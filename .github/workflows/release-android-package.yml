@@ -51,8 +51,8 @@ jobs:
       - name: Set up java
         uses: actions/setup-java@v3
         with:
-          distribution: 'zulu'
-          java-version: '11'
+          distribution: 'microsoft'
+          java-version: '20.0.1'
 
         # Setup Node.js environment
       - name: Set up Node.js 16.17.0
@@ -96,11 +96,14 @@ jobs:
       - name: Capacitor Copy
         run: npx cap copy
 
+      - name: Make gradlew executable
+        run: chmod +x ./android/gradlew
+
       - name: Build app bundle
-        run: cd android && ./gradlew bundle
+        run: ./android/gradlew bundle
 
       - name: Build app apk
-        run: cd android && ./gradlew assembleDebug
+        run: ./android/gradlew assembleDebug
 
       - name: Extract Android signing key from env
         run: |
