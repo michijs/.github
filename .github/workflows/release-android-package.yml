@@ -96,6 +96,9 @@ jobs:
       # Start Android
       - name: Capacitor Copy
         run: npx cap copy
+        
+      - name: Capacitor update
+        run: npx cap update
 
       - name: Make gradlew executable
         run: chmod +x ./android/gradlew
