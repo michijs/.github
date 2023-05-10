@@ -1,4 +1,4 @@
-name: Release package
+name: Release Android package
 on:
   workflow_call:
     inputs:
@@ -19,17 +19,23 @@ on:
         description: "Release notes"
         type: string
       dist-script:
-        description: "Distribution script to execute"
+        description: "Build script to execute"
         type: string
-        default: "dist"
+        default: "build"
     secrets:
       NPM_ACCESS_TOKEN:
         required: true
       GITHUB_ACCESS_TOKEN:
         required: true
+      ANDROID_RELEASE_KEYSTORE:
+        required: true
+      ANDROID_RELEASE_KEYSTORE_PASSWORD:
+        required: true
 
 env:
   RELEASE_TYPE: ${{ github.event.inputs.release-type }}
+  NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
 
 jobs:
   Release:
@@ -41,6 +47,12 @@ jobs:
           # We must fetch at least the immediate parents so that if this is
           # a pull request then we can checkout the head.
           fetch-depth: 2
+
+      - name: Setup java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '11'
 
         # Setup Node.js environment
       - name: Set up Node.js 16.17.0
@@ -80,6 +92,26 @@ jobs:
           echo "NEW_VERSION=$(npm --no-git-tag-version --preid=beta version $RELEASE_TYPE)" >> $GITHUB_ENV
           echo "RELEASE_TAG=beta" >> $GITHUB_ENV
 
+      # Start Android
+      - name: Capacitor Copy
+        run: npx cap copy
+
+      - name: Build app bundle
+        run: cd android && ./gradlew bundle
+
+      - name: Build app apk
+        run: cd android && ./gradlew assembleDebug
+
+      - name: Extract Android signing key from env
+        run: |
+          echo "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > android/release.jks.base64
+          base64 -d android/release.jks.base64 > android/release.decrypted.jks
+
+      - name: Sign dev build
+        run: jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/bundle/release/app-release-signed.aab ./android/app/build/outputs/bundle/release/app-release.aab release
+
+      # End Android
+
       # Commit changes
       - name: Commit package.json changes and create tag
         run: |
@@ -103,3 +135,8 @@ jobs:
           tag_name: ${{ env.NEW_VERSION }}
           body: ${{ github.event.inputs.release-notes }}
           prerelease: ${{ startsWith(github.event.inputs.release-type, 'pre') }}
+          files: |
+            android/app/build/outputs/apk/debug/app-debug.apk
+            android/app/build/outputs/bundle/release/app-release.aab
+            android/app/build/outputs/bundle/release/app-release.aab
+            android/app/build/outputs/bundle/release/app-release-signed.aab
