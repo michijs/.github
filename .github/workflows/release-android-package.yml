@@ -54,119 +54,116 @@ jobs:
           # a pull request then we can checkout the head.
           fetch-depth: 2
 
-      - name: Set up java 17.0.3
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'microsoft'
-          java-version: '17.0.3'
-          cache: 'gradle'
+      # - name: Set up java 17.0.3
+      #   uses: actions/setup-java@v3
+      #   with:
+      #     distribution: 'microsoft'
+      #     java-version: '17.0.3'
+      #     cache: 'gradle'
 
-        # Setup Node.js environment
-      - name: Set up Node.js 16.17.0
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16.17.0
-          # Important!
-          registry-url: 'https://registry.npmjs.org'
-          always-auth: true
+      #   # Setup Node.js environment
+      # - name: Set up Node.js 16.17.0
+      #   uses: actions/setup-node@v3
+      #   with:
+      #     node-version: 16.17.0
+      #     # Important!
+      #     registry-url: 'https://registry.npmjs.org'
+      #     always-auth: true
 
-      - name: Install dependencies
-        run: npm install
+      # - name: Install dependencies
+      #   run: npm install
 
-      # Build
-      - name: Build
-        run: npm run ${{ inputs.dist-script }}
+      # # Build
+      # - name: Build
+      #   run: npm run ${{ inputs.dist-script }}
 
-      # Configure Git
-      - name: Git configuration
-        run: |
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git config --global user.name "GitHub Actions"
+      # # Configure Git
+      # - name: Git configuration
+      #   run: |
+      #     git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      #     git config --global user.name "GitHub Actions"
 
-      # Bump package version
-      # Use tag latest
-      - name: Bump release version
-        if: startsWith(github.event.inputs.release-type, 'pre') != true
-        run: |
-          echo "NEW_VERSION=$(npm --no-git-tag-version version $RELEASE_TYPE)" >> $GITHUB_ENV
-          echo "RELEASE_TAG=latest" >> $GITHUB_ENV
+      # # Bump package version
+      # # Use tag latest
+      # - name: Bump release version
+      #   if: startsWith(github.event.inputs.release-type, 'pre') != true
+      #   run: |
+      #     echo "NEW_VERSION=$(npm --no-git-tag-version version $RELEASE_TYPE)" >> $GITHUB_ENV
+      #     echo "RELEASE_TRACK=production" >> $GITHUB_ENV
 
-      # Bump package pre-release version
-      # Use tag beta for pre-release versions
-      - name: Bump pre-release version
-        if: startsWith(github.event.inputs.release-type, 'pre')
-        run: |
-          echo "NEW_VERSION=$(npm --no-git-tag-version --preid=beta version $RELEASE_TYPE)" >> $GITHUB_ENV
-          echo "RELEASE_TAG=beta" >> $GITHUB_ENV
+      # # Bump package pre-release version
+      # # Use tag beta for pre-release versions
+      # - name: Bump pre-release version
+      #   if: startsWith(github.event.inputs.release-type, 'pre')
+      #   run: |
+      #     echo "NEW_VERSION=$(npm --no-git-tag-version --preid=beta version $RELEASE_TYPE)" >> $GITHUB_ENV
+      #     echo "RELEASE_TRACK=beta" >> $GITHUB_ENV
 
-      # Start Android
-      - name: Capacitor Sync
-        run: npx cap sync
+      # # Start Android
+      # - name: Capacitor Sync
+      #   run: npx cap sync
 
-      - name: Make gradlew executable
-        run: chmod +x ./android/gradlew
+      # - name: Make gradlew executable
+      #   run: chmod +x ./android/gradlew
 
-      - name: Build app bundle (AAB)
-        run: cd android && ./gradlew bundle
+      # - name: Build app bundle (AAB)
+      #   run: cd android && ./gradlew bundle
 
-      - name: Build app APK
-        run: cd android && ./gradlew assembleRelease
+      # - name: Build app APK
+      #   run: cd android && ./gradlew assembleRelease
 
-      - name: Extract Android signing key from env
-        run: |
-          echo "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > android/release.jks.base64
-          base64 -d android/release.jks.base64 > android/release.decrypted.jks
+      # - name: Extract Android signing key from env
+      #   run: |
+      #     echo "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > android/release.jks.base64
+      #     base64 -d android/release.jks.base64 > android/release.decrypted.jks
 
-      - name: Sign app bundle (AAB)
-        run: jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/bundle/release/app-release-signed.aab ./android/app/build/outputs/bundle/release/app-release.aab release
+      # - name: Sign app bundle (AAB)
+      #   run: jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/bundle/release/app-release-signed.aab ./android/app/build/outputs/bundle/release/app-release.aab release
 
-      - name: Sign app APK
-        run: jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/apk/app-release-signed.apk ./android/app/build/outputs/apk/app-release-unsigned.apk release
+      # - name: Sign app APK
+      #   run: jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/apk/app-release-signed.apk ./android/app/build/outputs/apk/app-release-unsigned.apk release
       
-      - name: Create service_account.json
-        id: createServiceAccount
-        run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
+      # - name: Create service_account.json
+      #   run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
+
+      - name: Get Package Name
+        run: |
+          cd android && namespace=$(grep -Po 'namespace\s+"(\S+)"' app/build.gradle | awk -F'"' '{print $2}')
+          echo "ANDROID_PACKAGE_NAME=$namespace" >> $GITHUB_ENV
+          echo "$namespace"
         
-      - name: Deploy to Play Store (production version)
-        if: startsWith(github.event.inputs.release-type, 'pre') != true && github.event.inputs.deploy-to-play-store
-        uses: r0adkll/upload-google-play@v1
-        with:
-          serviceAccountJson: service_account.json
-          packageName: com.package
-          releaseFile: ./android/app/build/outputs/bundle/release/app-release-signed.aab
-          track: production
+      # - name: Deploy to Play Store
+      #   if: github.event.inputs.deploy-to-play-store
+      #   uses: r0adkll/upload-google-play@v1
+      #   with:
+      #     serviceAccountJson: service_account.json
+      #     packageName: ${{ env.ANDROID_PACKAGE_NAME }}
+      #     releaseFile: ./android/app/build/outputs/bundle/release/app-release-signed.aab
+      #     track: ${{ env.RELEASE_TRACK }}
           
-      - name: Deploy to Play Store (beta version)
-        if: startsWith(github.event.inputs.release-type, 'pre') && github.event.inputs.deploy-to-play-store
-        uses: r0adkll/upload-google-play@v1
-        with:
-          serviceAccountJson: service_account.json
-          packageName: com.package
-          releaseFile: ./android/app/build/outputs/bundle/release/app-release-signed.aab
-          track: beta
-      # End Android
+      # # End Android
 
-      # Commit changes
-      - name: Commit package.json changes and create tag
-        run: |
-          git add "package.json"
-          git commit -m "chore: release ${{ env.NEW_VERSION }}"
-          git tag ${{ env.NEW_VERSION }}
+      # # Commit changes
+      # - name: Commit package.json changes and create tag
+      #   run: |
+      #     git add "package.json"
+      #     git commit -m "chore: release ${{ env.NEW_VERSION }}"
+      #     git tag ${{ env.NEW_VERSION }}
 
-      # Push repository changes
-      - name: Push changes to repository
-        run: |
-          git push origin && git push --tags
+      # # Push repository changes
+      # - name: Push changes to repository
+      #   run: |
+      #     git push origin && git push --tags
 
-      # Update GitHub release with changelog
-      - name: Update GitHub release documentation
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ env.NEW_VERSION }}
-          body: ${{ github.event.inputs.release-notes }}
-          prerelease: ${{ startsWith(github.event.inputs.release-type, 'pre') }}
-          files: |
-            ./android/app/build/outputs/apk/app-release-unsigned.apk
-            ./android/app/build/outputs/apk/app-release-signed.apk
-            ./android/app/build/outputs/bundle/release/app-release.aab
-            ./android/app/build/outputs/bundle/release/app-release-signed.aab
+      # # Update GitHub release with changelog
+      # - name: Update GitHub release documentation
+      #   uses: softprops/action-gh-release@v1
+      #   with:
+      #     tag_name: ${{ env.NEW_VERSION }}
+      #     body: ${{ github.event.inputs.release-notes }}
+      #     prerelease: ${{ startsWith(github.event.inputs.release-type, 'pre') }}
+      #     files: |
+      #       ./android/app/build/outputs/apk/app-release-unsigned.apk
+      #       ./android/app/build/outputs/apk/app-release-signed.apk
+      #       ./android/app/build/outputs/bundle/release/app-release.aab
+      #       ./android/app/build/outputs/bundle/release/app-release-signed.aab
