@@ -94,8 +94,8 @@ jobs:
           echo "RELEASE_TAG=beta" >> $GITHUB_ENV
 
       # Start Android
-      - name: Capacitor Copy
-        run: npx cap copy
+      - name: Capacitor Sync
+        run: npx cap sync
 
       - name: Make gradlew executable
         run: chmod +x ./android/gradlew
