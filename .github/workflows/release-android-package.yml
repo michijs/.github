@@ -22,6 +22,10 @@ on:
         description: "Build script to execute"
         type: string
         default: "build"
+      deploy-to-play-store:
+        description: "Deploy to Play Store"
+        type: boolean
+        default: true
     secrets:
       NPM_ACCESS_TOKEN:
         required: true
@@ -30,6 +34,8 @@ on:
       ANDROID_RELEASE_KEYSTORE:
         required: true
       ANDROID_RELEASE_KEYSTORE_PASSWORD:
+        required: true
+      SERVICE_ACCOUNT_JSON:
         required: true
 
 env:
@@ -100,10 +106,10 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./android/gradlew
 
-      - name: Build app bundle
+      - name: Build app bundle (AAB)
         run: cd android && ./gradlew bundle
 
-      - name: Build app apk
+      - name: Build app APK
         run: cd android && ./gradlew assembleRelease
 
       - name: Extract Android signing key from env
@@ -111,9 +117,33 @@ jobs:
           echo "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > android/release.jks.base64
           base64 -d android/release.jks.base64 > android/release.decrypted.jks
 
-      - name: Sign dev build
+      - name: Sign app bundle (AAB)
         run: jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/bundle/release/app-release-signed.aab ./android/app/build/outputs/bundle/release/app-release.aab release
 
+      - name: Sign app APK
+        run: jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/apk/app-release-signed.apk ./android/app/build/outputs/apk/app-release-unsigned.apk release
+      
+      - name: Create service_account.json
+        id: createServiceAccount
+        run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
+        
+      - name: Deploy to Play Store (production version)
+        if: startsWith(github.event.inputs.release-type, 'pre') != true && github.event.inputs.deploy-to-play-store
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: service_account.json
+          packageName: com.package
+          releaseFile: ./android/app/build/outputs/bundle/release/app-release-signed.aab
+          track: production
+          
+      - name: Deploy to Play Store (beta version)
+        if: startsWith(github.event.inputs.release-type, 'pre') && github.event.inputs.deploy-to-play-store
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJson: service_account.json
+          packageName: com.package
+          releaseFile: ./android/app/build/outputs/bundle/release/app-release-signed.aab
+          track: beta
       # End Android
 
       # Commit changes
@@ -136,7 +166,7 @@ jobs:
           body: ${{ github.event.inputs.release-notes }}
           prerelease: ${{ startsWith(github.event.inputs.release-type, 'pre') }}
           files: |
-            ./android/app/build/outputs/apk/debug/app-debug.apk
-            ./android/app/build/outputs/bundle/release/app-release.aab
+            ./android/app/build/outputs/apk/app-release-unsigned.apk
+            ./android/app/build/outputs/apk/app-release-signed.apk
             ./android/app/build/outputs/bundle/release/app-release.aab
             ./android/app/build/outputs/bundle/release/app-release-signed.aab
