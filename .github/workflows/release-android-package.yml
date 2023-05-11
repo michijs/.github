@@ -27,8 +27,6 @@ on:
         type: boolean
         default: true
     secrets:
-      NPM_ACCESS_TOKEN:
-        required: true
       GITHUB_ACCESS_TOKEN:
         required: true
       ANDROID_RELEASE_KEYSTORE:
