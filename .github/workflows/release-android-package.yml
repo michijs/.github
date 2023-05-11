@@ -119,7 +119,7 @@ jobs:
         run: jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/bundle/release/app-release-signed.aab ./android/app/build/outputs/bundle/release/app-release.aab release
 
       - name: Sign app APK
-        run: jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/apk/release/app-release-signed.apk ./android/app/build/outputs/apk/release/app-release.apk release
+        run: jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/apk/release/app-release-signed.apk ./android/app/build/outputs/apk/release/app-release-unsigned.apk release
       
       - name: Create service_account.json
         run: echo '${{ secrets.SERVICE_ACCOUNT_JSON }}' > service_account.json
@@ -161,6 +161,6 @@ jobs:
           prerelease: ${{ startsWith(github.event.inputs.release-type, 'pre') }}
           files: |
             ./android/app/build/outputs/apk/release/app-release.apk
-            ./android/app/build/outputs/apk/release/app-release-signed.apk
+            ./android/app/build/outputs/apk/release/app-release-unsigned.apk
             ./android/app/build/outputs/bundle/release/app-release.aab
             ./android/app/build/outputs/bundle/release/app-release-signed.aab
