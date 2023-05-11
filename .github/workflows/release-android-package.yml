@@ -25,7 +25,7 @@ on:
       deploy-to-play-store:
         description: "Deploy to Play Store"
         type: boolean
-        default: true
+        required: true
     secrets:
       GITHUB_ACCESS_TOKEN:
         required: true
