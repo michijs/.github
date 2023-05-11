@@ -135,7 +135,7 @@ jobs:
         with:
           serviceAccountJson: service_account.json
           packageName: ${{ env.ANDROID_PACKAGE_NAME }}
-          releaseFile: ./android/app/build/outputs/bundle/release/app-release-signed.aab
+          releaseFile: android/app/build/outputs/bundle/release/app-release-signed.aab
           track: ${{ env.RELEASE_TRACK }}
           
       # End Android
