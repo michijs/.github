@@ -127,7 +127,7 @@ jobs:
           echo "ANDROID_PACKAGE_NAME=$namespace" >> $GITHUB_ENV
         
       - name: Deploy to Play Store
-        if: github.event.inputs.deploy-to-play-store
+        if: fromJSON(github.event.inputs.deploy-to-play-store)
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
