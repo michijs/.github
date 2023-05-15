@@ -14,7 +14,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        PAGE: fromJSON("[${{ github.event.inputs.pages }}]")
+        PAGE: ${{fromJSON("[${{ github.event.inputs.pages }}]") }}
     steps:
       - name: Print page
         run: echo "${{ matrix.PAGE }}"
