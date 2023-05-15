@@ -19,11 +19,25 @@ jobs:
   take-screenshots:
     needs: convert-string-to-array
     runs-on: ubuntu-latest
-    name: "${{ matrix.PAGE }}"
+    name: "Take screenshot of ${{ matrix.PAGE }}"
     strategy:
       fail-fast: false
       matrix:
         PAGE: ${{fromJSON(needs.convert-string-to-array.outputs.ARRAY)}}
     steps:
-      - name: Print page
-        run: echo "${{ matrix.PAGE }}"
+      - name: install puppeteer-headful
+        uses: mujo-code/puppeteer-headful@master
+        env:
+          CI: 'true'
+      - name: Take screenshots
+        uses: flameddd/screenshots-ci-action@master
+        with:
+          url: ${{ matrix.PAGE }}
+          devices: iPhone 6,iPhone 6 landscape
+      - uses: actions/upload-artifact@v3
+        name: Upload screenshots
+        with:
+          path: screenshots
+          name: download-screenshots
+      - name: Clean
+        run: rm ./screenshots/*
