@@ -142,7 +142,7 @@ jobs:
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: ${{ env.ANDROID_PACKAGE_NAME }}
-          status: ${{github.event.inputs.STATUS}}
+          status: ${{ github.event.inputs.STATUS }}
           releaseFiles: android/app/build/outputs/bundle/release/app-release-signed.aab
           track: ${{ env.RELEASE_TRACK }}
           

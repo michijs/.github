@@ -1,0 +1,28 @@
+name: Take screenshots
+on:
+  workflow_dispatch:
+    inputs:
+      pages:
+        description: Provide the pages in stringified array format
+        required: true
+        type: string
+        default: "https://google.com/,https://github.com/"
+jobs:
+  convert-string-to-array:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Convert string to array
+        run: |
+          IFS=',' read -ra array <<< "${{ github.event.inputs.pages }}"
+          echo "ARRAY=${array[*]}" >> $GITHUB_ENV
+  take-screenshots:
+    needs: convert-string-to-array
+    runs-on: ubuntu-latest
+    name: "${{ matrix.PAGE }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        PAGE: ${{fromJSON( env.ARRAY )}}
+    steps:
+      - name: Print page
+        run: echo "${{ matrix.PAGE }}"
