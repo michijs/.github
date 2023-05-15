@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        PAGE: ${{ fromJson(needs.convert-string-to-array.outputs.ARRAY) }}
+        PAGE: ${{ needs.convert-string-to-array.outputs.ARRAY }}
     steps:
       - name: Print page
         run: echo "${{ matrix.PAGE }}"
