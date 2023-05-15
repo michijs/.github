@@ -8,13 +8,22 @@ on:
         type: string
         default: "https://google.com/,https://github.com/"
 jobs:
+  convert-string-to-array:
+    runs-on: ubuntu-latest
+    outputs:
+      ARRAY: ${{ steps.convert-string-to-array-step.outputs.ARRAY }}
+    steps:
+      - name: Convert string to array
+        id: convert-string-to-array-step
+        run: echo "ARRAY=$(echo "${{ github.event.inputs.pages }}" | jq -R 'split(",")')" >> "$GITHUB_OUTPUT"
   take-screenshots:
+    needs: convert-string-to-array
     runs-on: ubuntu-latest
     name: "${{ matrix.PAGE }}"
     strategy:
       fail-fast: false
       matrix:
-        PAGE: ${{fromJSON(format('[{0}]', github.event.inputs.pages)) }}
+        PAGE: ${{fromJSON(needs.convert-string-to-array.outputs.ARRAY)}}
     steps:
       - name: Print page
         run: echo "${{ matrix.PAGE }}"
