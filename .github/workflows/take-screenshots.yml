@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        PAGE: ${{fromJSON($ARRAY)}}
+        PAGE: ${{ fromJson(env.ARRAY) }}
     steps:
       - name: Print page
         run: echo "${{ matrix.PAGE }}"
