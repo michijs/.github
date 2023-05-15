@@ -10,11 +10,14 @@ on:
 jobs:
   convert-string-to-array:
     runs-on: ubuntu-latest
+    outputs:
+      ARRAY: ${{ steps.convert-string-to-array-step.outputs.ARRAY }}
     steps:
       - name: Convert string to array
+        id: convert-string-to-array-step
         run: |
           IFS=',' read -ra array <<< "${{ github.event.inputs.pages }}"
-          echo "ARRAY=${array[*]}" >> $GITHUB_ENV
+          echo "ARRAY=${array[*]}" >> "$GITHUB_OUTPUT"
   take-screenshots:
     needs: convert-string-to-array
     runs-on: ubuntu-latest
@@ -22,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        PAGE: ${{ fromJson(env.ARRAY) }}
+        PAGE: ${{ fromJson(needs.convert-string-to-array.outputs.ARRAY) }}
     steps:
       - name: Print page
         run: echo "${{ matrix.PAGE }}"
