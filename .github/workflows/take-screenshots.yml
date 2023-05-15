@@ -26,11 +26,11 @@ jobs:
         PAGE: ${{fromJSON(needs.convert-string-to-array.outputs.ARRAY)}}
     steps:
       - name: install puppeteer-headful
-        uses: mujo-code/puppeteer-headful@master
+        uses: mujo-code/puppeteer-headful@16.6.0
         env:
           CI: 'true'
       - name: Take screenshots
-        uses: flameddd/screenshots-ci-action@master
+        uses: flameddd/screenshots-ci-action@v2.0.0
         with:
           url: ${{ matrix.PAGE }}
           devices: iPhone 6,iPhone 6 landscape
