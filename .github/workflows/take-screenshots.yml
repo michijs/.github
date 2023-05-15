@@ -17,7 +17,7 @@ jobs:
         id: convert-string-to-array-step
         run: |
           IFS=',' read -ra array <<< "${{ github.event.inputs.pages }}"
-          echo "ARRAY=${array[*]}" >> "$GITHUB_OUTPUT"
+          echo "ARRAY=$(jq -n --argjson array "${array[*]}" '$array')" >> "$GITHUB_OUTPUT"
   take-screenshots:
     needs: convert-string-to-array
     runs-on: ubuntu-latest
@@ -25,7 +25,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        PAGE: ${{ needs.convert-string-to-array.outputs.ARRAY }}
+        PAGE: ${{ fromJson(needs.convert-string-to-array.outputs.ARRAY) }}
     steps:
       - name: Print page
         run: echo "${{ matrix.PAGE }}"
