@@ -116,10 +116,10 @@ jobs:
           base64 -d android/release.jks.base64 > android/release.decrypted.jks
 
       - name: Sign app bundle (AAB)
-        run: jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/bundle/release/app-release-signed.aab ./android/app/build/outputs/bundle/release/app-release.aab release
+        run: jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/bundle/release/app-release-signed.aab ./android/app/build/outputs/bundle/release/app-release.aab play_store
 
       - name: Sign app APK
-        run: jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/apk/release/app-release-signed.apk ./android/app/build/outputs/apk/release/app-release-unsigned.apk release
+        run: jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/apk/release/app-release-signed.apk ./android/app/build/outputs/apk/release/app-release-unsigned.apk play_store
 
       - name: Get Package Name
         run: |
