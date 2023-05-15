@@ -2,6 +2,16 @@ name: Release Android package
 on:
   workflow_call:
     inputs:
+      status: 
+        description: "Release status"
+        type: string
+        default: "completed"
+        # type: choice
+        # options:
+        #   - completed
+        #   - inProgress
+        #   - halted
+        #   - draft
       release-type:
         description: "Release type"
         required: true
@@ -132,6 +142,7 @@ jobs:
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: ${{ env.ANDROID_PACKAGE_NAME }}
+          status: ${{env.STATUS}}
           releaseFiles: android/app/build/outputs/bundle/release/app-release-signed.aab
           track: ${{ env.RELEASE_TRACK }}
           
