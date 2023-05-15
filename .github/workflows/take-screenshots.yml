@@ -8,24 +8,13 @@ on:
         type: string
         default: "https://google.com/,https://github.com/"
 jobs:
-  convert-string-to-array:
-    runs-on: ubuntu-latest
-    outputs:
-      ARRAY: ${{ steps.convert-string-to-array-step.outputs.ARRAY }}
-    steps:
-      - name: Convert string to array
-        id: convert-string-to-array-step
-        run: |
-          IFS=',' read -ra array <<< "${{ github.event.inputs.pages }}"
-          echo "ARRAY=$(jq -n --argjson array "${array[*]}" '$array')" >> "$GITHUB_OUTPUT"
   take-screenshots:
-    needs: convert-string-to-array
     runs-on: ubuntu-latest
     name: "${{ matrix.PAGE }}"
     strategy:
       fail-fast: false
       matrix:
-        PAGE: ${{ needs.convert-string-to-array.outputs.ARRAY }}
+        PAGE: fromJSON("[${{ github.event.inputs.pages }}]")
     steps:
       - name: Print page
         run: echo "${{ matrix.PAGE }}"
