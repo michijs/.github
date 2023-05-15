@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Convert string to array
         id: convert-string-to-array-step
-        run: ARRAY=$(echo "${{ github.event.inputs.pages }}" | jq -R 'split(",")') >> "$GITHUB_OUTPUT"
+        run: echo ARRAY=$(echo "${{ github.event.inputs.pages }}" | jq -R 'split(",")') >> "$GITHUB_OUTPUT"
   take-screenshots:
     needs: convert-string-to-array
     runs-on: ubuntu-latest
