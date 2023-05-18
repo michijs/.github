@@ -36,7 +36,9 @@ jobs:
           devices: iPhone 6,iPhone 6 landscape
           type: png
       - name: Get artifact name
-        run: echo "ARTIFACT_NAME=$(echo '${{matrix.PAGE}}' | base64)" >> $GITHUB_ENV
+        run: |
+          filename=$(basename "${{matrix.PAGE}}")
+          echo "ARTIFACT_NAME=$(echo "$filename" | tr -d '/:?')" >> $GITHUB_ENV
       - uses: actions/upload-artifact@v3
         name: Upload screenshots
         with:
