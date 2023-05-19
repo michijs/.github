@@ -69,6 +69,7 @@ jobs:
           git push origin --delete ${{ github.ref }}_lint || true
 
       - name: Create new branch
+        if: env.CHANGES_DETECTED == 'true'
         run: git checkout -b ${{ github.ref }}_lint
 
       - name: Commit changes
