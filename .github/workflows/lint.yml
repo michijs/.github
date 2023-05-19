@@ -69,13 +69,18 @@ jobs:
       - name: Create pull request
         if: env.CHANGES_DETECTED == 'true'
         run: |
-            ERROR=$(rome check --json . 2>&1 || true)
             gh pr create -B ${{ github.ref }} -H ${{ github.ref }}_lint --title 'Linting changes' --body "This pull request includes linting changes based on the target branch.
 
-            Please review and merge if everything looks good.
+            Please review and merge if everything looks good."
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
 
-            Additional errors:
-            ${ERROR}
-            "
+      - name: Add comment to pull request
+        if: env.CHANGES_DETECTED == 'true'
+        run: |
+          ERROR=$(rome check --json . 2>&1 || true)
+          PR_NUMBER=$(gh pr list -B ${{ github.ref }} -H ${{ github.ref }}_lint --json number --limit 1 | jq -r '.[0].number')
+          gh pr comment $PR_NUMBER --body "Additional errors:
+          ${ERROR}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
