@@ -75,7 +75,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
 
-      - name: Add comment to pull request
+      - name: Add comment to pull request with additional errors
         if: env.CHANGES_DETECTED == 'true'
         run: |
           ERROR=$(rome check --json . 2>&1 || true)
