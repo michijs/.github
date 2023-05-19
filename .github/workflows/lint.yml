@@ -35,7 +35,7 @@ jobs:
 
       - name: Save rome errors
         run: |
-          ERROR="rome check . 2>&1"
+          ERROR=$(rome check . 2>&1)
           echo "ERROR=${ERROR}" >> $GITHUB_ENV
 
       - name: Clean Rome config file
