@@ -33,10 +33,10 @@ jobs:
       - name: Run Rome check
         run: rome check --apply . || true
 
-      - name: Save rome errors
-        id: save-rome-errors
-        run: echo "ERROR=$(rome check --json . 2>&1 || true)" >> $GITHUB_OUTPUT
-
+      - name: Show additional Rome errors
+        id: show-additional-rome-errors
+        run: rome check --json . 2>&1 || true
+        
       - name: Clean Rome config file
         run: rm rome.json
 
@@ -78,6 +78,6 @@ jobs:
             Please review and merge if everything looks good.
 
             Additional errors:
-            ${{ steps.save-rome-errors.outputs.ERROR }}'
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}#step:show-additional-rome-errors
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
