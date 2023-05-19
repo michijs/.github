@@ -1,0 +1,79 @@
+name: Lint
+on:
+  workflow_call:
+    secrets:
+      GITHUB_ACCESS_TOKEN:
+        required: true
+
+jobs:
+  Run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          # We must fetch at least the immediate parents so that if this is
+          # a pull request then we can checkout the head.
+          fetch-depth: 2
+
+      # Configure Git
+      - name: Git configuration
+        run: |
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "GitHub Actions"
+      
+      - name: Delete existing branch (if exists)
+        run: |
+          git push origin --delete ${{ github.ref }}_lint || true
+
+      - name: Create new branch
+        run: git checkout -b ${{ github.ref }}_lint
+
+      - name: Setup Rome
+        uses: rome/setup-rome@v0.4
+        with:
+          version: latest 
+
+      - name: Import Rome config file
+        run: |
+              echo '{ "$schema": "https://raw.githubusercontent.com/michijs/.github/main/rome.json" }' > rome.json
+
+      - name: Run Rome check
+        run: rome check --apply-unsafe .
+
+      - name: Clean Rome config file
+        run: rm rome.json
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          if git diff-index --quiet HEAD --; then
+            echo "No changes detected. Skipping next steps."
+            exit 78
+          fi
+
+      - name: Commit changes
+        if: steps.check_changes.outcome != 'skipped'
+        run: |
+          git add .
+          git commit -m "Linting changes"
+
+      - name: Push changes
+        if: steps.check_changes.outcome != 'skipped'
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          branch: ${{ github.ref }}_lint
+
+      - name: Create pull request
+        if: steps.check_changes.outcome != 'skipped'
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          branch: ${{ github.ref }}_lint
+          title: Linting changes
+          body: |
+            This pull request includes linting changes based on the target branch.
+
+            Please review and merge if everything looks good.
+          base: ${{ github.ref }}
