@@ -21,6 +21,7 @@
         "useSimplifiedLogicExpression": "off"
       },
       "suspicious": {
+        "noAssignInExpressions": "off",
         "noExplicitAny": "off",
         "noDoubleEquals": "off"
       },
