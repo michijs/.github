@@ -72,12 +72,18 @@ jobs:
           github_token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
           branch: ${{ github.ref }}_lint
 
+      - name: Remove prefix from branch name
+        run: |
+          BRANCH_NAME="${{ github.ref }}"
+          BRANCH_NAME="${BRANCH_NAME/refs\/heads\//}"
+          echo "Branch name without prefix: $BRANCH_NAME" >> $GITHUB_ENV
+
       - name: Create pull request
         if: env.CHANGES_DETECTED == 'true'
         uses: peter-evans/create-pull-request@v5.0.1
         with:
           token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
-          branch: ${{ github.ref }}_lint
+          branch: ${{ env.BRANCH_NAME }}_lint
           title: Linting changes
           body: |
             This pull request includes linting changes based on the target branch.
@@ -86,3 +92,4 @@ jobs:
 
             Additional errors:
             ${{ env.ERRORS }}
+          base: ${{ env.BRANCH_NAME }}
