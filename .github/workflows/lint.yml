@@ -44,6 +44,7 @@ jobs:
         run: |
           ERRORS=$(rome check --json . 2>&1)
           echo "ERRORS=${ERRORS}" >> $GITHUB_ENV
+        continue-on-error: true
 
       - name: Clean Rome config file
         run: rm rome.json
