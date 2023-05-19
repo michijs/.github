@@ -79,7 +79,7 @@ jobs:
         if: env.CHANGES_DETECTED == 'true'
         run: |
           ERROR=$(rome check --json . 2>&1 || true)
-          PR_NUMBER=$(gh pr list -B ${{ github.ref }} -H ${{ github.ref }}_lint --json number --limit 1 | jq -r '.[0].number')
+          PR_NUMBER=$(gh pr view -B ${{ github.ref }}_lint --json number | jq -r '.number')
           gh pr comment $PR_NUMBER --body "Additional errors:
           ${ERROR}"
         env:
