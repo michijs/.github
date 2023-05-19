@@ -73,7 +73,10 @@ jobs:
 
             Please review and merge if everything looks good.")
             ERROR=$(rome check --json . 2>&1 || true)
-            gh pr comment $PR_URL --body "Additional errors:
-            ${ERROR}"
+            gh pr comment $PR_URL --body "
+            <details>
+              <summary>Additional errors:</summary>
+              ${ERROR}
+            </details>"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
