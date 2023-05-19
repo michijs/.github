@@ -72,7 +72,7 @@ jobs:
             PR_URL=$(gh pr create -B ${{ github.ref }} -H ${{ github.ref }}_lint --title 'Linting changes' --body "This pull request includes linting changes based on the target branch.
 
             Please review and merge if everything looks good." | awk '{print $4}')
-            PR_NUMBER=$(basename $PR_URL)
+            PR_NUMBER=$(echo "${PR_URL}" | sed -n 's|.*/pull/\([0-9]\+\).*|\1|p')
             ERROR=$(rome check --json . 2>&1 || true)
             gh pr comment $PR_NUMBER --body "Additional errors:
             ${ERROR}"
