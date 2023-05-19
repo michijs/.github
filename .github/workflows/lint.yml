@@ -30,14 +30,32 @@ jobs:
       - name: Import Rome config file
         run: wget -O rome.json https://raw.githubusercontent.com/michijs/.github/main/rome.json
 
+      - name: Run Rome format
+        run: rome format --write --json .
+
+      - name: Check for changes
+        run: |
+          if git diff-index --quiet HEAD --; then
+            echo "No changes detected. Skipping next format steps."
+          else
+            echo "Changes detected. Proceeding with next steps."
+            echo "FORMAT_CHANGES_DETECTED=true" >> $GITHUB_ENV
+          fi
+
+      - name: Commit changes
+        if: env.FORMAT_CHANGES_DETECTED == 'true'
+        run: |
+          git add .
+          git commit -m "Format changes"
+
+      - name: Push changes
+        if: env.FORMAT_CHANGES_DETECTED == 'true'
+        run: git push origin
+
       - name: Run Rome check
         run: rome check --apply . || true
 
-      - name: Clean Rome config file
-        run: rm rome.json
-
       - name: Check for changes
-        id: check_changes
         run: |
           if git diff-index --quiet HEAD --; then
             echo "No changes detected. Skipping next steps."
