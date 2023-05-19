@@ -51,26 +51,26 @@ jobs:
         run: |
           if git diff-index --quiet HEAD --; then
             echo "No changes detected. Skipping next steps."
-            exit 0
           else
             echo "Changes detected. Proceeding with next steps."
+            echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
           fi
 
       - name: Commit changes
-        if: steps.check_changes.outcome != 'skipped'
+        if: env.CHANGES_DETECTED == 'true'
         run: |
           git add .
           git commit -m "Linting changes"
 
       - name: Push changes
-        if: steps.check_changes.outcome != 'skipped'
+        if: env.CHANGES_DETECTED == 'true'
         uses: ad-m/github-push-action@v0.6.0
         with:
           github_token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
           branch: ${{ github.ref }}_lint
 
       - name: Create pull request
-        if: steps.check_changes.outcome != 'skipped'
+        if: env.CHANGES_DETECTED == 'true'
         uses: peter-evans/create-pull-request@v3
         with:
           token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
