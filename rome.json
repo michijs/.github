@@ -11,6 +11,7 @@
     "enabled": true
   },
   "linter": {
+    "ignore": ["**/*.json"],
     "enabled": true,
     "rules": {
       "a11y": {
