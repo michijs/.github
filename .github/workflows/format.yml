@@ -34,8 +34,8 @@ jobs:
       - name: Run Rome format
         run: rome format --write --json .
 
-      # - name: Clean Rome config file
-      #   run: rm rome.json
+      - name: Clean Rome config file
+        run: rm rome.json
 
       - name: Check for changes
         id: check_changes
@@ -56,4 +56,3 @@ jobs:
         uses: ad-m/github-push-action@v0.6.0
         with:
           github_token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
-          branch: ${{ github.ref }}_lint
