@@ -16,6 +16,7 @@ jobs:
       - name: Convert string to array
         id: convert-string-to-array-step
         run: echo ARRAY=$(echo "${{ github.event.inputs.pages }}" | jq -R 'split(",")') >> "$GITHUB_OUTPUT"
+        
   take-screenshots:
     needs: convert-string-to-array
     runs-on: ubuntu-latest
@@ -29,18 +30,21 @@ jobs:
         uses: mujo-code/puppeteer-headful@16.6.0
         env:
           CI: 'true'
+
       - name: Take screenshots
         uses: flameddd/screenshots-ci-action@v2.0.0
         with:
           url: ${{ matrix.PAGE }}
           devices: iPhone 6,iPhone 6 landscape
           type: png
+
       - name: Get artifact name
         run: |
           filename=$(basename "${{matrix.PAGE}}")
           echo "ARTIFACT_NAME=$(echo "$filename" | tr -d '/:?')" >> $GITHUB_ENV
-      - uses: actions/upload-artifact@v3
-        name: Upload screenshots
+
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v3
         with:
           path: screenshots
           name: "Screenshot_${{ env.ARTIFACT_NAME }}"
