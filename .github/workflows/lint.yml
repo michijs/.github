@@ -75,7 +75,7 @@ jobs:
       - name: Remove prefix from branch name
         run: |
           BRANCH_NAME="${{ github.ref }}"
-          echo 'BRANCH_NAME="${BRANCH_NAME/refs\/heads\//}' >> $GITHUB_ENV
+          echo 'BRANCH_NAME="${BRANCH_NAME/refs\/heads\//}"' >> $GITHUB_ENV
 
       - name: Create pull request
         if: env.CHANGES_DETECTED == 'true'
