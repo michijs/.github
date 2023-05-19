@@ -36,10 +36,7 @@ jobs:
       - name: Save rome errors
         run: |
           ERROR=$(rome check --json . 2>&1 || true)
-          ERROR="${ERROR//'%'/'%25'}"
-          ERROR="${ERROR//$'\n'/'%0A'}"
-          ERROR="${ERROR//$'\r'/'%0D'}"
-          echo "ERROR=${ERROR}" >> $GITHUB_ENV
+          echo "ERROR=${ERROR//'%'/'%25'}" >> $GITHUB_ENV
 
       - name: Clean Rome config file
         run: rm rome.json
