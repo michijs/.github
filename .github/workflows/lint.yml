@@ -39,7 +39,7 @@ jobs:
               echo '{ "$schema": "https://raw.githubusercontent.com/michijs/.github/main/rome.json" }' > rome.json
 
       - name: Run Rome check
-        run: rome check --apply-unsafe .
+        run: rome check --apply-unsafe --json .
 
       - name: Clean Rome config file
         run: rm rome.json

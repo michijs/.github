@@ -32,7 +32,7 @@ jobs:
               echo '{ "$schema": "https://raw.githubusercontent.com/michijs/.github/main/rome.json" }' > rome.json
 
       - name: Run Rome format
-        run: rome format --write .
+        run: rome format --write --json .
 
       - name: Clean Rome config file
         run: rm rome.json
