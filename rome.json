@@ -15,7 +15,8 @@
     "enabled": true,
     "rules": {
       "a11y": {
-        "useValidAnchor": "off"
+        "useValidAnchor": "off",
+        "useButtonType": "off"
       },
       "complexity": {
         "useSimplifiedLogicExpression": "off"
@@ -28,7 +29,11 @@
       "style": {
         "useSingleVarDeclarator": "off",
         "useBlockStatements": "off",
+        "noNonNullAssertion ": "off",
         "noImplicitBoolean": "off"
+      },
+      "correctness": {
+        "noUnreachableSuper": "off"
       },
       "performance": {
         "noDelete": "off"
