@@ -61,7 +61,7 @@ jobs:
 
       - name: Push changes
         if: env.CHANGES_DETECTED == 'true'
-        run: git push -u origin head
+        run: git push -u origin ${{ github.ref }}_lint
 
       - name: Create pull request
         if: env.CHANGES_DETECTED == 'true'
