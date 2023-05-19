@@ -38,7 +38,10 @@ jobs:
         run: wget -O rome.json https://raw.githubusercontent.com/michijs/.github/main/rome.json
 
       - name: Run Rome check
-        run: rome check --apply-unsafe --json .
+        run: rome check --apply-unsafe . || true
+
+      - name: Show rome errors
+        run: rome check --json .
 
       - name: Clean Rome config file
         run: rm rome.json
