@@ -34,7 +34,9 @@ jobs:
         run: rome check --apply . || true
 
       - name: Save rome errors
-        run: echo 'ERROR=$(rome check --json . || true)' >> $GITHUB_ENV
+        run: |
+          ERROR="rome check . 2>&1"
+          echo "ERROR=${ERROR}" >> $GITHUB_ENV
 
       - name: Clean Rome config file
         run: rm rome.json
