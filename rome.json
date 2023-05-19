@@ -29,7 +29,7 @@
       "style": {
         "useSingleVarDeclarator": "off",
         "useBlockStatements": "off",
-        "noNonNullAssertion ": "off",
+        "noNonNullAssertion": "off",
         "noImplicitBoolean": "off"
       },
       "correctness": {
