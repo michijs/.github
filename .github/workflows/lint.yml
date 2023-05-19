@@ -40,8 +40,10 @@ jobs:
       - name: Run Rome check
         run: rome check --apply-unsafe . || true
 
-      - name: Show rome errors
-        run: echo "ERRORS=$(rome check --json .)" >> $GITHUB_ENV
+      - name: Save rome errors
+        run: |
+          ERRORS=$(rome check --json . 2>&1)
+          echo "ERRORS=${ERRORS}" >> $GITHUB_ENV
 
       - name: Clean Rome config file
         run: rm rome.json
