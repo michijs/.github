@@ -35,8 +35,7 @@ jobs:
           version: latest 
 
       - name: Import Rome config file
-        run: |
-              echo '{ "$schema": "https://raw.githubusercontent.com/michijs/.github/main/rome.json" }' > rome.json
+        run: wget -O rome.json https://raw.githubusercontent.com/michijs/.github/main/rome.json
 
       - name: Run Rome check
         run: rome check --apply-unsafe --json .
