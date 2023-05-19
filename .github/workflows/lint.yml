@@ -35,7 +35,7 @@ jobs:
 
       - name: Save rome errors
         id: save-rome-errors
-        run: echo ERROR=$(rome check --json . 2>&1 || true)
+        run: echo "ERROR=$(rome check --json . 2>&1 || true)" >> $GITHUB_OUTPUT
 
       - name: Clean Rome config file
         run: rm rome.json
