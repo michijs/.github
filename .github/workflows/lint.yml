@@ -86,4 +86,3 @@ jobs:
 
             Additional errors:
             ${{ env.ERRORS }}
-          base: ${{ github.base_ref }}
