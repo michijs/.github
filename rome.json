@@ -1,10 +1,15 @@
 {
   "formatter": {
+    "ignore": ["*.json"],
     "enabled": true,
     "indentStyle": "space",
     "indentSize": 2
   },
+  "organizeImports": {
+    "enabled": true
+  },
   "linter": {
+    "ignore": ["*.json"],
     "enabled": true,
     "rules": {
       "a11y": {

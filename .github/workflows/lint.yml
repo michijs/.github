@@ -41,7 +41,7 @@ jobs:
         run: rome check --apply-unsafe . || true
 
       - name: Show rome errors
-        run: rome check --json .
+        run: echo "ERRORS=$(rome check --json .)" >> $GITHUB_ENV
 
       - name: Clean Rome config file
         run: rm rome.json
@@ -51,7 +51,9 @@ jobs:
         run: |
           if git diff-index --quiet HEAD --; then
             echo "No changes detected. Skipping next steps."
-            exit 78
+            exit 0
+          else
+            echo "Changes detected. Proceeding with next steps."
           fi
 
       - name: Commit changes
@@ -78,4 +80,7 @@ jobs:
             This pull request includes linting changes based on the target branch.
 
             Please review and merge if everything looks good.
+
+            Additional errors:
+            ${{ env.ERRORS }}
           base: ${{ github.ref }}
