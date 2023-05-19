@@ -75,7 +75,7 @@ jobs:
       - name: Create pull request
         if: env.CHANGES_DETECTED == 'true'
         run: |
-            gh pr create -B ${{ github.ref }} -H ${{ env.BRANCH_NAME }}_lint --title 'Linting changes' --body 'This pull request includes linting changes based on the target branch.
+            gh pr create -B ${{ github.ref }} -H ${{ github.ref }}_lint --title 'Linting changes' --body 'This pull request includes linting changes based on the target branch.
 
             Please review and merge if everything looks good.
 
