@@ -118,7 +118,7 @@ jobs:
         run: cd android && ./gradlew bundle
 
       - name: Build app APK
-        run: cd android && ./gradlew assembleRelease
+        run: cd android && ./gradlew assembleDebug
 
       - name: Extract Android signing key from env
         run: |
@@ -129,7 +129,7 @@ jobs:
         run: jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/bundle/release/app-release-signed.aab ./android/app/build/outputs/bundle/release/app-release.aab play_store
 
       - name: Sign app APK
-        run: jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/apk/release/app-release-signed.apk ./android/app/build/outputs/apk/release/app-release-unsigned.apk play_store
+        run: jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/apk/debug/app-debug-signed.apk ./android/app/build/outputs/apk/debug/app-debug.apk play_store
 
       - name: Get Package Name
         run: |
@@ -174,7 +174,7 @@ jobs:
           body: ${{ github.event.inputs.release-notes }}
           prerelease: ${{ startsWith(github.event.inputs.release-type, 'pre') }}
           files: |
-            ./android/app/build/outputs/apk/release/app-release-signed.apk
-            ./android/app/build/outputs/apk/release/app-release-unsigned.apk
+            ./android/app/build/outputs/apk/debug/app-debug-signed.apk
+            ./android/app/build/outputs/apk/debug/app-debug.apk
             ./android/app/build/outputs/bundle/release/app-release.aab
             ./android/app/build/outputs/bundle/release/app-release-signed.aab
