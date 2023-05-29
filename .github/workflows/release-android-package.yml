@@ -81,16 +81,12 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      # Build
-      - name: Build
-        run: npm run ${{ inputs.dist-script }}
-
       # Configure Git
       - name: Git configuration
         run: |
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "GitHub Actions"
-
+  
       # Bump package version
       # Use tag latest
       - name: Bump release version
@@ -98,7 +94,7 @@ jobs:
         run: |
           echo "NEW_VERSION=$(npm --no-git-tag-version version $RELEASE_TYPE)" >> $GITHUB_ENV
           echo "RELEASE_TRACK=production" >> $GITHUB_ENV
-
+  
       # Bump package pre-release version
       # Use tag beta for pre-release versions
       - name: Bump pre-release version
@@ -106,6 +102,10 @@ jobs:
         run: |
           echo "NEW_VERSION=$(npm --no-git-tag-version --preid=beta version $RELEASE_TYPE)" >> $GITHUB_ENV
           echo "RELEASE_TRACK=beta" >> $GITHUB_ENV
+
+      # Build
+      - name: Build
+        run: npm run ${{ inputs.dist-script }}
 
       # Start Android
       - name: Capacitor Sync
