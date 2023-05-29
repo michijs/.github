@@ -27,7 +27,7 @@ jobs:
         PAGE: ${{fromJSON(needs.convert-string-to-array.outputs.ARRAY)}}
     steps:
       - name: install puppeteer-headful
-        uses: mujo-code/puppeteer-headful@16.6.0
+        uses: mujo-code/puppeteer-headful@18.9.0
         env:
           CI: 'true'
 
