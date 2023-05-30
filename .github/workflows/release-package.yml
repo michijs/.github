@@ -30,6 +30,7 @@ on:
 
 env:
   RELEASE_TYPE: ${{ github.event.inputs.release-type }}
+  NPM_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
 
 jobs:
   Release:
