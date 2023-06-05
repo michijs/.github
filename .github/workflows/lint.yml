@@ -51,6 +51,8 @@ jobs:
       - name: Push changes
         if: env.FORMAT_CHANGES_DETECTED == 'true'
         run: git push origin
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Rome check
         run: rome check --apply . || true
