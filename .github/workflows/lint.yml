@@ -1,9 +1,6 @@
 name: Lint
 on:
   workflow_call:
-    secrets:
-      GITHUB_ACCESS_TOKEN:
-        required: true
 
 jobs:
   Run:
@@ -64,13 +61,21 @@ jobs:
             echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
           fi
 
+      - name: Remove refs/heads prefix from github.ref (if exists)
+        run: |
+          if [[ ${{ github.ref }} == refs/heads/* ]]; then
+            echo "BRANCH_NAME=${{ github.ref}}#refs/heads/" >> $GITHUB_ENV
+          else
+            echo "BRANCH_NAME=${{ github.ref}}" >> $GITHUB_ENV
+          fi
+
       - name: Delete existing branch (if exists)
         run: |
-          git push origin --delete ${{ github.ref }}_lint || true
+          git push origin --delete ${{ env.BRANCH_NAME }}_lint || true
 
       - name: Create new branch
         if: env.CHANGES_DETECTED == 'true'
-        run: git checkout -b ${{ github.ref }}_lint
+        run: git checkout -b ${{ env.BRANCH_NAME }}_lint
 
       - name: Commit changes
         if: env.CHANGES_DETECTED == 'true'
@@ -82,14 +87,14 @@ jobs:
         if: env.CHANGES_DETECTED == 'true'
         uses: ad-m/github-push-action@v0.6.0
         with:
-          github_token: ${{ secrets.GITHUB_ACCESS_TOKEN }}
-          branch: ${{ github.ref }}_lint
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ env.BRANCH_NAME }}_lint
 
       - name: Create pull request
         if: env.CHANGES_DETECTED == 'true'
         run: |
             SUGGESTIONS=$(rome check --json . 2>&1 || true)
-            gh pr create -B ${{ github.ref }} -H ${{ github.ref }}_lint --title 'Linting changes' --body "This pull request includes linting changes based on the target branch.
+            gh pr create -B ${{ env.BRANCH_NAME }} -H ${{ env.BRANCH_NAME }}_lint --title 'Linting changes' --body "This pull request includes linting changes based on the target branch.
 
             Please review and merge if everything looks good.
             
@@ -99,4 +104,4 @@ jobs:
             </details>
             "
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
