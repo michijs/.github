@@ -23,7 +23,7 @@ jobs:
           git config --global user.name "GitHub Actions"
       
       - name: Setup Rome
-        uses: rome/setup-rome@v0.4
+        uses: rome/setup-rome@v0.5
         with:
           version: latest 
 
