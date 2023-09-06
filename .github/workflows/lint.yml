@@ -66,7 +66,7 @@ jobs:
       - name: Remove refs/heads prefix from github.ref (if exists)
         run: |
           if [[ ${{ github.ref }} == refs/heads/* ]]; then
-            echo "BRANCH_NAME=${{ github.ref }} | cut -c 12"- >> $GITHUB_ENV
+            echo "BRANCH_NAME=${{ github.ref }}" | cut -c 12 >> $GITHUB_ENV
           else
             echo "BRANCH_NAME=${{ github.ref }}" >> $GITHUB_ENV
           fi
