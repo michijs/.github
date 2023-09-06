@@ -30,6 +30,8 @@ on:
 
 env:
   RELEASE_TYPE: ${{ github.event.inputs.release-type }}
+  NPM_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
+  NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
 
 jobs:
   Release:

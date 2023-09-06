@@ -20,7 +20,7 @@ jobs:
           git config --global user.name "GitHub Actions"
       
       - name: Setup Rome
-        uses: rome/setup-rome@v0.4
+        uses: rome/setup-rome@v0.5
         with:
           version: latest 
 
@@ -48,6 +48,8 @@ jobs:
       - name: Push changes
         if: env.FORMAT_CHANGES_DETECTED == 'true'
         run: git push origin
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Rome check
         run: rome check --apply . || true
