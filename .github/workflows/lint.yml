@@ -22,16 +22,14 @@ jobs:
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "GitHub Actions"
       
-      - name: Setup Rome
-        uses: rome/setup-rome@v0.5
-        with:
-          version: latest 
+      - name: Setup Biome
+        run: npm i -g @biomejs/biome
 
-      - name: Import Rome config file
-        run: wget -O rome.json https://raw.githubusercontent.com/michijs/.github/main/rome.json
+      - name: Import Biome config file
+        run: wget -O biome.json https://raw.githubusercontent.com/michijs/.github/main/biome.json
 
-      - name: Run Rome format
-        run: rome format --write --json .
+      - name: Run Biome format
+        run: biome format --write --json .
 
       - name: Check for changes
         run: |
@@ -54,8 +52,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run Rome check
-        run: rome check --apply . || true
+      - name: Run Biome check
+        run: biome check --apply . || true
 
       - name: Check for changes
         run: |
@@ -99,7 +97,7 @@ jobs:
       - name: Create pull request
         if: env.CHANGES_DETECTED == 'true'
         run: |
-            SUGGESTIONS=$(rome check --json . 2>&1 || true)
+            SUGGESTIONS=$(biome check --json . 2>&1 || true)
             gh pr create -B ${{ env.BRANCH_NAME }} -H ${{ env.BRANCH_NAME }}_lint --title 'Linting changes' --body "This pull request includes linting changes based on the target branch.
 
             Please review and merge if everything looks good.
