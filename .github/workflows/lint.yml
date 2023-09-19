@@ -81,6 +81,10 @@ jobs:
         if: env.CHANGES_DETECTED == 'true'
         run: git checkout -b ${{ env.BRANCH_NAME }}_lint
 
+      - name: Remove biome file
+        if: env.CHANGES_DETECTED == 'true'
+        run: rm biome.json
+
       - name: Commit changes
         if: env.CHANGES_DETECTED == 'true'
         run: |
