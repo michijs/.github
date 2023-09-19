@@ -62,7 +62,6 @@ jobs:
         run: biome check --apply . || true
 
       - name: Remove biome file
-        if: env.CHANGES_DETECTED == 'true'
         run: rm biome.json
 
       - name: Check for changes
