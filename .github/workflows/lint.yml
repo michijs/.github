@@ -31,6 +31,9 @@ jobs:
       - name: Run Biome format
         run: biome format --write --json .
 
+      - name: Remove biome file
+        run: rm biome.json
+
       - name: Check for changes
         run: |
           if git diff-index --quiet HEAD --; then
@@ -52,8 +55,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Import Biome config file
+        run: wget -O biome.json https://raw.githubusercontent.com/michijs/.github/main/biome.json
+
       - name: Run Biome check
         run: biome check --apply . || true
+
+      - name: Remove biome file
+        if: env.CHANGES_DETECTED == 'true'
+        run: rm biome.json
 
       - name: Check for changes
         run: |
@@ -80,10 +90,6 @@ jobs:
       - name: Create new branch
         if: env.CHANGES_DETECTED == 'true'
         run: git checkout -b ${{ env.BRANCH_NAME }}_lint
-
-      - name: Remove biome file
-        if: env.CHANGES_DETECTED == 'true'
-        run: rm biome.json
 
       - name: Commit changes
         if: env.CHANGES_DETECTED == 'true'
