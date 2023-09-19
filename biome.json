@@ -8,7 +8,7 @@
     "indentSize": 2
   },
   "organizeImports": {
-    "enabled": true
+    "enabled": false
   },
   "linter": {
     "ignore": ["**/*.json"],
