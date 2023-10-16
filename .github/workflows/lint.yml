@@ -98,7 +98,7 @@ jobs:
 
       - name: Push changes
         if: env.CHANGES_DETECTED == 'true'
-        uses: ad-m/github-push-action@v0.6.0
+        uses: ad-m/github-push-action@v0.8.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ env.BRANCH_NAME }}_lint
