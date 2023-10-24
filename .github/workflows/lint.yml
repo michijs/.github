@@ -51,9 +51,9 @@ jobs:
 
       - name: Push changes
         if: env.FORMAT_CHANGES_DETECTED == 'true'
-        run: git push origin
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: ad-m/github-push-action@v0.8.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Import Biome config file
         run: wget -O biome.json https://raw.githubusercontent.com/michijs/.github/main/biome.json
