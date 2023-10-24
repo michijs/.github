@@ -34,6 +34,15 @@ jobs:
       - name: Remove biome file
         run: rm biome.json
 
+      - name: Remove refs/heads prefix from github.ref (if exists)
+        run: |
+          if [[ ${{ github.ref }} == refs/heads/* ]]; then
+            BRANCH_NAME=$(echo "${{ github.ref }}" | cut -c 12-)
+            echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+          else
+            echo "BRANCH_NAME=${{ github.ref }}" >> $GITHUB_ENV
+          fi
+
       - name: Check for changes
         run: |
           if git diff-index --quiet HEAD --; then
@@ -72,15 +81,6 @@ jobs:
           else
             echo "Changes detected. Proceeding with next steps."
             echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
-          fi
-
-      - name: Remove refs/heads prefix from github.ref (if exists)
-        run: |
-          if [[ ${{ github.ref }} == refs/heads/* ]]; then
-            BRANCH_NAME=$(echo "${{ github.ref }}" | cut -c 12-)
-            echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
-          else
-            echo "BRANCH_NAME=${{ github.ref }}" >> $GITHUB_ENV
           fi
 
       - name: Delete existing branch (if exists)
