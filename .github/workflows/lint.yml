@@ -54,6 +54,7 @@ jobs:
         uses: ad-m/github-push-action@v0.8.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ env.BRANCH_NAME }}
 
       - name: Import Biome config file
         run: wget -O biome.json https://raw.githubusercontent.com/michijs/.github/main/biome.json
