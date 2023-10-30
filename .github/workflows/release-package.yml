@@ -103,6 +103,6 @@ jobs:
 
       # Publish version to public repository
       - name: Publish
-        run: npm publish --access public --tag ${{ env.RELEASE_TAG }} --provenance
+        run: npm publish --provenance --access public --tag ${{ env.RELEASE_TAG }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
