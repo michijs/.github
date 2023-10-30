@@ -9,6 +9,7 @@ jobs:
   Run:
     runs-on: ubuntu-latest
     steps:
+      # Setup
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
@@ -16,12 +17,22 @@ jobs:
           # a pull request then we can checkout the head.
           fetch-depth: 2
 
+      - name: Get Branch Name and remove refs/heads prefix from github.ref (if exists)
+        run: |
+          if [[ ${{ github.ref }} == refs/heads/* ]]; then
+            BRANCH_NAME=$(echo "${{ github.ref }}" | cut -c 12-)
+            echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+          else
+            echo "BRANCH_NAME=${{ github.ref }}" >> $GITHUB_ENV
+          fi
+
       # Configure Git
       - name: Git configuration
         run: |
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "GitHub Actions"
-      
+          
+      # Formatter
       - name: Setup Biome
         run: npm i -g @biomejs/biome
 
@@ -33,15 +44,6 @@ jobs:
 
       - name: Remove biome file
         run: rm biome.json
-
-      - name: Remove refs/heads prefix from github.ref (if exists)
-        run: |
-          if [[ ${{ github.ref }} == refs/heads/* ]]; then
-            BRANCH_NAME=$(echo "${{ github.ref }}" | cut -c 12-)
-            echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
-          else
-            echo "BRANCH_NAME=${{ github.ref }}" >> $GITHUB_ENV
-          fi
 
       - name: Check for changes
         run: |
@@ -64,6 +66,16 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ env.BRANCH_NAME }}
+
+      # Linter
+      - name: Check if branch contains 'dependabot'
+        run: |
+          if [[ "${{ env.BRANCH_NAME }}" == *dependabot* ]]; then
+            echo "Branch contains 'dependabot'. Linter will not run."
+            exit 0
+          else
+            echo "Branch does not contain 'dependabot'. Linter will run."
+          fi
 
       - name: Import Biome config file
         run: wget -O biome.json https://raw.githubusercontent.com/michijs/.github/main/biome.json
