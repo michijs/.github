@@ -28,6 +28,9 @@ on:
       GITHUB_ACCESS_TOKEN:
         required: true
 
+permissions:
+  id-token: write
+
 env:
   RELEASE_TYPE: ${{ github.event.inputs.release-type }}
   NPM_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
@@ -35,8 +38,6 @@ env:
 
 jobs:
   Release:
-    permissions:
-      id-token: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -91,10 +92,6 @@ jobs:
           git commit -m "chore: release ${{ env.NEW_VERSION }}"
           git tag ${{ env.NEW_VERSION }}
 
-      # Publish version to public repository
-      - name: Publish
-        run: npm publish --access public --tag ${{ env.RELEASE_TAG }} --provenance
-
       # Push repository changes
       - name: Push changes to repository
         run: |
@@ -107,3 +104,7 @@ jobs:
           tag_name: ${{ env.NEW_VERSION }}
           body: ${{ github.event.inputs.release-notes }}
           prerelease: ${{ startsWith(github.event.inputs.release-type, 'pre') }}
+
+      # Publish version to public repository
+      - name: Publish
+        run: npm publish --access public --tag ${{ env.RELEASE_TAG }} --provenance
