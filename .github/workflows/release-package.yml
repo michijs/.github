@@ -35,6 +35,8 @@ env:
 
 jobs:
   Release:
+    permissions:
+      id-token: write
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -91,7 +93,7 @@ jobs:
 
       # Publish version to public repository
       - name: Publish
-        run: npm publish --access public --tag ${{ env.RELEASE_TAG }}
+        run: npm publish --access public --tag ${{ env.RELEASE_TAG }} --provenance
 
       # Push repository changes
       - name: Push changes to repository
