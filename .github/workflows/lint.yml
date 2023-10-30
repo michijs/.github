@@ -72,21 +72,25 @@ jobs:
         run: |
           if [[ "${{ env.BRANCH_NAME }}" == *dependabot* ]]; then
             echo "Branch contains 'dependabot'. Linter will not run."
-            exit 0
+            echo "DEPENDABOT_DETECTED=true" >> $GITHUB_ENV
           else
             echo "Branch does not contain 'dependabot'. Linter will run."
           fi
 
       - name: Import Biome config file
+        if: env.DEPENDABOT_DETECTED != 'true'
         run: wget -O biome.json https://raw.githubusercontent.com/michijs/.github/main/biome.json
 
       - name: Run Biome check
+        if: env.DEPENDABOT_DETECTED != 'true'
         run: biome check --apply . || true
 
       - name: Remove biome file
+        if: env.DEPENDABOT_DETECTED != 'true'
         run: rm biome.json
 
       - name: Check for changes
+        if: env.DEPENDABOT_DETECTED != 'true'
         run: |
           if git diff-index --quiet HEAD --; then
             echo "No changes detected. Skipping next steps."
@@ -96,6 +100,7 @@ jobs:
           fi
 
       - name: Delete existing branch (if exists)
+        if: env.DEPENDABOT_DETECTED != 'true'
         run: |
           git push origin --delete ${{ env.BRANCH_NAME }}_lint || true
 
