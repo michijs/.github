@@ -3,7 +3,7 @@ on:
   workflow_call:
     inputs:
       script-name:
-        description: "Build script to execute"
+        description: "Script to execute"
         type: string
         required: true
 
@@ -11,20 +11,7 @@ jobs:
   Run:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          # We must fetch at least the immediate parents so that if this is
-          # a pull request then we can checkout the head.
-          fetch-depth: 2
-
-      - name: Set up environment
-        uses: michijs/.github/.github/actions/setup@main
-
-      - name: Install dependencies
-        uses: michijs/.github/.github/actions/install@main
-
       - name: Execute script
-        uses: michijs/.github/.github/actions/run@main
+        uses: michijs/.github/.github/actions/execute-script@main
         with: 
           command: ${{ inputs.script-name }}
