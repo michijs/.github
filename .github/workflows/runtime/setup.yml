@@ -1,11 +1,7 @@
 name: "Setup runtime"
+runs:
+  steps:
+    - name: Setup bun
+      uses: oven-sh/setup-bun@v1
+      registry-url: 'https://registry.npmjs.org'
 
-on: workflow_call
-
-jobs:
-  setup:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Setup bun
-        uses: oven-sh/setup-bun@v1
-        registry-url: 'https://registry.npmjs.org'
