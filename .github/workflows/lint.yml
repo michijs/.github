@@ -34,7 +34,9 @@ jobs:
           
       # Formatter
       - name: Setup Biome
-        run: npm i -g @biomejs/biome
+        uses: michijs/.github/.github/workflows/runtime/install.yml@main
+        with: 
+          package: -g @biomejs/biome
 
       - name: Import Biome config file
         run: wget -O biome.json https://raw.githubusercontent.com/michijs/.github/main/biome.json

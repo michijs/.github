@@ -1,0 +1,11 @@
+name: "Install packages"
+
+on: workflow_call
+  package:
+    description: "Package to install"
+    type: string
+    default: ""
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    run: bun install ${{ github.event.inputs.package }}

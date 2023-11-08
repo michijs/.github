@@ -49,8 +49,11 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           always-auth: true
 
+      - name: Set up environment
+        uses: michijs/.github/.github/workflows/runtime/setup.yml@main
+
       - name: Install dependencies
-        run: npm install
+        uses: michijs/.github/.github/workflows/runtime/install.yml@main
 
       # Configure Git
       - name: Git configuration
@@ -74,9 +77,10 @@ jobs:
           echo "NEW_VERSION=$(npm --no-git-tag-version --preid=beta version $RELEASE_TYPE)" >> $GITHUB_ENV
           echo "RELEASE_TAG=beta" >> $GITHUB_ENV
 
-      # Build
       - name: Build
-        run: npm run ${{ inputs.dist-script }}
+        uses: michijs/.github/.github/workflows/runtime/run.yml@main
+        with: 
+          script-name: ${{ inputs.dist-script }}
 
       # Commit changes
       - name: Commit package.json changes and create tag

@@ -1,0 +1,13 @@
+name: "Run command"
+
+on: workflow_call
+  inputs:
+    command:
+      description: "Command to run"
+      required: true
+      type: string
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    run: bun run ${{ github.event.inputs.command }}
