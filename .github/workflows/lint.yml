@@ -31,24 +31,12 @@ jobs:
         run: |
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git config --global user.name "GitHub Actions"
-          
+
       - name: Set up environment
         uses: michijs/.github/.github/actions/setup@main
 
-      # Formatter
-      - name: Setup Biome
-        uses: michijs/.github/.github/actions/install@main
-        with: 
-          package: -g @biomejs/biome
-
-      - name: Import Biome config file
-        run: wget -O biome.json https://raw.githubusercontent.com/michijs/.github/main/biome.json
-
-      - name: Run Biome format
-        run: biome format --write --json .
-
-      - name: Remove biome file
-        run: rm biome.json
+      - name: Run formatter
+        uses: michijs/.github/.github/actions/lint@main
 
       - name: Check for changes
         run: |
@@ -82,17 +70,11 @@ jobs:
             echo "Branch does not contain 'dependabot'. Linter will run."
           fi
 
-      - name: Import Biome config file
+      - name: Run linter
         if: env.DEPENDABOT_DETECTED != 'true'
-        run: wget -O biome.json https://raw.githubusercontent.com/michijs/.github/main/biome.json
-
-      - name: Run Biome check
-        if: env.DEPENDABOT_DETECTED != 'true'
-        run: biome check --apply . || true
-
-      - name: Remove biome file
-        if: env.DEPENDABOT_DETECTED != 'true'
-        run: rm biome.json
+        uses: michijs/.github/.github/actions/lint@main
+        with: 
+          command: check --apply . || true
 
       - name: Check for changes
         if: env.DEPENDABOT_DETECTED != 'true'
