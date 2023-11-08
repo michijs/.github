@@ -3,6 +3,4 @@ runs:
   using: "composite"
   steps:
     - uses: oven-sh/setup-bun@v1
-      with:
-        registry-url: 'https://registry.npmjs.org'
 
