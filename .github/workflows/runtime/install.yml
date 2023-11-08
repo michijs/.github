@@ -8,3 +8,4 @@ runs:
   using: "composite"
   steps:
     - run: bun install ${{ github.event.inputs.package }}
+      shell: bash
