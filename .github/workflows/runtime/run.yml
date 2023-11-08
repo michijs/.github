@@ -10,4 +10,6 @@ on: workflow_call
 jobs:
   run:
     runs-on: ubuntu-latest
-    run: bun run ${{ github.event.inputs.command }}
+    steps:
+      - name: Bun run
+        run: bun run ${{ github.event.inputs.command }}

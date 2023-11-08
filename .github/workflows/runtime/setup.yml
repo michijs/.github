@@ -5,5 +5,7 @@ on: workflow_call
 jobs:
   setup:
     runs-on: ubuntu-latest
-    uses: oven-sh/setup-bun@v1
-    registry-url: 'https://registry.npmjs.org'
+    steps:
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v1
+        registry-url: 'https://registry.npmjs.org'

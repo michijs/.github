@@ -8,4 +8,6 @@ on: workflow_call
 jobs:
   install:
     runs-on: ubuntu-latest
-    run: bun install ${{ github.event.inputs.package }}
+    steps:
+      - name: Bun install
+        run: bun install ${{ github.event.inputs.package }}
