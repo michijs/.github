@@ -79,10 +79,10 @@ jobs:
           always-auth: true
 
       - name: Set up environment
-        uses: michijs/.github/.github/workflows/runtime/setup.yml@main
+        uses: michijs/.github/.github/actions/setup@main
 
       - name: Install dependencies
-        uses: michijs/.github/.github/workflows/runtime/install.yml@main
+        uses: michijs/.github/.github/actions/install@main
 
       # Configure Git
       - name: Git configuration
@@ -108,7 +108,7 @@ jobs:
 
       # Build
       - name: Build
-        uses: michijs/.github/.github/workflows/runtime/run.yml@main
+        uses: michijs/.github/.github/actions/run@main
         with: 
           script-name: ${{ inputs.dist-script }}
 

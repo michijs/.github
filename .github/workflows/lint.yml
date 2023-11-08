@@ -34,7 +34,7 @@ jobs:
           
       # Formatter
       - name: Setup Biome
-        uses: michijs/.github/.github/workflows/runtime/install.yml@main
+        uses: michijs/.github/.github/actions/install@main
         with: 
           package: -g @biomejs/biome
 
