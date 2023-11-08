@@ -1,5 +1,6 @@
 name: "Setup runtime"
 runs:
+  using: "composite"
   steps:
     - name: Setup bun
       uses: oven-sh/setup-bun@v1
