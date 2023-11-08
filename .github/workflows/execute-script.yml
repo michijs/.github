@@ -27,4 +27,4 @@ jobs:
       - name: Execute script
         uses: michijs/.github/.github/actions/run@main
         with: 
-          script-name: ${{ inputs.script-name }}
+          command: ${{ inputs.script-name }}
