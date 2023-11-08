@@ -1,0 +1,17 @@
+name: "Execute commit if there are changes"
+inputs:
+  message:
+    description: "Commit message"
+    required: true
+    type: string
+
+runs:
+  using: "composite"
+  steps:
+    - name: Add changes
+      shell: bash
+      run: git add .
+    - name: Commit changes
+      shell: bash
+      run: git commit -m "${{ inputs.message }}" || echo "No changes to commit"
+

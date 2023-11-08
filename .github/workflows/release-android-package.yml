@@ -165,9 +165,12 @@ jobs:
           git tag ${{ env.NEW_VERSION }}
 
       # Push repository changes
-      - name: Push changes to repository
-        run: |
-          git push origin && git push --tags
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.8.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+          tags: true
 
       # Update GitHub release with changelog
       - name: Update GitHub release documentation
