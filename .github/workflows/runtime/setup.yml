@@ -2,7 +2,7 @@ name: "Setup runtime"
 runs:
   using: "composite"
   steps:
-    - name: Setup bun
-      uses: oven-sh/setup-bun@v1
-      registry-url: 'https://registry.npmjs.org'
+    - uses: oven-sh/setup-bun@v1
+      with:
+        registry-url: 'https://registry.npmjs.org'
 

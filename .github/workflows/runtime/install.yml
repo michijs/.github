@@ -7,5 +7,4 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: bun install
-      run: bun install ${{ github.event.inputs.package }}
+    - run: bun install ${{ github.event.inputs.package }}

@@ -8,6 +8,5 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Run
-      run: bun run ${{ github.event.inputs.command }}
+    - run: bun run ${{ github.event.inputs.command }}
 
