@@ -1,26 +1,30 @@
 name: Execute script
-inputs:
-  script-name:
-    description: "Build script to execute"
-    type: string
-    required: true
-runs:
-  using: "composite"
-  steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-      with:
-        # We must fetch at least the immediate parents so that if this is
-        # a pull request then we can checkout the head.
-        fetch-depth: 2
+on:
+  workflow_call:
+    inputs:
+      script-name:
+        description: "Build script to execute"
+        type: string
+        required: true
 
-    - name: Set up environment
-      uses: michijs/.github/.github/workflows/runtime/setup.yml@main
+jobs:
+  Run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # We must fetch at least the immediate parents so that if this is
+          # a pull request then we can checkout the head.
+          fetch-depth: 2
 
-    - name: Install dependencies
-      uses: michijs/.github/.github/workflows/runtime/install.yml@main
+      - name: Set up environment
+        uses: michijs/.github/.github/workflows/runtime/setup.yml@main
 
-    - name: Execute script
-      uses: michijs/.github/.github/workflows/runtime/run.yml@main
-      with: 
-        script-name: ${{ inputs.script-name }}
+      - name: Install dependencies
+        uses: michijs/.github/.github/workflows/runtime/install.yml@main
+
+      - name: Execute script
+        uses: michijs/.github/.github/workflows/runtime/run.yml@main
+        with: 
+          script-name: ${{ inputs.script-name }}
