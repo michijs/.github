@@ -108,7 +108,7 @@ jobs:
       - name: Build
         uses: michijs/.github/.github/actions/run@main
         with: 
-          script-name: ${{ inputs.dist-script }}
+          command: ${{ inputs.dist-script }}
 
       # Start Android
       - name: Capacitor Sync
