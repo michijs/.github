@@ -19,6 +19,7 @@
         "useButtonType": "off"
       },
       "complexity": {
+        "noBannedTypes": "off",
         "useSimplifiedLogicExpression": "off"
       },
       "suspicious": {
