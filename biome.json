@@ -19,6 +19,7 @@
         "useButtonType": "off"
       },
       "complexity": {
+        "noForEach": "off",
         "noBannedTypes": "off",
         "useSimplifiedLogicExpression": "off"
       },
