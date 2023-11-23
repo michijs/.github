@@ -10,6 +10,9 @@ inputs:
   tags:
     description: "Tags"
     required: false
+  force:
+    description: "Force"
+    required: false
 
 runs:
   using: "composite"
@@ -23,3 +26,4 @@ runs:
         github_token: ${{ inputs.github_token }}
         branch: ${{ inputs.branch }}
         tags: ${{ inputs.tags }}
+        force: ${{ inputs.force }}
