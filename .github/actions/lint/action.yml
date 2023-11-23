@@ -1,9 +1,9 @@
 name: "Run lint"
+description: "Runs linter on the project"
 inputs:
   command:
     description: "Command to run"
     default: "format --write --json ."
-    type: string
 
 runs:
   using: "composite"

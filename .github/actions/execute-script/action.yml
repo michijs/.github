@@ -1,9 +1,9 @@
 name: "Execute script"
+description: "Execute script"
 inputs:
   script-name:
     description: "Script to execute"
     required: true
-    type: string
 
 runs:
   using: "composite"

@@ -1,4 +1,5 @@
 name: "Setup runtime"
+description: "Setup runtime"
 runs:
   using: "composite"
   steps:

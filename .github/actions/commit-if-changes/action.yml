@@ -1,9 +1,9 @@
 name: "Execute commit if there are changes"
+description: "Execute commit if there are changes"
 inputs:
   message:
     description: "Commit message"
     required: true
-    type: string
 
 runs:
   using: "composite"

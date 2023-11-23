@@ -1,0 +1,22 @@
+name: "Pull and push changes"
+description: "Pull and push changes"
+inputs:
+  github_token:
+    description: "Github token"
+    required: true
+  branch:
+    description: "Branch name"
+    required: true
+  
+runs:
+  using: "composite"
+  steps:
+    - name: Pull changes
+      shell: bash
+      run: git pull
+    - name: push changes
+      uses: ad-m/github-push-action@v0.8.0
+      with:
+        github_token: ${{ inputs.GITHUB_TOKEN }}
+        branch: ${{ inputs.BRANCH_NAME }}
+

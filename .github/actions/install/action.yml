@@ -1,8 +1,8 @@
 name: "Install packages"
+description: "Install packages"
 inputs:
   package:
     description: "Package to install"
-    type: string
     default: ""
 runs:
   using: "composite"

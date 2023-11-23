@@ -42,7 +42,7 @@ jobs:
           message: "Format changes"
 
       - name: Push changes
-        uses: ad-m/github-push-action@v0.8.0
+        uses: michijs/.github/.github/actions/pull-and-push@main
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ env.BRANCH_NAME }}
@@ -90,7 +90,7 @@ jobs:
 
       - name: Push changes
         if: env.CHANGES_DETECTED == 'true'
-        uses: ad-m/github-push-action@v0.8.0
+        uses: michijs/.github/.github/actions/pull-and-push@main
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           force: true

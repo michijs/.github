@@ -1,4 +1,5 @@
 name: "Set GIT config Github actions"
+description: "Set GIT config Github actions"
 
 runs:
   using: "composite"

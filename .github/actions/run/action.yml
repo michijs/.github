@@ -1,9 +1,9 @@
 name: "Run command"
+description: "Run command"
 inputs:
   command:
     description: "Command to run"
     required: true
-    type: string
 
 runs:
   using: "composite"
