@@ -7,7 +7,10 @@ inputs:
   branch:
     description: "Branch name"
     required: true
-  
+  tags:
+    description: "Tags"
+    required: false
+
 runs:
   using: "composite"
   steps:
@@ -17,6 +20,6 @@ runs:
     - name: push changes
       uses: ad-m/github-push-action@v0.8.0
       with:
-        github_token: ${{ inputs.GITHUB_TOKEN }}
-        branch: ${{ inputs.BRANCH_NAME }}
-
+        github_token: ${{ inputs.github_token }}
+        branch: ${{ inputs.branch }}
+        tags: ${{ inputs.tags }}
