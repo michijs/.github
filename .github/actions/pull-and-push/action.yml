@@ -16,7 +16,7 @@ runs:
   steps:
     - name: Previous git config
       shell: bash
-      run: git config pull.ff only
+      run: git config pull.rebase false
     - name: Pull changes
       shell: bash
       run: git pull origin ${{ github.head_ref || github.ref_name }}
