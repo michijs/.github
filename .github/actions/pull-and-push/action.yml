@@ -14,9 +14,12 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Previous git config
+      shell: bash
+      run: git config pull.ff only
     - name: Pull changes
       shell: bash
-      run: git pull origin ${{ github.head_ref || github.ref_name }} --ff-only
+      run: git pull origin ${{ github.head_ref || github.ref_name }}
     - name: push changes
       uses: ad-m/github-push-action@v0.8.0
       with:
