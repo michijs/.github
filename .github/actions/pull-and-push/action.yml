@@ -14,12 +14,9 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: test
-      shell: bash
-      run: echo ${{ github.head_ref || github.ref_name }} 
     - name: Pull changes
       shell: bash
-      run: git pull origin ${{ github.head_ref || github.ref_name }}
+      run: git pull origin ${{ github.head_ref || github.ref_name }} --ff-only
     - name: push changes
       uses: ad-m/github-push-action@v0.8.0
       with:
