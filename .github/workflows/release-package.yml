@@ -92,7 +92,6 @@ jobs:
         uses: michijs/.github/.github/actions/pull-and-push@main
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
           tags: true
 
       # Update GitHub release with changelog
