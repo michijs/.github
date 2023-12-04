@@ -4,6 +4,9 @@ inputs:
   github_token:
     description: "Github token"
     required: true
+  branch:
+    description: "Branch name"
+    required: false
   tags:
     description: "Tags"
     required: false
@@ -24,6 +27,6 @@ runs:
       uses: ad-m/github-push-action@v0.8.0
       with:
         github_token: ${{ inputs.github_token }}
-        branch: ${{ github.head_ref || github.ref_name }}
+        branch: ${{ inputs.branch || github.head_ref || github.ref_name }}
         tags: ${{ inputs.tags }}
         force: ${{ inputs.force }}
