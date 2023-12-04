@@ -17,9 +17,6 @@ jobs:
           # a pull request then we can checkout the head.
           fetch-depth: 2
 
-      - name: Get Branch Name
-        run: echo "BRANCH_NAME=${{ github.head_ref || github.ref_name }}" >> $GITHUB_ENV
-
       # Configure Git
       - name: Git configuration
         uses: michijs/.github/.github/actions/set-git-config-github-actions@main
@@ -41,6 +38,9 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       # Linter
+      - name: Get Branch Name
+        run: echo "BRANCH_NAME=${{ github.head_ref || github.ref_name }}" >> $GITHUB_ENV
+        
       - name: Check if branch contains 'dependabot'
         run: |
           if [[ "${{ env.BRANCH_NAME }}" == *dependabot* ]]; then
