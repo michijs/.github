@@ -17,14 +17,8 @@ jobs:
           # a pull request then we can checkout the head.
           fetch-depth: 2
 
-      - name: Get Branch Name and remove refs/heads prefix from github.ref (if exists)
-        run: |
-          if [[ ${{ github.ref }} == refs/heads/* ]]; then
-            BRANCH_NAME=$(echo "${{ github.ref }}" | cut -c 12-)
-            echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
-          else
-            echo "BRANCH_NAME=${{ github.ref }}" >> $GITHUB_ENV
-          fi
+      - name: Get Branch Name
+        run: echo "BRANCH_NAME=${{ github.head_ref || github.ref_name }}" >> $GITHUB_ENV
 
       # Configure Git
       - name: Git configuration
@@ -45,7 +39,6 @@ jobs:
         uses: michijs/.github/.github/actions/pull-and-push@main
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ env.BRANCH_NAME }}
 
       # Linter
       - name: Check if branch contains 'dependabot'
