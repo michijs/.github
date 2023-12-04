@@ -4,9 +4,6 @@ inputs:
   github_token:
     description: "Github token"
     required: true
-  branch:
-    description: "Branch name"
-    required: true
   tags:
     description: "Tags"
     required: false
@@ -22,11 +19,11 @@ runs:
       run: echo ${{ github.head_ref || github.ref_name }} 
     - name: Pull changes
       shell: bash
-      run: git pull origin/${{ inputs.branch }} || true
+      run: git pull origin ${{ github.head_ref || github.ref_name }}
     - name: push changes
       uses: ad-m/github-push-action@v0.8.0
       with:
         github_token: ${{ inputs.github_token }}
-        branch: ${{ inputs.branch }}
+        branch: ${{ github.head_ref || github.ref_name }}
         tags: ${{ inputs.tags }}
         force: ${{ inputs.force }}
