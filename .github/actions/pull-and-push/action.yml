@@ -22,7 +22,9 @@ runs:
       run: git config pull.rebase false
     - name: Pull changes
       shell: bash
-      run: git pull origin ${{ github.head_ref || github.ref_name }}
+      # Avoids issues if branch does not exist
+      continue-on-error: true
+      run: git pull origin ${{ inputs.branch || github.head_ref || github.ref_name }}
     - name: push changes
       uses: ad-m/github-push-action@v0.8.0
       with:
