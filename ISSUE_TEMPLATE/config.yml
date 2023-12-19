@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions & Discussions
+    url: https://github.com/orgs/michijs/discussions
+    about: Use GitHub discussions for message-board style questions and discussions.
+  - name: Sponsor us
+    url: https://github.com/sponsors/michijs
+    about: Love Michijs? Please consider supporting us.
