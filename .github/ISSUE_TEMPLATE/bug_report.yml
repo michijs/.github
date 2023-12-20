@@ -82,3 +82,5 @@ body:
     id: volunteer
     attributes:
       label: Would you be willing to participate in carrying out a pull request with a proposed solution?
+      options:
+        - label: I am going to implement a fix and open a pull request following the community guidelines
