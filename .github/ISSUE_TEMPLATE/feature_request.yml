@@ -1,0 +1,67 @@
+name: "\U0001F527 Feature request"
+description: Suggest an idea for this project
+assignees: lsegurado
+labels: enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **Before You Start...**
+
+        This form is only for submitting feature request. If you have a usage question
+        or are unsure if this is really a bug, make sure to:
+
+        - Read the docs
+        - Ask on [GitHub Discussions](https://github.com/orgs/michijs/discussions)
+
+        Also try to search for your issue - it may have already been answered or even fixed in the development branch.
+        However, if you find that an old, closed issue still persists in the latest version,
+        you should open a new issue using the form below instead of commenting on the old issue.
+  - type: textarea
+    id: problem-to-resolve
+    attributes:
+      label: Is your feature request related to a problem? Please describe.
+      description: |
+        A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
+      placeholder: Problem to resolve
+    validations:
+      required: true
+  - type: textarea
+    id: solution-proposal
+    attributes:
+      label: Describe the solution you'd like
+      description: |
+        A clear and concise description of what you want to happen.
+      placeholder: Proposed solution
+    validations:
+      required: true
+  - type: textarea
+    id: why-do-it
+    attributes:
+      label: Describe how it would improve compared to current functioning
+      description: |
+        A clear and concise description of why we would do it.
+      placeholder: Why do it?
+    validations:
+      required: true
+  - type: textarea
+    id: additional-comments
+    attributes:
+      label: Any additional comments?
+      description: e.g. some background/context of how you ran into this bug.
+  - type: checkboxes
+    id: breaking-change
+    attributes:
+      label: Is a breaking change?
+      options:
+        - label: It is a breaking change and requires reworking projects in progress
+          required: true
+    validations:
+      required: true
+  - type: checkboxes
+    id: volunteer
+    attributes:
+      label: Would you be willing to participate in carrying out a pull request with a proposed solution?
+      options:
+        - label: I am going to implement a fix and open a pull request following the community guidelines
+          required: false
