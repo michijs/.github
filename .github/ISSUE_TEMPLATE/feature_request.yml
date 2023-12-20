@@ -48,7 +48,6 @@ body:
     id: additional-comments
     attributes:
       label: Any additional comments?
-      description: e.g. some background/context of how you ran into this bug.
   - type: checkboxes
     id: breaking-change
     attributes:
