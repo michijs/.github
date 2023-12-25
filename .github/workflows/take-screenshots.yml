@@ -32,7 +32,7 @@ jobs:
           CI: 'true'
 
       - name: Take screenshots
-        uses: flameddd/screenshots-ci-action@v2.0.0
+        uses: flameddd/screenshots-ci-action@v2.1.0
         with:
           url: ${{ matrix.PAGE }}
           devices: iPhone 6,iPhone 6 landscape
