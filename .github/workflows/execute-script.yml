@@ -6,9 +6,6 @@ on:
         description: "Script to execute"
         type: string
         required: true
-
-permissions:
-  packages: read
   
 jobs:
   Run:

@@ -46,9 +46,6 @@ on:
       SERVICE_ACCOUNT_JSON:
         required: true
 
-permissions:
-  packages: read
-
 env:
   RELEASE_TYPE: ${{ github.event.inputs.release-type }}
   NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
