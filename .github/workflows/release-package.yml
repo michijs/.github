@@ -101,7 +101,7 @@ jobs:
         # If public publish to npm
         # Setup Node.js environment
       - name: Set up Node.js 20.9.0 with registry.npmjs.org
-        if: inputs.visibility = "public"
+        if: inputs.visibility == "public"
         uses: actions/setup-node@v4
         with:
           node-version: 20.9.0
@@ -110,7 +110,7 @@ jobs:
           always-auth: true
 
       - name: Publish to registry.npmjs.org
-        if: inputs.visibility = "public"
+        if: inputs.visibility == "public"
         run: |
           npm publish --provenance --access ${{ inputs.visibility }} --tag ${{ env.RELEASE_TAG }}
         env:
