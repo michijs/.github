@@ -3,7 +3,7 @@ description: "Runs linter on the project"
 inputs:
   command:
     description: "Command to run"
-    default: "format --write --json ."
+    default: "format --write ."
 
 runs:
   using: "composite"

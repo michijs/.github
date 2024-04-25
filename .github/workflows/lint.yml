@@ -93,7 +93,7 @@ jobs:
         if: env.CHANGES_DETECTED == 'true'
         continue-on-error: true
         run: |
-            SUGGESTIONS=$(biome check --json . 2>&1 || true)
+            SUGGESTIONS=$(biome check . 2>&1 || true)
             gh pr create -B ${{ env.BRANCH_NAME }} -H ${{ env.BRANCH_NAME }}_lint --title '[${{ env.BRANCH_NAME }}] Linting changes' --body "This pull request includes linting changes based on the target branch.
 
             Please review and merge if everything looks good.
