@@ -26,10 +26,6 @@ on:
         description: "Package visibility"
         type: string
         default: "public"
-      registry-url:
-        description: "Package registry"
-        type: string
-        default: "https://registry.npmjs.org"
 permissions:
   id-token: write
   contents: write
@@ -49,15 +45,6 @@ jobs:
           # a pull request then we can checkout the head.
           fetch-depth: 2
 
-        # Setup Node.js environment
-      - name: Set up Node.js 20.9.0
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.9.0
-          # Important!
-          registry-url: ${{ inputs.registry-url }}
-          always-auth: true
-
       - name: Set up environment
         uses: michijs/.github/.github/actions/setup@main
 
@@ -73,7 +60,7 @@ jobs:
       - name: Bump release version
         if: startsWith(github.event.inputs.release-type, 'pre') != true
         run: |
-          echo "NEW_VERSION=$(npm --no-git-tag-version version $RELEASE_TYPE)" >> $GITHUB_ENV
+          echo "NEW_VERSION=$(bunx npm --no-git-tag-version version $RELEASE_TYPE)" >> $GITHUB_ENV
           echo "RELEASE_TAG=latest" >> $GITHUB_ENV
 
       # Bump package pre-release version
@@ -81,7 +68,7 @@ jobs:
       - name: Bump pre-release version
         if: startsWith(github.event.inputs.release-type, 'pre')
         run: |
-          echo "NEW_VERSION=$(npm --no-git-tag-version --preid=beta version $RELEASE_TYPE)" >> $GITHUB_ENV
+          echo "NEW_VERSION=$(bunx npm --no-git-tag-version --preid=beta version $RELEASE_TYPE)" >> $GITHUB_ENV
           echo "RELEASE_TAG=beta" >> $GITHUB_ENV
 
       - name: Build
@@ -111,16 +98,35 @@ jobs:
           body: ${{ github.event.inputs.release-notes }}
           prerelease: ${{ startsWith(github.event.inputs.release-type, 'pre') }}
 
-      - name: Set NODE_AUTH_TOKEN
-        run: |
-          if [[ "${{ inputs.registry-url }}" = "https://registry.npmjs.org" ]]; then
-            echo "NODE_AUTH_TOKEN=${{ secrets.NPM_ACCESS_TOKEN }}" >> $GITHUB_ENV
-          else
-            echo "NODE_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
-          fi
+        # If public publish to npm
+        # Setup Node.js environment
+      - name: Set up Node.js 20.9.0 with registry.npmjs.org
+        if: inputs.visibility = "public"
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.9.0
+          # Important!
+          registry-url: https://registry.npmjs.org
+          always-auth: true
 
-      # Publish version to public / private repository
-      - name: Publish
+      - name: Publish to registry.npmjs.org
+        if: inputs.visibility = "public"
+        run: |
+          npm publish --provenance --access ${{ inputs.visibility }} --tag ${{ env.RELEASE_TAG }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
+
+        # If private or public publish to github packages
+        # Setup Node.js environment
+      - name: Set up Node.js 20.9.0 with npm.pkg.github.com
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.9.0
+          # Important!
+          registry-url: https://npm.pkg.github.com
+          always-auth: true
+
+      - name: Publish to npm.pkg.github.com
         run: |
           if [[ "${{ inputs.visibility }}" = "public" ]]; then
             npm publish --provenance --access ${{ inputs.visibility }} --tag ${{ env.RELEASE_TAG }}
@@ -128,4 +134,4 @@ jobs:
             npm publish --access ${{ inputs.visibility }} --tag ${{ env.RELEASE_TAG }}
           fi
         env:
-          NODE_AUTH_TOKEN: ${{ env.NODE_AUTH_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
