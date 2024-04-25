@@ -4,6 +4,9 @@ inputs:
   script-name:
     description: "Script to execute"
     required: true
+  github_token:
+    description: "Github token"
+    required: true
 
 runs:
   using: "composite"
@@ -21,7 +24,7 @@ runs:
     - name: Install dependencies
       uses: michijs/.github/.github/actions/install@main
       with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ inputs.github_token }}
 
     - name: Run script
       uses: michijs/.github/.github/actions/run@main
