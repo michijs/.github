@@ -10,7 +10,11 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - run: bun install ${{ inputs.package }}
-      env:
-        BUN_AUTH_TOKEN: ${{ inputs.github_token }}
+    - run: echo "//npm.pkg.github.com/:_authToken=${{ inputs.github_token }}" > ~/.npmrc
       shell: bash
+    - run: bunx npm install
+      shell: bash
+    # - run: bun install ${{ inputs.package }}
+    #   env:
+    #     BUN_AUTH_TOKEN: ${{ inputs.github_token }}
+    #   shell: bash
