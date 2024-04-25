@@ -121,6 +121,11 @@ jobs:
 
       # Publish version to public / private repository
       - name: Publish
-        run: npm publish --provenance --access ${{ inputs.visibility }} --tag ${{ env.RELEASE_TAG }}
+        run: |
+          if [[ "${{ inputs.visibility }}" = "public" ]]; then
+            npm publish --provenance --access ${{ inputs.visibility }} --tag ${{ env.RELEASE_TAG }}
+          else
+            npm publish --access ${{ inputs.visibility }} --tag ${{ env.RELEASE_TAG }}
+          fi
         env:
           NODE_AUTH_TOKEN: ${{ env.NODE_AUTH_TOKEN }}
