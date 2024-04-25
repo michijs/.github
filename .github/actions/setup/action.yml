@@ -4,7 +4,3 @@ runs:
   using: "composite"
   steps:
     - uses: oven-sh/setup-bun@v1.2.1
-      with:
-        registry-url: "https://npm.pkg.github.com/"
-        scope: "@michijs"
-
