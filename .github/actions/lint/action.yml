@@ -4,6 +4,9 @@ inputs:
   command:
     description: "Command to run"
     default: "format --write ."
+  github_token:
+    description: "Github token"
+    required: true
 
 runs:
   using: "composite"
@@ -12,7 +15,7 @@ runs:
       uses: michijs/.github/.github/actions/install@main
       with: 
         package: -g @biomejs/biome
-        github_token: ${{ secrets.GITHUB_TOKEN }}
+        github_token: ${{ inputs.github_token }}
 
     - name: Import Biome config file
       shell: bash

@@ -26,6 +26,8 @@ jobs:
 
       - name: Run formatter
         uses: michijs/.github/.github/actions/lint@main
+        with: 
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Commit changes
         uses: michijs/.github/.github/actions/commit-if-changes@main
@@ -55,6 +57,7 @@ jobs:
         uses: michijs/.github/.github/actions/lint@main
         with: 
           command: check --apply . || true
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check for changes
         if: env.DEPENDABOT_DETECTED != 'true'
