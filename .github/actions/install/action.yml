@@ -10,11 +10,21 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - run: echo "//npm.pkg.github.com/:_authToken=${{ inputs.github_token }}" > ~/.npmrc
+    - run: echo "//npm.pkg.github.com/:_authToken=${{ inputs.github_token }}\n@michijs:registry=https://npm.pkg.github.com" > ~/.npmrc
       shell: bash
     - run: bunx npm install
       shell: bash
     # - run: bun install ${{ inputs.package }}
     #   env:
     #     BUN_AUTH_TOKEN: ${{ inputs.github_token }}
+    #   shell: bash
+
+    # Telling bun were to find @michijs private packages
+    # - run: echo "[install.scopes]\n\"@michijs\" = { token = \"${{ inputs.github_token }}\", url = \"https://npm.pkg.github.com\" }" > bunfig.toml
+    #   shell: bash
+    # - run: bun install ${{ inputs.package }}
+    #   env:
+    #     BUN_AUTH_TOKEN: ${{ inputs.github_token }}
+    #   shell: bash
+    # - run: rm bunfig.toml
     #   shell: bash
