@@ -26,6 +26,10 @@ on:
         description: "Package visibility"
         type: string
         default: "public"
+      registry-url:
+        description: "Package registry"
+        type: string
+        default: "https://registry.npmjs.org"
 permissions:
   id-token: write
   contents: write
@@ -44,15 +48,6 @@ jobs:
           # We must fetch at least the immediate parents so that if this is
           # a pull request then we can checkout the head.
           fetch-depth: 2
-
-      - name: Determine registry URL
-        run: |
-          if [ -f .npmrc ]; then
-            REGISTRY_URL=$(grep -E '^@.*:registry=' .npmrc | cut -d'=' -f2-)
-          else
-            REGISTRY_URL="https://registry.npmjs.org"
-          fi
-          echo "REGISTRY_URL=$REGISTRY_URL" >> $GITHUB_ENV
 
         # Setup Node.js environment
       - name: Set up Node.js 20.9.0
@@ -116,10 +111,9 @@ jobs:
           body: ${{ github.event.inputs.release-notes }}
           prerelease: ${{ startsWith(github.event.inputs.release-type, 'pre') }}
 
-
       - name: Set NODE_AUTH_TOKEN
         run: |
-          if [ "$REGISTRY_URL" = "https://registry.npmjs.org" ]; then
+          if [[ "${{ inputs.registry-url }}" = "https://registry.npmjs.org" ]]; then
             echo "NODE_AUTH_TOKEN=${{ secrets.NPM_ACCESS_TOKEN }}" >> $GITHUB_ENV
           else
             echo "NODE_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
