@@ -115,8 +115,17 @@ jobs:
           body: ${{ github.event.inputs.release-notes }}
           prerelease: ${{ startsWith(github.event.inputs.release-type, 'pre') }}
 
+
+      - name: Set NODE_AUTH_TOKEN
+        run: |
+          if [ "$REGISTRY_URL" = "https://registry.npmjs.org" ]; then
+            echo "NODE_AUTH_TOKEN=${{ secrets.NPM_ACCESS_TOKEN }}" >> $GITHUB_ENV
+          else
+            echo "NODE_AUTH_TOKEN=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
+          fi
+
       # Publish version to public / private repository
       - name: Publish
         run: npm publish --provenance --access ${{ inputs.visibility }} --tag ${{ env.RELEASE_TAG }}
         env:
-          NODE_AUTH_TOKEN: ${{ if eq(env.REGISTRY_URL, 'https://registry.npmjs.org') }}${{ secrets.NPM_ACCESS_TOKEN }}{{ else }}${{ secrets.GITHUB_TOKEN }}{{ endif }}
+          NODE_AUTH_TOKEN: ${{ env.NODE_AUTH_TOKEN }}
