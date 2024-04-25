@@ -22,6 +22,10 @@ on:
         description: "Distribution script to execute"
         type: string
         default: "dist"
+      visibility:
+        description: "Package visibility"
+        type: string
+        default: "public"
 permissions:
   id-token: write
   contents: write
@@ -40,13 +44,22 @@ jobs:
           # a pull request then we can checkout the head.
           fetch-depth: 2
 
+      - name: Determine registry URL
+        run: |
+          if [ -f .npmrc ]; then
+            REGISTRY_URL=$(grep -E '^@.*:registry=' .npmrc | cut -d'=' -f2-)
+          else
+            REGISTRY_URL="https://registry.npmjs.org"
+          fi
+          echo "REGISTRY_URL=$REGISTRY_URL" >> $GITHUB_ENV
+
         # Setup Node.js environment
       - name: Set up Node.js 20.9.0
         uses: actions/setup-node@v4
         with:
           node-version: 20.9.0
           # Important!
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: ${{ inputs.registry-url }}
           always-auth: true
 
       - name: Set up environment
@@ -102,8 +115,8 @@ jobs:
           body: ${{ github.event.inputs.release-notes }}
           prerelease: ${{ startsWith(github.event.inputs.release-type, 'pre') }}
 
-      # Publish version to public repository
+      # Publish version to public / private repository
       - name: Publish
-        run: npm publish --provenance --access public --tag ${{ env.RELEASE_TAG }}
+        run: npm publish --provenance --access ${{ inputs.visibility }} --tag ${{ env.RELEASE_TAG }}
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ if eq(env.REGISTRY_URL, 'https://registry.npmjs.org') }}${{ secrets.NPM_ACCESS_TOKEN }}{{ else }}${{ secrets.GITHUB_TOKEN }}{{ endif }}
