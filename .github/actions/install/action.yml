@@ -18,3 +18,6 @@ runs:
       env:
         BUN_AUTH_TOKEN: ${{ inputs.github_token }}
       shell: bash
+      # Cleaning
+    - run: rm bunfig.toml
+      shell: bash
