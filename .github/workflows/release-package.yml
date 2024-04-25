@@ -29,6 +29,7 @@ on:
 permissions:
   id-token: write
   contents: write
+  packages: write
 
 env:
   RELEASE_TYPE: ${{ github.event.inputs.release-type }}
