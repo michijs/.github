@@ -12,6 +12,7 @@ runs:
       uses: michijs/.github/.github/actions/install@main
       with: 
         package: -g @biomejs/biome
+        github_token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Import Biome config file
       shell: bash

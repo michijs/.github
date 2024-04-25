@@ -50,6 +50,8 @@ jobs:
 
       - name: Install dependencies
         uses: michijs/.github/.github/actions/install@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       # Configure Git
       - name: Git configuration

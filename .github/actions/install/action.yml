@@ -1,6 +1,9 @@
 name: "Install packages"
 description: "Install packages"
 inputs:
+  github_token:
+    description: "Github token"
+    required: true
   package:
     description: "Package to install"
     default: ""
@@ -8,7 +11,7 @@ runs:
   using: "composite"
   steps:
     # Telling bun were to find @michijs private packages
-    - run: echo "[install.scopes]\n\"@michijs\" = { token = \"${{ secrets.GITHUB_TOKEN }}\", url = \"https://npm.pkg.github.com\" }" > $HOME/.bunfig.toml
+    - run: echo "[install.scopes]\n\"@michijs\" = { token = \"${{ inputs.github_token }}\", url = \"https://npm.pkg.github.com\" }" > $HOME/.bunfig.toml
       shell: bash
     - run: bun install ${{ inputs.package }}
       shell: bash
