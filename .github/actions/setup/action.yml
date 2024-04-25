@@ -3,5 +3,4 @@ description: "Setup runtime"
 runs:
   using: "composite"
   steps:
-    - run: curl -fsSL https://bun.sh/install | bash
-      shell: bash
+    - uses: oven-sh/setup-bun@v1.2.1
