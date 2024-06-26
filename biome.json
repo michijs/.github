@@ -30,6 +30,8 @@
         "noDoubleEquals": "off"
       },
       "style": {
+        "noInferrableTypes": "off",
+        "useShorthandFunctionType": "off",
         "useSingleVarDeclarator": "off",
         "useBlockStatements": "off",
         "noNonNullAssertion": "off",
