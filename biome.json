@@ -1,4 +1,5 @@
 {
+  "$schema": "https://biomejs.dev/schemas/1.8.2/schema.json",
   "files": {
     "ignore": ["**/*.json"]
   },
@@ -14,23 +15,26 @@
     "ignore": ["**/*.json"],
     "enabled": true,
     "rules": {
+      "recommended": true,
       "a11y": {
+        "all": true,
         "useValidAnchor": "off",
         "useButtonType": "off"
       },
       "complexity": {
+        "all": true,
         "noForEach": "off",
         "noBannedTypes": "off",
         "useSimplifiedLogicExpression": "off"
       },
       "suspicious": {
+        "all": true,
         "noEmptyInterface": "off",
         "noAssignInExpressions": "off",
         "noExplicitAny": "off",
         "noDoubleEquals": "off"
       },
       "style": {
-        "noInferrableTypes": "off",
         "useShorthandFunctionType": "off",
         "useSingleVarDeclarator": "off",
         "useBlockStatements": "off",
@@ -38,9 +42,11 @@
         "noImplicitBoolean": "off"
       },
       "correctness": {
+        "all": true,
         "noUnreachableSuper": "off"
       },
       "performance": {
+        "all": true,
         "noDelete": "off"
       }
     }
