@@ -1,5 +1,6 @@
 
 
+<!-- TODO: Use bash code for commands -->
 Using private michijs packages
 Setting up environmnent
 
