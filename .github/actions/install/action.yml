@@ -14,7 +14,7 @@ runs:
     #   shell: bash
     # - run: npm install
     #   shell: bash
-    - run: echo 'export GITHUB_TOKEN=${{inputs.github_token}}' >> ~/.bashrc
+    - run: echo 'export GITHUB_TOKEN=${{inputs.github_token}}' >> ~/.bash_profile
       shell: bash
     - run: bun install ${{ inputs.package }}
       env:
