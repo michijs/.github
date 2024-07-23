@@ -17,6 +17,7 @@ runs:
     - run: bun install ${{ inputs.package }}
       env:
         BUN_AUTH_TOKEN: ${{ inputs.github_token }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
       shell: bash
       # Cleaning
     - run: rm ./bunfig.toml || true

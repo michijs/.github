@@ -3,7 +3,9 @@ description: "Setup runtime"
 runs:
   using: "composite"
   steps:
-    - uses: oven-sh/setup-bun@v1.2.1
+    - uses: oven-sh/setup-bun@v2.0.1
       with:
+        # Downloading directly from github
+        bun-download-url: "https://github.com/oven-sh/bun/releases/latest/download/bun-linux-x64.zip"
         registry-url: "https://npm.pkg.github.com/"
         scope: "@michijs"
