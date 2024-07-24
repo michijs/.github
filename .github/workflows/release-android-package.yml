@@ -47,7 +47,7 @@ on:
         required: true
 
 env:
-  RELEASE_TYPE: ${{ github.event.inputs.release-type }}
+  RELEASE_TYPE: ${{ inputs.release-type }}
   NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_ACCESS_TOKEN }}
 
@@ -91,7 +91,7 @@ jobs:
       # Bump package version
       # Use tag latest
       - name: Bump release version
-        if: startsWith(github.event.inputs.release-type, 'pre') != true
+        if: startsWith(inputs.release-type, 'pre') != true
         run: |
           echo "NEW_VERSION=$(npm --no-git-tag-version version $RELEASE_TYPE)" >> $GITHUB_ENV
           echo "RELEASE_TRACK=production" >> $GITHUB_ENV
@@ -99,7 +99,7 @@ jobs:
       # Bump package pre-release version
       # Use tag beta for pre-release versions
       - name: Bump pre-release version
-        if: startsWith(github.event.inputs.release-type, 'pre')
+        if: startsWith(inputs.release-type, 'pre')
         run: |
           echo "NEW_VERSION=$(npm --no-git-tag-version --preid=beta version $RELEASE_TYPE)" >> $GITHUB_ENV
           echo "RELEASE_TRACK=beta" >> $GITHUB_ENV
@@ -142,16 +142,16 @@ jobs:
       - name: Create whats new directory
         run: |
           mkdir whatsnew
-          cd whatsnew && echo "${{ github.event.inputs.release-notes }}" >> "whatsnew-en-US"
+          cd whatsnew && echo "${{ inputs.release-notes }}" >> "whatsnew-en-US"
         
       - name: Deploy to Play Store
-        if: fromJSON(github.event.inputs.deploy-to-play-store)
+        if: fromJSON(inputs.deploy-to-play-store)
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: ${{ env.ANDROID_PACKAGE_NAME }}
           whatsNewDirectory: "whatsnew"
-          status: ${{ github.event.inputs.STATUS }}
+          status: ${{ inputs.STATUS }}
           releaseFiles: android/app/build/outputs/bundle/release/app-release-signed.aab
           track: ${{ env.RELEASE_TRACK }}
           
@@ -176,8 +176,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.NEW_VERSION }}
-          body: ${{ github.event.inputs.release-notes }}
-          prerelease: ${{ startsWith(github.event.inputs.release-type, 'pre') }}
+          body: ${{ inputs.release-notes }}
+          prerelease: ${{ startsWith(inputs.release-type, 'pre') }}
           files: |
             ./android/app/build/outputs/apk/debug/app-debug-signed.apk
             ./android/app/build/outputs/apk/debug/app-debug.apk
