@@ -92,7 +92,7 @@ jobs:
       - name: Set up registry.npmjs.org registry
         if: inputs.visibility == 'public'
         run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_ACCESS_TOKEN }}" > .npmrc
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_ACCESS_TOKEN }}" > ~/.npmrc
 
       - name: Publish to registry.npmjs.org
         if: inputs.visibility == 'public'
@@ -103,7 +103,7 @@ jobs:
       - name: Set up npm.pkg.github.com registry
         run: |
           echo "@michijs:registry=https://npm.pkg.github.com
-          //npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > .npmrc
+          //npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" > ~/.npmrc
 
       - name: Publish to npm.pkg.github.com
         run: |
