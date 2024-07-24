@@ -26,6 +26,7 @@ on:
         description: "Package visibility"
         type: string
         default: "public"
+
 permissions:
   id-token: write
   contents: write
@@ -51,46 +52,37 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
-      # Configure Git
-      - name: Git configuration
+      - name: Configure Git
         uses: michijs/.github/.github/actions/set-git-config-github-actions@main
 
-      # Bump package version
-      # Use tag latest
-      - name: Bump release version
-        if: startsWith(github.event.inputs.release-type, 'pre') != true
+      - name: Bump package version
         run: |
-          echo "NEW_VERSION=$(bunx npm --no-git-tag-version version $RELEASE_TYPE)" >> $GITHUB_ENV
-          echo "RELEASE_TAG=latest" >> $GITHUB_ENV
-
-      # Bump package pre-release version
-      # Use tag beta for pre-release versions
-      - name: Bump pre-release version
-        if: startsWith(github.event.inputs.release-type, 'pre')
-        run: |
-          echo "NEW_VERSION=$(bunx npm --no-git-tag-version --preid=beta version $RELEASE_TYPE)" >> $GITHUB_ENV
-          echo "RELEASE_TAG=beta" >> $GITHUB_ENV
+          if [[ "${{ github.event.inputs.release-type }}" == pre* ]]; then
+            NEW_VERSION=$(bunx npm --no-git-tag-version --preid=beta version $RELEASE_TYPE)
+            echo "RELEASE_TAG=beta" >> $GITHUB_ENV
+          else
+            NEW_VERSION=$(bunx npm --no-git-tag-version version $RELEASE_TYPE)
+            echo "RELEASE_TAG=latest" >> $GITHUB_ENV
+          fi
+          echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
 
       - name: Build
         uses: michijs/.github/.github/actions/run@main
-        with: 
+        with:
           command: ${{ inputs.dist-script }}
 
-      # Commit changes
       - name: Commit package.json changes and create tag
         run: |
-          git add "package.json"
+          git add package.json
           git commit -m "chore: release ${{ env.NEW_VERSION }}"
           git tag ${{ env.NEW_VERSION }}
 
-      # Push repository changes
       - name: Push changes
         uses: michijs/.github/.github/actions/pull-and-push@main
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           tags: true
 
-      # Update GitHub release with changelog
       - name: Update GitHub release documentation
         uses: softprops/action-gh-release@v2
         with:
@@ -100,39 +92,26 @@ jobs:
 
         # If public publish to npm
         # Setup Node.js environment
-      - name: Set up Node.js 20.9.0 with registry.npmjs.org
+      - name: Set up registry.npmjs.org registry
         if: inputs.visibility == 'public'
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.9.0
-          # Important!
-          registry-url: https://registry.npmjs.org
-          always-auth: true
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${NPM_ACCESS_TOKEN}" > ~/.npmrc
 
       - name: Publish to registry.npmjs.org
         if: inputs.visibility == 'public'
         run: |
-          npm publish --provenance --access ${{ inputs.visibility }} --tag ${{ env.RELEASE_TAG }}
+          bunx npm publish --provenance --access ${{ inputs.visibility }} --tag ${{ env.RELEASE_TAG }}
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
+          NPM_ACCESS_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
 
         # If private or public publish to github packages
-        # Setup Node.js environment
-      - name: Set up Node.js 20.9.0 with npm.pkg.github.com
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20.9.0
-          # Important!
-          registry-url: https://npm.pkg.github.com
-          always-auth: true
+      - name: Set up npm.pkg.github.com registry
+        run: |
+          echo "@michijs:registry=https://npm.pkg.github.com
+          //npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" > ~/.npmrc
 
       - name: Publish to npm.pkg.github.com
         run: |
-          if [[ "${{ inputs.visibility }}" = "public" ]]; then
-            npm publish --provenance --access ${{ inputs.visibility }} --tag ${{ env.RELEASE_TAG }}
-          else
-            npm publish --access ${{ inputs.visibility }} --tag ${{ env.RELEASE_TAG }}
-          fi
+          bunx npm publish --access ${{ inputs.visibility }} --tag ${{ env.RELEASE_TAG }} $([[ "${{ inputs.visibility }}" = "public" ]] && echo "--provenance")
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
