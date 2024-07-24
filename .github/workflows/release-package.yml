@@ -32,9 +32,6 @@ permissions:
   contents: write
   packages: write
 
-env:
-  RELEASE_TYPE: ${{ github.event.inputs.release-type }}
-
 jobs:
   Release:
     runs-on: ubuntu-latest
@@ -55,19 +52,22 @@ jobs:
       - name: Configure Git
         uses: michijs/.github/.github/actions/set-git-config-github-actions@main
 
+      - name: Debug
+        run: bunx npm --version
+
       # Bump package version
       # Use tag latest
       - name: Bump release version
         if: startsWith(github.event.inputs.release-type, 'pre') != true
         run: |
-          echo "NEW_VERSION=$(bunx npm --no-git-tag-version version $RELEASE_TYPE)" >> $GITHUB_ENV
+          echo "NEW_VERSION=$(bunx npm --no-git-tag-version version ${{ github.event.inputs.release-type }})" >> $GITHUB_ENV
           echo "RELEASE_TAG=latest" >> $GITHUB_ENV
       # Bump package pre-release version
       # Use tag beta for pre-release versions
       - name: Bump pre-release version
         if: startsWith(github.event.inputs.release-type, 'pre')
         run: |
-          echo "NEW_VERSION=$(bunx npm --no-git-tag-version --preid=beta version $RELEASE_TYPE)" >> $GITHUB_ENV
+          echo "NEW_VERSION=$(bunx npm --no-git-tag-version --preid=beta version ${{ github.event.inputs.release-type }})" >> $GITHUB_ENV
           echo "RELEASE_TAG=beta" >> $GITHUB_ENV
 
       - name: Build
