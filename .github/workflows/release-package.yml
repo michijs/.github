@@ -52,23 +52,16 @@ jobs:
       - name: Configure Git
         uses: michijs/.github/.github/actions/set-git-config-github-actions@main
 
-      - name: Debug
-        run: bunx npm --version
-
-      # Bump package version
-      # Use tag latest
-      - name: Bump release version
-        if: startsWith(inputs.release-type, 'pre') != true
+      - name: Bump package version
         run: |
-          echo "NEW_VERSION=$(bunx npm --no-git-tag-version version ${{ inputs.release-type }})" >> $GITHUB_ENV
-          echo "RELEASE_TAG=latest" >> $GITHUB_ENV
-      # Bump package pre-release version
-      # Use tag beta for pre-release versions
-      - name: Bump pre-release version
-        if: startsWith(inputs.release-type, 'pre')
-        run: |
-          echo "NEW_VERSION=$(bunx npm --no-git-tag-version --preid=beta version ${{ inputs.release-type }})" >> $GITHUB_ENV
-          echo "RELEASE_TAG=beta" >> $GITHUB_ENV
+          if [[ "${{ github.event.inputs.release-type }}" == pre* ]]; then
+            NEW_VERSION=$(bunx npm --no-git-tag-version --preid=beta version $RELEASE_TYPE)
+            echo "RELEASE_TAG=beta" >> $GITHUB_ENV
+          else
+            NEW_VERSION=$(bunx npm --no-git-tag-version version $RELEASE_TYPE)
+            echo "RELEASE_TAG=latest" >> $GITHUB_ENV
+          fi
+          echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
 
       - name: Build
         uses: michijs/.github/.github/actions/run@main
@@ -99,7 +92,7 @@ jobs:
       - name: Set up registry.npmjs.org registry
         if: inputs.visibility == 'public'
         run: |
-          echo "//registry.npmjs.org/:_authToken=${NPM_ACCESS_TOKEN}" > ~/.npmrc
+          echo "//registry.npmjs.org/:_authToken=${NPM_ACCESS_TOKEN}" > .npmrc
 
       - name: Publish to registry.npmjs.org
         if: inputs.visibility == 'public'
@@ -112,7 +105,7 @@ jobs:
       - name: Set up npm.pkg.github.com registry
         run: |
           echo "@michijs:registry=https://npm.pkg.github.com
-          //npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" > ~/.npmrc
+          //npm.pkg.github.com/:_authToken=${GITHUB_TOKEN}" > .npmrc
 
       - name: Publish to npm.pkg.github.com
         run: |
