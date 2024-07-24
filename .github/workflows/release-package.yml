@@ -54,7 +54,7 @@ jobs:
 
       - name: Bump package version
         run: |
-          if [[ "${{ github.event.inputs.release-type }}" == pre* ]]; then
+          if [[ "${{ inputs.release-type }}" == pre* ]]; then
             NEW_VERSION=$(bunx npm --no-git-tag-version --preid=beta version $RELEASE_TYPE)
             echo "RELEASE_TAG=beta" >> $GITHUB_ENV
           else
