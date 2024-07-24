@@ -58,16 +58,16 @@ jobs:
       # Bump package version
       # Use tag latest
       - name: Bump release version
-        if: startsWith(github.event.inputs.release-type, 'pre') != true
+        if: startsWith(inputs.release-type, 'pre') != true
         run: |
-          echo "NEW_VERSION=$(bunx npm --no-git-tag-version version ${{ github.event.inputs.release-type }})" >> $GITHUB_ENV
+          echo "NEW_VERSION=$(bunx npm --no-git-tag-version version ${{ inputs.release-type }})" >> $GITHUB_ENV
           echo "RELEASE_TAG=latest" >> $GITHUB_ENV
       # Bump package pre-release version
       # Use tag beta for pre-release versions
       - name: Bump pre-release version
-        if: startsWith(github.event.inputs.release-type, 'pre')
+        if: startsWith(inputs.release-type, 'pre')
         run: |
-          echo "NEW_VERSION=$(bunx npm --no-git-tag-version --preid=beta version ${{ github.event.inputs.release-type }})" >> $GITHUB_ENV
+          echo "NEW_VERSION=$(bunx npm --no-git-tag-version --preid=beta version ${{ inputs.release-type }})" >> $GITHUB_ENV
           echo "RELEASE_TAG=beta" >> $GITHUB_ENV
 
       - name: Build
@@ -91,8 +91,8 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ env.NEW_VERSION }}
-          body: ${{ github.event.inputs.release-notes }}
-          prerelease: ${{ startsWith(github.event.inputs.release-type, 'pre') }}
+          body: ${{ inputs.release-notes }}
+          prerelease: ${{ startsWith(inputs.release-type, 'pre') }}
 
         # If public publish to npm
         # Setup Node.js environment
