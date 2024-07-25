@@ -15,7 +15,7 @@ runs:
     # - run: npm install
     #   shell: bash
     # Save the current bunfig.toml
-    - run: cp ./bunfig.toml ./bunfig.toml.bak || true
+    - run: cp ./bunfig.toml ./bunfigbak || true
       shell: bash
     - run: bun install ${{ inputs.package }}
       env:
@@ -26,5 +26,5 @@ runs:
     - run: rm ./bunfig.toml || true
       shell: bash
     # Restore the saved bunfig.toml
-    - run: mv ./bunfig.toml.bak ./bunfig.toml || true
+    - run: mv ./bunfigbak ./bunfig.toml || true
       shell: bash
