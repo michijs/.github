@@ -3,7 +3,19 @@ description: "Setup runtime"
 runs:
   using: "composite"
   steps:
-    - uses: oven-sh/setup-bun@v2.0.1
-      # with:
-        # Downloading directly from github
-        # bun-download-url: "https://github.com/oven-sh/bun/releases/latest/download/bun-linux-x64.zip"
+    - name: Set bun download URL
+      id: set-bun-url
+      shell: bash
+      run: |
+        if [[ "$RUNNER_OS" == "Linux" ]]; then
+          echo "BUN_URL=https://github.com/oven-sh/bun/releases/latest/download/bun-linux-x64.zip" >> $GITHUB_ENV
+        elif [[ "$RUNNER_OS" == "Windows" ]]; then
+          echo "BUN_URL=https://github.com/oven-sh/bun/releases/latest/download/bun-windows-x64.zip" >> $GITHUB_ENV
+        elif [[ "$RUNNER_OS" == "macOS" ]]; then
+          echo "BUN_URL=https://github.com/oven-sh/bun/releases/latest/download/bun-darwin-x64.zip" >> $GITHUB_ENV
+        fi
+
+    - name: Setup
+      uses: oven-sh/setup-bun@v2.0.1
+      with:
+        bun-download-url: ${{ env.BUN_URL }}
