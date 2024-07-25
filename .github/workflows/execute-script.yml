@@ -10,7 +10,8 @@ on:
 jobs:
   Run:
     # TODO: Use ubuntu-latest when bun test fix their issue
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
+    # runs-on: windows-latest
     steps:
       - name: Execute script
         uses: michijs/.github/.github/actions/execute-script@main
