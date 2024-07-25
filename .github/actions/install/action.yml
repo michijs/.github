@@ -14,6 +14,9 @@ runs:
     #   shell: bash
     # - run: npm install
     #   shell: bash
+    # Save the current bunfig.toml
+    - run: cp ./bunfig.toml ./bunfig.toml.bak || true
+      shell: bash
     - run: bun install ${{ inputs.package }}
       env:
         BUN_AUTH_TOKEN: ${{ inputs.github_token }}
@@ -21,4 +24,7 @@ runs:
       shell: bash
       # Cleaning
     - run: rm ./bunfig.toml || true
+      shell: bash
+    # Restore the saved bunfig.toml
+    - run: mv ./bunfig.toml.bak ./bunfig.toml || true
       shell: bash
