@@ -4,6 +4,6 @@ runs:
   using: "composite"
   steps:
     - uses: oven-sh/setup-bun@v2.0.1
-      with:
+      # with:
         # Downloading directly from github
         # bun-download-url: "https://github.com/oven-sh/bun/releases/latest/download/bun-linux-x64.zip"
