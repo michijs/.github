@@ -7,5 +7,3 @@ runs:
       with:
         # Downloading directly from github
         bun-download-url: "https://github.com/oven-sh/bun/releases/latest/download/bun-linux-x64.zip"
-        registry-url: "https://npm.pkg.github.com/"
-        scope: "@michijs"
