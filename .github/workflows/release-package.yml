@@ -109,5 +109,5 @@ jobs:
         run: |
           bunx npm publish --access ${{ inputs.visibility }} --tag ${{ env.RELEASE_TAG }} $([[ "${{ inputs.visibility }}" = "public" ]] && echo "--provenance")
         # Necesary when having an existing local .npmrc
-        with:
+        env:
           github_token: ${{ secrets.GITHUB_TOKEN }}
