@@ -3,16 +3,29 @@ description: "Setup runtime"
 runs:
   using: "composite"
   steps:
+    - name: Extract Bun version from package.json (default to latest)
+      id: extract-bun-version
+      shell: bash
+      run: |
+        BUN_VERSION=$(cat package.json | grep '"packageManager":' | grep -o 'bun@[0-9.]*' | cut -d'@' -f2 || echo "latest")
+        echo "BUN_VERSION=$BUN_VERSION" >> $GITHUB_ENV
+
     - name: Set bun download URL
       id: set-bun-url
       shell: bash
       run: |
+        if [[ "$BUN_VERSION" == "latest" ]]; then
+          BASE_URL="https://github.com/oven-sh/bun/releases/latest/download"
+        else
+          BASE_URL="https://github.com/oven-sh/bun/releases/download/bun-v${BUN_VERSION}"
+        fi
+        
         if [[ "$RUNNER_OS" == "Linux" ]]; then
-          echo "BUN_URL=https://github.com/oven-sh/bun/releases/latest/download/bun-linux-x64.zip" >> $GITHUB_ENV
+          echo "BUN_URL=$BASE_URL/bun-linux-x64.zip" >> $GITHUB_ENV
         elif [[ "$RUNNER_OS" == "Windows" ]]; then
-          echo "BUN_URL=https://github.com/oven-sh/bun/releases/latest/download/bun-windows-x64.zip" >> $GITHUB_ENV
+          echo "BUN_URL=$BASE_URL/bun-windows-x64.zip" >> $GITHUB_ENV
         elif [[ "$RUNNER_OS" == "macOS" ]]; then
-          echo "BUN_URL=https://github.com/oven-sh/bun/releases/latest/download/bun-darwin-x64.zip" >> $GITHUB_ENV
+          echo "BUN_URL=$BASE_URL/bun-darwin-x64.zip" >> $GITHUB_ENV
         fi
 
     - name: Setup
