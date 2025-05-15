@@ -60,7 +60,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up java 17.0.3
+      - name: Set up java
         uses: actions/setup-java@v4
         with:
           distribution: 'microsoft'
@@ -68,7 +68,7 @@ jobs:
           cache: 'gradle'
 
         # Setup Node.js environment
-      - name: Set up Node.js 16.17.0
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
@@ -88,21 +88,16 @@ jobs:
       - name: Git configuration
         uses: michijs/.github/.github/actions/set-git-config-github-actions@main
   
-      # Bump package version
-      # Use tag latest
-      - name: Bump release version
-        if: startsWith(inputs.release-type, 'pre') != true
+      - name: Bump package version
         run: |
-          echo "NEW_VERSION=$(npm --no-git-tag-version version $RELEASE_TYPE)" >> $GITHUB_ENV
-          echo "RELEASE_TRACK=production" >> $GITHUB_ENV
-  
-      # Bump package pre-release version
-      # Use tag beta for pre-release versions
-      - name: Bump pre-release version
-        if: startsWith(inputs.release-type, 'pre')
-        run: |
-          echo "NEW_VERSION=$(npm --no-git-tag-version --preid=beta version $RELEASE_TYPE)" >> $GITHUB_ENV
-          echo "RELEASE_TRACK=beta" >> $GITHUB_ENV
+          if [[ "${{ inputs.release-type }}" == pre* ]]; then
+            NEW_VERSION=$(bunx npm --no-git-tag-version --preid=beta version ${{ inputs.release-type }})
+            echo "RELEASE_TAG=beta" >> $GITHUB_ENV
+          else
+            NEW_VERSION=$(bunx npm --no-git-tag-version version ${{ inputs.release-type }})
+            echo "RELEASE_TAG=latest" >> $GITHUB_ENV
+          fi
+          echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
 
       # Build
       - name: Build
@@ -110,40 +105,33 @@ jobs:
         with: 
           command: ${{ inputs.dist-script }}
 
-      # Start Android
-      - name: Capacitor Sync
-        run: npx cap sync
-
-      - name: Make gradlew executable
-        run: chmod +x ./android/gradlew
-
-      - name: Build app bundle (AAB)
-        run: cd android && ./gradlew bundle
-
       - name: Build app APK
-        run: cd android && ./gradlew assembleDebug
+        uses: michijs/.github/.github/actions/run@main
+        with: 
+          command: tauri android build
 
       - name: Extract Android signing key from env
         run: |
-          echo "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > android/release.jks.base64
-          base64 -d android/release.jks.base64 > android/release.decrypted.jks
+          echo "${{ secrets.ANDROID_RELEASE_KEYSTORE }}" > ./src-tauri/gen/android/release.jks.base64
+          base64 -d ./src-tauri/gen/android/release.jks.base64 > ./src-tauri/gen/android/release.decrypted.jks
 
       - name: Sign app bundle (AAB)
-        run: jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/bundle/release/app-release-signed.aab ./android/app/build/outputs/bundle/release/app-release.aab play_store
+        run: jarsigner -keystore ./src-tauri/gen/android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./src-tauri/gen/android/app/build/outputs/bundle/release/app-release-signed.aab ./src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-universal-release.aab play_store
 
       - name: Sign app APK
-        run: jarsigner -keystore android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./android/app/build/outputs/apk/debug/app-debug-signed.apk ./android/app/build/outputs/apk/debug/app-debug.apk play_store
-
-      - name: Get Package Name
-        run: |
-          cd android && namespace=$(grep -Po 'namespace\s+"(\S+)"' app/build.gradle | awk -F'"' '{print $2}')
-          echo "ANDROID_PACKAGE_NAME=$namespace" >> $GITHUB_ENV
+        run: jarsigner -keystore ./src-tauri/gen/android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./src-tauri/gen/android/app/build/outputs/apk/x86_64/debug/app-debug-signed.apk ./src-tauri/gen/android/app/build/outputs/apk/x86_64/debug/app-x86_64-debug.apk play_store
 
       - name: Create whats new directory
         run: |
           mkdir whatsnew
           cd whatsnew && echo "${{ inputs.release-notes }}" >> "whatsnew-en-US"
         
+      - name: Get Package Name
+        if: fromJSON(inputs.deploy-to-play-store)
+        run: |
+          namespace=$(node -p "require('./src-tauri/tauri.conf.json').package.identifier")
+          echo "ANDROID_PACKAGE_NAME=$namespace" >> $GITHUB_ENV
+          
       - name: Deploy to Play Store
         if: fromJSON(inputs.deploy-to-play-store)
         uses: r0adkll/upload-google-play@v1
@@ -152,7 +140,7 @@ jobs:
           packageName: ${{ env.ANDROID_PACKAGE_NAME }}
           whatsNewDirectory: "whatsnew"
           status: ${{ inputs.STATUS }}
-          releaseFiles: android/app/build/outputs/bundle/release/app-release-signed.aab
+          releaseFiles: ./src-tauri/gen/android/app/build/outputs/bundle/release/app-release-signed.aab
           track: ${{ env.RELEASE_TRACK }}
           
       # End Android
@@ -160,7 +148,7 @@ jobs:
       # Commit changes
       - name: Commit package.json changes and create tag
         run: |
-          git add "package.json"
+          git add package.json
           git commit -m "chore: release ${{ env.NEW_VERSION }}"
           git tag ${{ env.NEW_VERSION }}
 
@@ -179,7 +167,7 @@ jobs:
           body: ${{ inputs.release-notes }}
           prerelease: ${{ startsWith(inputs.release-type, 'pre') }}
           files: |
-            ./android/app/build/outputs/apk/debug/app-debug-signed.apk
-            ./android/app/build/outputs/apk/debug/app-debug.apk
-            ./android/app/build/outputs/bundle/release/app-release.aab
-            ./android/app/build/outputs/bundle/release/app-release-signed.aab
+            ./src-tauri/gen/android/app/build/outputs/apk/x86_64/debug/app-debug-signed.apk
+            ./src-tauri/gen/android/app/build/outputs/apk/x86_64/debug/app-debug.apk
+            ./src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-universal-release.aab
+            ./src-tauri/gen/android/app/build/outputs/bundle/release/app-release-signed.aab
