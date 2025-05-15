@@ -105,7 +105,13 @@ jobs:
         with: 
           command: ${{ inputs.dist-script }}
 
-      - name: Install
+      # Cargo dependency
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libglib2.0-dev pkg-config
+        
+      - name: Android install
         uses: michijs/.github/.github/actions/run@main
         with: 
           command: cargo install --path ./src-tauri
