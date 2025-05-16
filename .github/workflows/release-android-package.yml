@@ -138,7 +138,7 @@ jobs:
           base64 -d ./src-tauri/gen/android/release.jks.base64 > ./src-tauri/gen/android/release.decrypted.jks
 
       - name: Sign app bundle (AAB)
-        run: jarsigner -keystore ./src-tauri/gen/android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./src-tauri/gen/android/app/build/outputs/bundle/release/app-release-signed.aab ./src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-universal-release.aab play_store
+        run: jarsigner -keystore ./src-tauri/gen/android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-release-signed.aab ./src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-universal-release.aab play_store
 
       - name: Sign app APK
         run: jarsigner -keystore ./src-tauri/gen/android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./src-tauri/gen/android/app/build/outputs/apk/x86_64/debug/app-debug-signed.apk ./src-tauri/gen/android/app/build/outputs/apk/x86_64/debug/app-x86_64-debug.apk play_store
@@ -162,7 +162,7 @@ jobs:
           packageName: ${{ env.ANDROID_PACKAGE_NAME }}
           whatsNewDirectory: "whatsnew"
           status: ${{ inputs.STATUS }}
-          releaseFiles: ./src-tauri/gen/android/app/build/outputs/bundle/release/app-release-signed.aab
+          releaseFiles: ./src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-release-signed.aab
           track: ${{ env.RELEASE_TRACK }}
           
       # End Android
@@ -192,4 +192,4 @@ jobs:
             ./src-tauri/gen/android/app/build/outputs/apk/x86_64/debug/app-debug-signed.apk
             ./src-tauri/gen/android/app/build/outputs/apk/x86_64/debug/app-debug.apk
             ./src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-universal-release.aab
-            ./src-tauri/gen/android/app/build/outputs/bundle/release/app-release-signed.aab
+            ./src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-release-signed.aab
