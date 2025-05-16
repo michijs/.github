@@ -190,6 +190,6 @@ jobs:
           prerelease: ${{ startsWith(inputs.release-type, 'pre') }}
           files: |
             ./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-debug-signed.apk
-            ./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-debug.apk
+            ./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk
             ./src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-universal-release.aab
             ./src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-release-signed.aab
