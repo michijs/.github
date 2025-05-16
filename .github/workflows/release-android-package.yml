@@ -141,7 +141,7 @@ jobs:
         run: jarsigner -keystore ./src-tauri/gen/android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-release-signed.aab ./src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-universal-release.aab play_store
 
       - name: Sign app APK
-        run: jarsigner -keystore ./src-tauri/gen/android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./src-tauri/gen/android/app/build/outputs/apk/x86_64/debug/app-debug-signed.apk ./src-tauri/gen/android/app/build/outputs/apk/x86_64/debug/app-x86_64-debug.apk play_store
+        run: jarsigner -keystore ./src-tauri/gen/android/release.decrypted.jks -storepass "${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}" -signedjar ./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-debug-signed.apk ./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk play_store
 
       - name: Create whats new directory
         run: |
@@ -189,7 +189,7 @@ jobs:
           body: ${{ inputs.release-notes }}
           prerelease: ${{ startsWith(inputs.release-type, 'pre') }}
           files: |
-            ./src-tauri/gen/android/app/build/outputs/apk/x86_64/debug/app-debug-signed.apk
-            ./src-tauri/gen/android/app/build/outputs/apk/x86_64/debug/app-debug.apk
+            ./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-debug-signed.apk
+            ./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-debug.apk
             ./src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-universal-release.aab
             ./src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-release-signed.aab
