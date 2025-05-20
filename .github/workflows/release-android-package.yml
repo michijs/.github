@@ -114,10 +114,10 @@ jobs:
         run: |
           if [[ "${{ inputs.release-type }}" == pre* ]]; then
             NEW_VERSION=$(bunx npm --no-git-tag-version --preid=beta version ${{ inputs.release-type }})
-            echo "RELEASE_TAG=beta" >> $GITHUB_ENV
+            echo "RELEASE_TRACK=beta" >> $GITHUB_ENV
           else
             NEW_VERSION=$(bunx npm --no-git-tag-version version ${{ inputs.release-type }})
-            echo "RELEASE_TAG=latest" >> $GITHUB_ENV
+            echo "RELEASE_TRACK=production" >> $GITHUB_ENV
           fi
           echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
 
