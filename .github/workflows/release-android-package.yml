@@ -152,7 +152,7 @@ jobs:
       - name: Build app APK
         uses: michijs/.github/.github/actions/run@main
         with: 
-          command: tauri android build --target aarch64-linux-android
+          command: tauri android build --target aarch64
 
       - name: Extract Android signing key from env
         run: |
