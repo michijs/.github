@@ -84,6 +84,28 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Cache Rust dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            ./src-tauri/target
+          key: rust-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            rust-${{ runner.os }}-
+
+      - name: Cache Gradle build and wrappers
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ./src-tauri/gen/android/.gradle
+          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            gradle-${{ runner.os }}-
+
       # Configure Git
       - name: Git configuration
         uses: michijs/.github/.github/actions/set-git-config-github-actions@main
@@ -125,12 +147,12 @@ jobs:
           command: cargo install --path ./src-tauri
 
       - name: Install Rust Android dependency
-        run: rustup target add aarch64-linux-android armv7-linux-androideabi i686-linux-android x86_64-linux-android
+        run: rustup target add aarch64-linux-android
           
       - name: Build app APK
         uses: michijs/.github/.github/actions/run@main
         with: 
-          command: tauri android build
+          command: tauri android build --target aarch64-linux-android
 
       - name: Extract Android signing key from env
         run: |
