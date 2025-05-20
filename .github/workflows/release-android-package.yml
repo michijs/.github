@@ -172,9 +172,7 @@ jobs:
         
       - name: Get Package Name
         if: fromJSON(inputs.deploy-to-play-store)
-        run: |
-          namespace=$(node -p "require('./src-tauri/tauri.conf.json').package.identifier")
-          echo "ANDROID_PACKAGE_NAME=$namespace" >> $GITHUB_ENV
+        run: echo "ANDROID_PACKAGE_NAME=$(jq -r .identifier src-tauri/tauri.conf.json)" >> $GITHUB_ENV
           
       - name: Deploy to Play Store
         if: fromJSON(inputs.deploy-to-play-store)
