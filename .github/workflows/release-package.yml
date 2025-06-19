@@ -18,6 +18,9 @@ on:
       release-notes:
         description: "Release notes"
         type: string
+      release-notes-path:
+        description: "Release notes path"
+        type: string
       dist-script:
         description: "Distribution script to execute"
         type: string
@@ -85,6 +88,7 @@ jobs:
         with:
           tag_name: ${{ env.NEW_VERSION }}
           body: ${{ inputs.release-notes }}
+          body_path: ${{ inputs.release-notes-path }}
           prerelease: ${{ startsWith(inputs.release-type, 'pre') }}
 
         # If public publish to npm
