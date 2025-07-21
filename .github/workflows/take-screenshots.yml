@@ -21,6 +21,8 @@ jobs:
     needs: convert-string-to-array
     runs-on: ubuntu-latest
     name: "Take screenshot of ${{ matrix.PAGE }}"
+    env:
+      TARGET_URL: ${{ matrix.PAGE }}
     strategy:
       fail-fast: false
       matrix:
