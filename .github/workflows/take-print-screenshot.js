@@ -5,10 +5,10 @@ const { chromium } = require('playwright');
   const page = await browser.newPage();
 
   // Emulate print media
-  await page.emulateMedia({ media: 'print' });
+  await page.emulateMedia({ media: 'screen' });
 
   // Go to your hosted/local page (use Vercel/Netlify preview or local server)
-  await page.goto('https://your-site.com/your-page');
+  await page.goto(process.env.TARGET_URL);
 
   await page.screenshot({ path: 'print-screenshot.png', fullPage: true });
 
