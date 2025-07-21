@@ -10,7 +10,7 @@ const { chromium } = require('playwright');
   // Go to your hosted/local page (use Vercel/Netlify preview or local server)
   await page.goto(process.env.TARGET_URL);
 
-  await page.screenshot({ path: 'print-screenshot.png', fullPage: true });
+  await page.screenshot({ path: 'screenshots/print-screenshot.png', fullPage: true });
 
   await browser.close();
 })();
