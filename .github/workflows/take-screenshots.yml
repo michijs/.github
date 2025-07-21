@@ -39,7 +39,7 @@ jobs:
         run: npm install playwright
 
       - name: Install Playwright Browsers
-        uses: microsoft/playwright-github-action@v1
+        run: npx playwright install --with-deps
 
       - name: Run print-mode screenshot script
         run: node take-print-screenshot.js
