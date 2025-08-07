@@ -8,7 +8,7 @@ permissions:
 jobs:
   Run:
     runs-on: ubuntu-latest
-    if: github.head_ref == 'master'
+    if: github.head_ref == 'master' || github.ref_name == 'master'
     steps:
       # Setup
       - name: Checkout repository
