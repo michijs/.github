@@ -1,6 +1,10 @@
 name: Deploy
 on:
   workflow_call:
+    inputs:
+      branch:
+        required: true
+        type: string
 permissions:
   contents: write
   pull-requests: write 
@@ -8,7 +12,7 @@ permissions:
 jobs:
   Run:
     runs-on: ubuntu-latest
-    if: github.head_ref == 'master' || github.ref_name == 'master'
+    if: inputs.branch == 'master'
     steps:
       # Setup
       - name: Checkout repository
@@ -28,9 +32,9 @@ jobs:
       - name: Create new branch
         run: git checkout -B production
 
-      - name: Push changes
-        uses: michijs/.github/.github/actions/pull-and-push@main
+      - name: push changes
+        uses: ad-m/github-push-action@v0.8.0
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          force: true
+          github_token: ${{ secrets.github_token }}
           branch: production
+          force: true
