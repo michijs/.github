@@ -8,6 +8,9 @@ permissions:
 jobs:
   Run:
     runs-on: ubuntu-latest
+    if: >
+      !startsWith(github.ref_name, 'dependabot/') &&
+      github.ref_name != 'production'
     steps:
       # Setup
       - name: Checkout repository
@@ -20,53 +23,27 @@ jobs:
       - name: Get Branch Name
         run: echo "BRANCH_NAME=${{ github.head_ref || github.ref_name }}" >> $GITHUB_ENV
           
-      - name: Check if branch contains 'dependabot'
-        run: |
-          if [[ "${{ env.BRANCH_NAME }}" == *dependabot* ]]; then
-            echo "Branch contains 'dependabot'. Linter will not run."
-            echo "DEPENDABOT_DETECTED=true" >> $GITHUB_ENV
-          else
-            echo "Branch does not contain 'dependabot'. Linter will run."
-          fi
-
       # Configure Git
       - name: Git configuration
-        if: env.DEPENDABOT_DETECTED != 'true'
         uses: michijs/.github/.github/actions/set-git-config-github-actions@main
 
       - name: Set up environment
-        if: env.DEPENDABOT_DETECTED != 'true'
         uses: michijs/.github/.github/actions/setup@main
 
       - name: Run formatter
-        if: env.DEPENDABOT_DETECTED != 'true'
         uses: michijs/.github/.github/actions/lint@main
         with: 
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
-      # - name: Commit changes
-      #   if: env.DEPENDABOT_DETECTED != 'true'
-      #   uses: michijs/.github/.github/actions/commit-if-changes@main
-      #   with:
-      #     message: "Format changes"
-
-      # - name: Push changes
-      #   if: env.DEPENDABOT_DETECTED != 'true'
-      #   uses: michijs/.github/.github/actions/pull-and-push@main
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-
       # Linter
 
       - name: Run linter
-        if: env.DEPENDABOT_DETECTED != 'true'
         uses: michijs/.github/.github/actions/lint@main
         with: 
           command: check --apply . || true
           github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check for changes
-        if: env.DEPENDABOT_DETECTED != 'true'
         run: |
           if git diff-index --quiet HEAD --; then
             echo "No changes detected. Skipping next steps."
@@ -75,14 +52,9 @@ jobs:
             echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
           fi
 
-      - name: Delete existing branch (if exists)
-        if: env.DEPENDABOT_DETECTED != 'true'
-        run: |
-          git push origin --delete ${{ env.BRANCH_NAME }}_lint || true
-
       - name: Create new branch
         if: env.CHANGES_DETECTED == 'true'
-        run: git checkout -b ${{ env.BRANCH_NAME }}_lint
+        run: git checkout -B ${{ env.BRANCH_NAME }}_lint
 
       - name: Commit changes
         if: env.CHANGES_DETECTED == 'true'
@@ -90,13 +62,13 @@ jobs:
         with:
           message: "Linting changes"
 
-      - name: Push changes
+      - name: push changes
         if: env.CHANGES_DETECTED == 'true'
-        uses: michijs/.github/.github/actions/pull-and-push@main
+        uses: ad-m/github-push-action@v0.8.0
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          force: true
+          github_token: ${{ secrets.github_token }}
           branch: ${{ env.BRANCH_NAME }}_lint
+          force: true
 
       - name: Create pull request
         if: env.CHANGES_DETECTED == 'true'
