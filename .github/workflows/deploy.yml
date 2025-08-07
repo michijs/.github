@@ -1,10 +1,6 @@
 name: Deploy
 on:
   workflow_call:
-    inputs:
-      branch:
-        required: true
-        type: string
 permissions:
   contents: write
   pull-requests: write 
@@ -12,7 +8,7 @@ permissions:
 jobs:
   Run:
     runs-on: ubuntu-latest
-    if: inputs.branch == 'master'
+    if: github.head_ref == 'master' || github.ref_name == 'master'
     steps:
       # Setup
       - name: Checkout repository
