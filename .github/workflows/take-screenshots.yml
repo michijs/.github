@@ -21,23 +21,29 @@ jobs:
     needs: convert-string-to-array
     runs-on: ubuntu-latest
     name: "Take screenshot of ${{ matrix.PAGE }}"
+    env:
+      TARGET_URL: ${{ matrix.PAGE }}
     strategy:
       fail-fast: false
       matrix:
         PAGE: ${{fromJSON(needs.convert-string-to-array.outputs.ARRAY)}}
     steps:
-      - name: install puppeteer-headful
-        uses: mujo-code/puppeteer-headful@18.9.0
-        env:
-          CI: 'true'
+      - uses: actions/checkout@v4
 
-      - name: Take screenshots
-        uses: flameddd/screenshots-ci-action@v2.1.0
+      - name: Install Node.js
+        uses: actions/setup-node@v4
         with:
-          url: ${{ matrix.PAGE }}
-          devices: iPhone 6,iPhone 6 landscape
-          type: png
+          node-version: 20
 
+      - name: Install
+        run: npm install playwright
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Run print-mode screenshot script
+        run: node take-print-screenshot.js
+        
       - name: Get artifact name
         run: |
           filename=$(basename "${{matrix.PAGE}}")
