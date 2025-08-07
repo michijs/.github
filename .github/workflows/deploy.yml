@@ -8,7 +8,6 @@ permissions:
 jobs:
   Run:
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.head_branch == 'master'
     steps:
       # Setup
       - name: Checkout repository
