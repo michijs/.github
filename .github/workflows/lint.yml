@@ -9,6 +9,7 @@ jobs:
   Run:
     runs-on: ubuntu-latest
     if: >
+      !startsWith(github.ref_name, 'lint/') &&
       !startsWith(github.ref_name, 'dependabot/') &&
       github.ref_name != 'production'
     steps:
@@ -54,7 +55,7 @@ jobs:
 
       - name: Create new branch
         if: env.CHANGES_DETECTED == 'true'
-        run: git checkout -B ${{ env.BRANCH_NAME }}_lint
+        run: git checkout -B lint/${{ env.BRANCH_NAME }}
 
       - name: Commit changes
         if: env.CHANGES_DETECTED == 'true'
@@ -67,7 +68,7 @@ jobs:
         uses: ad-m/github-push-action@v0.8.0
         with:
           github_token: ${{ secrets.github_token }}
-          branch: ${{ env.BRANCH_NAME }}_lint
+          branch: lint/${{ env.BRANCH_NAME }}
           force: true
 
       - name: Create pull request
@@ -75,7 +76,7 @@ jobs:
         continue-on-error: true
         run: |
             SUGGESTIONS=$(biome check . 2>&1 || true)
-            gh pr create -B ${{ env.BRANCH_NAME }} -H ${{ env.BRANCH_NAME }}_lint --title '[${{ env.BRANCH_NAME }}] Linting changes' --body "This pull request includes linting changes based on the target branch.
+            gh pr create -B ${{ env.BRANCH_NAME }} -H lint/${{ env.BRANCH_NAME }} --title '[${{ env.BRANCH_NAME }}] Linting changes' --body "This pull request includes linting changes based on the target branch.
 
             Please review and merge if everything looks good.
             
