@@ -6,9 +6,14 @@ on:
         description: "Script to execute"
         type: string
         required: true
+      skip:
+        description: "Should be skipped"
+        type: boolean
+        required: false
   
 jobs:
   Run:
+    if: inputs.skip != 'false'
     runs-on: ubuntu-latest
     steps:
       - name: Execute script
