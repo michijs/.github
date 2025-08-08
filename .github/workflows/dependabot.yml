@@ -82,11 +82,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create new PR
-        id: package-analysis
         if: env.CHANGES_DETECTED == 'true'
         run: |
           # Initialize output
-          OUTPUT="## Updated Packages Analysis
+          OUTPUT="## Updated Packages
           
           "
 
