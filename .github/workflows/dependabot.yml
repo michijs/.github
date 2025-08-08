@@ -126,7 +126,7 @@ jobs:
             COMMIT_HISTORY=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/${owner}/${repo}/commits --jq '.[] | "<li><a href="+.commit.url+"><code>+"+.sha[0:6]+"</code></a> "+.commit.message+"</li>"')
 
             OUTPUT+="
-            <details><summary><h3>${PKG_NAME} - ${OLD_VERSION:-Not found} to ${NEW_VERSION}</h3></summary>${FINAL_CHANGELOG}<details><summary>Commit history:</summary><ul>${COMMIT_HISTORY}</ul></details>
+            <details><summary><h3>Bump ${PKG_NAME} from ${OLD_VERSION:-Not found} to ${NEW_VERSION}</h3></summary><blockquote>${FINAL_CHANGELOG}</blockquote><details><summary>Commit history:</summary><ul>${COMMIT_HISTORY}</ul></details>
             </details>
             "
           done
