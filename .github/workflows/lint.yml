@@ -53,6 +53,13 @@ jobs:
             echo "Changes detected. Proceeding with next steps."
             echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
           fi
+          
+      - name: Close old PR
+        continue-on-error: true
+        run: 
+          gh pr close lint/${{ env.BRANCH_NAME }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create new branch
         if: env.CHANGES_DETECTED == 'true'
@@ -71,14 +78,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: lint/${{ env.BRANCH_NAME }}
           force: true
-
-      - name: Close old PR
-        if: env.CHANGES_DETECTED == 'true'
-        continue-on-error: true
-        run: 
-          gh pr close lint/${{ env.BRANCH_NAME }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create pull request
         if: env.CHANGES_DETECTED == 'true'

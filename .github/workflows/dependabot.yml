@@ -55,6 +55,13 @@ jobs:
             echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
           fi
 
+      - name: Close old PR
+        continue-on-error: true
+        run: 
+          gh pr close michijs-dependabot
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create new branch
         if: env.CHANGES_DETECTED == 'true'
         run: git checkout -B michijs-dependabot
@@ -72,14 +79,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: michijs-dependabot
           force: true
-
-      - name: Close old PR
-        if: env.CHANGES_DETECTED == 'true'
-        continue-on-error: true
-        run: 
-          gh pr close michijs-dependabot
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create new PR
         if: env.CHANGES_DETECTED == 'true'
