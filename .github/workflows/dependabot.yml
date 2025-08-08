@@ -84,7 +84,7 @@ jobs:
             NEW_VERSION=$(echo "$pkg" | cut -d'@' -f2)
             
             # Get previous version
-            OLD_VERSION=$(echo "$OLD_JSON" | jq -r ".dependencies.${PKG_NAME}, .devDependencies.${PKG_NAME} | select(.)")
+            OLD_VERSION=$(echo "$OLD_JSON" | jq -r --arg pkg "$PKG_NAME" '(.dependencies[$pkg] // .devDependencies[$pkg]) // "Not found"')
             
             OUTPUT+="### ${PKG_NAME}\n"
             OUTPUT+="- **From:** ${OLD_VERSION:-Not found}\n"
