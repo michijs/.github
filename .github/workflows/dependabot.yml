@@ -104,8 +104,7 @@ jobs:
 
             url=$(bunx npm view "$PKG_NAME" repository.url)
 
-            owner=$(echo "$url" | sed -E 's#^git\+https://github.com/([^/]+)/.*#\1#')
-            repo=$(echo "$url" | sed -E 's#^git\+https://github.com/[^/]+/([^\.]+)(\.git)?#\1#')
+            read owner repo <<< $(echo "$url" | sed -E 's|git\+https://github.com/([^/]+)/([^/.]+)(\.git)?|\1 \2|'); echo "Owner: $owner, Repo: $repo"
 
             # Get previous version
             OLD_VERSION=$(echo "$OLD_JSON" | jq -r --arg pkg "$PKG_NAME" '(.dependencies[$pkg] // .devDependencies[$pkg]) // "Not found"')
