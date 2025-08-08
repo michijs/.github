@@ -121,13 +121,7 @@ jobs:
             if [ -n "$CHANGELOG" ]; then
               FINAL_CHANGELOG="<details>
                 <summary>Changelog:</summary>
-                <em>Sourced from <a href="https://github.com/${owner}/${repo}/releases">releases</a>.</em>
-
-                ${CHANGELOG}
-
-              </details>
-              
-              "
+                <em>Sourced from <a href="https://github.com/${owner}/${repo}/releases">releases</a>.</em>${CHANGELOG}</details>"
             fi
 
             # Get commit history
