@@ -103,7 +103,7 @@ jobs:
             NEW_VERSION="${pkg##*@}"
 
             url=$(bunx npm view "$PKG_NAME" repository.url)
-            directory=$(bunx npm view "$PKG_NAME" repository.directory)
+            directory=$(bunx --silent npm view "$PKG_NAME" repository.directory)
             clean_url=${url#git+}
             clean_url=${clean_url%.git}
 
@@ -114,7 +114,7 @@ jobs:
             OLD_VERSION=$(echo "$OLD_JSON" | jq -r --arg pkg "$PKG_NAME" '(.dependencies[$pkg] // .devDependencies[$pkg]) // "Not found"')
 
             # Get changelog
-            if [ -z "$directory" ] || [ ! -d "$directory" ]; then
+            if [ -z "$directory" ]; then
               CHANGELOG=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/${owner}/${repo}/releases --jq '.[] | "\n### "+(.tag_name)+"\n\n"+(.body)+"\n\n"' || true)
             fi
             FINAL_CHANGELOG=""
