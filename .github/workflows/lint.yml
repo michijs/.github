@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     if: >
       !startsWith(github.ref_name, 'lint/') &&
-      !startsWith(github.ref_name, 'dependabot/') &&
+      !startsWith(github.ref_name, 'dependabot') &&
       github.ref_name != 'production'
     steps:
       # Setup

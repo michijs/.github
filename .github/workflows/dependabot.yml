@@ -1,0 +1,114 @@
+name: dependabot
+on:
+  workflow_call:
+permissions:
+  contents: write
+  pull-requests: write 
+
+jobs:
+  Run:
+    runs-on: ubuntu-latest
+    if: >
+      github.ref_name == 'master'
+    steps:
+      # Setup
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # We must fetch at least the immediate parents so that if this is
+          # a pull request then we can checkout the head.
+          fetch-depth: 2
+
+      # Configure Git
+      - name: Git configuration
+        uses: michijs/.github/.github/actions/set-git-config-github-actions@main
+
+      - name: Set up environment
+        uses: michijs/.github/.github/actions/setup@main
+        
+      - name: Get previous package.json state
+        id: previous-state
+        run: |
+          git show ${{ github.event.before }}:package.json > old_package.json
+          echo "old_json=$(jq -c . old_package.json)" >> $GITHUB_OUTPUT
+
+      - name: Run dependency check
+        run: |
+          UPDATED_PACKAGES=$(bunx npm-check-updates -u --jsonUpgraded | jq -r 'to_entries[] | "\(.key)@\(.value)"' | tr '\n' ' ')
+          echo "UPDATED_PACKAGES='$UPDATED_PACKAGES'" >> $GITHUB_ENV
+
+      - name: Check for changes
+        run: |
+          if git diff-index --quiet HEAD --; then
+            echo "No changes detected. Skipping next steps."
+          else
+            echo "Changes detected. Proceeding with next steps."
+            echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
+          fi
+
+      - name: Create new branch
+        if: env.CHANGES_DETECTED == 'true'
+        run: git checkout -B dependabot
+
+      - name: Commit changes
+        if: env.CHANGES_DETECTED == 'true'
+        uses: michijs/.github/.github/actions/commit-if-changes@main
+        with:
+          message: "Dependabot changes"
+
+      - name: push changes
+        if: env.CHANGES_DETECTED == 'true'
+        uses: ad-m/github-push-action@v0.8.0
+        with:
+          github_token: ${{ secrets.github_token }}
+          branch: dependabot
+          force: true
+
+      - name: Analyze package updates
+        id: package-analysis
+        if: env.CHANGES_DETECTED == 'true'
+        run: |
+          # Initialize output
+          OUTPUT="## Updated Packages Analysis\n\n"
+
+          # Get current package.json contents
+          CURRENT_JSON=$(cat package.json)
+          OLD_JSON='${{ steps.previous-state.outputs.old_json }}'
+
+          # Convert space-separated list to array
+          IFS=' ' read -ra PKGS <<< "$UPDATED_PACKAGES"
+
+          for pkg in "${PKGS[@]}"; do
+            COMMIT_HISTORY=""
+            PKG_NAME=$(echo "$pkg" | cut -d'@' -f1)
+            NEW_VERSION=$(echo "$pkg" | cut -d'@' -f2)
+            
+            # Get previous version
+            OLD_VERSION=$(echo "$OLD_JSON" | jq -r ".dependencies.${PKG_NAME}, .devDependencies.${PKG_NAME} | select(.)")
+            
+            OUTPUT+="### ${PKG_NAME}\n"
+            OUTPUT+="- **From:** ${OLD_VERSION:-Not found}\n"
+            OUTPUT+="- **To:** ${NEW_VERSION}\n"
+            
+            # Try to get changelog
+            CHANGELOG_URL="https://registry.npmjs.org/${PKG_NAME}/${NEW_VERSION}"
+            CHANGELOG=$(curl -s $CHANGELOG_URL | jq -r '.changelog // .version // "No changelog found"' || echo "No changelog available")
+            OUTPUT+="<details>
+              <summary>Changelog:</summary>
+              ${CHANGELOG}
+            </details>"
+
+            # Get commit history for this package
+            COMMITS=$(git log --pretty=format:"- %h %s (%an)" -G "\"${PKG_NAME}\"" -- package.json)
+            if [ -n "$COMMITS" ]; then
+              COMMIT_HISTORY+="#### ${PKG_NAME} commit history:\n${COMMITS}\n\n"
+            fi
+            OUTPUT+="<details>
+              <summary>Commit history:</summary>
+              ${COMMIT_HISTORY}
+            </details>"
+          done
+
+          gh pr create -B master -H dependabot --title '[master] Dependabot changes' --body "${OUTPUT}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
