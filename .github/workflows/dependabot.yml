@@ -1,4 +1,4 @@
-name: dependabot
+name: Dependabot
 on:
   workflow_call:
 permissions:
@@ -48,20 +48,20 @@ jobs:
 
       - name: Create new branch
         if: env.CHANGES_DETECTED == 'true'
-        run: git checkout -B dependabot
+        run: git checkout -B michijs-dependabot
 
       - name: Commit changes
         if: env.CHANGES_DETECTED == 'true'
         uses: michijs/.github/.github/actions/commit-if-changes@main
         with:
-          message: "Dependabot changes"
+          message: "Michijs Dependabot changes"
 
       - name: push changes
         if: env.CHANGES_DETECTED == 'true'
         uses: ad-m/github-push-action@v0.8.0
         with:
           github_token: ${{ secrets.github_token }}
-          branch: dependabot
+          branch: michijs-dependabot
           force: true
 
       - name: Analyze package updates
@@ -109,6 +109,6 @@ jobs:
             </details>"
           done
 
-          gh pr create -B master -H dependabot --title '[master] Dependabot changes' --body "${OUTPUT}"
+          gh pr create -B master -H michijs-dependabot --title '[master] Michijs Dependabot changes' --body "${OUTPUT}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
