@@ -103,8 +103,11 @@ jobs:
             NEW_VERSION="${pkg##*@}"
 
             url=$(bunx npm view "$PKG_NAME" repository.url)
+            clean_url=${url#git+}
+            clean_url=${clean_url%.git}
 
-            read owner repo <<< $(echo "$url" | sed -E 's|git\+https://github.com/([^/]+)/([^/.]+)(\.git)?|\1 \2|'); echo "Owner: $owner, Repo: $repo"
+            owner=$(echo "$clean_url" | cut -d'/' -f4)
+            repo=$(echo "$clean_url" | cut -d'/' -f5)
 
             # Get previous version
             OLD_VERSION=$(echo "$OLD_JSON" | jq -r --arg pkg "$PKG_NAME" '(.dependencies[$pkg] // .devDependencies[$pkg]) // "Not found"')
