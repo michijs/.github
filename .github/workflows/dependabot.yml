@@ -69,7 +69,9 @@ jobs:
         if: env.CHANGES_DETECTED == 'true'
         run: |
           # Initialize output
-          OUTPUT="## Updated Packages Analysis\n\n"
+          OUTPUT="## Updated Packages Analysis
+          
+          "
 
           # Get current package.json contents
           CURRENT_JSON=$(cat package.json)
@@ -85,28 +87,33 @@ jobs:
             
             # Get previous version
             OLD_VERSION=$(echo "$OLD_JSON" | jq -r --arg pkg "$PKG_NAME" '(.dependencies[$pkg] // .devDependencies[$pkg]) // "Not found"')
-            
-            OUTPUT+="### ${PKG_NAME}\n"
-            OUTPUT+="- **From:** ${OLD_VERSION:-Not found}\n"
-            OUTPUT+="- **To:** ${NEW_VERSION}\n"
-            
+
             # Try to get changelog
             CHANGELOG_URL="https://registry.npmjs.org/${PKG_NAME}/${NEW_VERSION}"
-            CHANGELOG=$(curl -s $CHANGELOG_URL | jq -r '.changelog // .version // "No changelog found"' || echo "No changelog available")
-            OUTPUT+="<details>
-              <summary>Changelog:</summary>
-              ${CHANGELOG}
-            </details>"
+            CHANGELOG=$(curl -s "$CHANGELOG_URL" | jq -r '.changelog // .description // empty' || true)
 
             # Get commit history for this package
             COMMITS=$(git log --pretty=format:"- %h %s (%an)" -G "\"${PKG_NAME}\"" -- package.json)
             if [ -n "$COMMITS" ]; then
               COMMIT_HISTORY+="#### ${PKG_NAME} commit history:\n${COMMITS}\n\n"
             fi
-            OUTPUT+="<details>
+            
+            OUTPUT+="### ${PKG_NAME}
+            From: ${OLD_VERSION:-Not found}
+            To: ${NEW_VERSION}
+
+            ${if [ -n "$CHANGELOG" ]; then
+              "<details>
+                <summary>Changelog:</summary>
+                ${CHANGELOG}
+              </details>"
+            fi}
+
+            <details>
               <summary>Commit history:</summary>
               ${COMMIT_HISTORY}
-            </details>"
+            </details>
+            "
           done
 
           gh pr create -B master -H michijs-dependabot --title '[master] Michijs Dependabot changes' --body "${OUTPUT}"
