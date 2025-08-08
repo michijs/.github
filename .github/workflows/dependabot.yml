@@ -32,10 +32,17 @@ jobs:
           git show ${{ github.event.before }}:package.json > old_package.json
           echo "old_json=$(jq -c . old_package.json)" >> $GITHUB_OUTPUT
 
-      - name: Run dependency check
+      - name: Detect updated packages (non-destructive)
+        id: detect-updates
         run: |
-          UPDATED_PACKAGES=$(bunx npm-check-updates -u --jsonUpgraded | jq -r 'to_entries[] | "\(.key)@\(.value)"' | tr '\n' ' ')
-          echo "UPDATED_PACKAGES='$UPDATED_PACKAGES'" >> $GITHUB_ENV
+          RAW_UPDATED=$(bunx npm-check-updates --jsonUpgraded)
+          echo "raw_json=$RAW_UPDATED" >> $GITHUB_OUTPUT
+
+          UPDATED_PACKAGES=$(echo "$RAW_UPDATED" | jq -r 'to_entries[] | "\(.key)@\(.value)"' | tr '\n' ' ')
+          echo "UPDATED_PACKAGES=$UPDATED_PACKAGES" >> $GITHUB_ENV
+
+      - name: Update dependencies
+        run: bunx npm-check-updates -u
 
       - name: Check for changes
         run: |
@@ -114,7 +121,7 @@ jobs:
             # Get commit history for this package
             COMMITS=$(git log --pretty=format:"- %h %s (%an)" -G "\"${PKG_NAME}\"" -- package.json)
             if [ -n "$COMMITS" ]; then
-              COMMIT_HISTORY+="#### ${PKG_NAME} commit history:\n${COMMITS}\n\n"
+              COMMIT_HISTORY+="${COMMITS}"
             fi
             
             OUTPUT+="### ${PKG_NAME}
@@ -126,7 +133,9 @@ jobs:
             <details>
               <summary>Commit history:</summary>
 
+
               ${COMMIT_HISTORY}
+
 
             </details>
             
