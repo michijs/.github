@@ -33,11 +33,15 @@ jobs:
           echo "old_json=$(jq -c . old_package.json)" >> $GITHUB_OUTPUT
 
       - name: Detect updated packages (non-destructive)
-        id: detect-updates
         run: |
           RAW_UPDATED=$(bunx npm-check-updates --jsonUpgraded)
-          echo "raw_json=$RAW_UPDATED" >> $GITHUB_OUTPUT
 
+          # Save raw JSON safely
+          echo "raw_json<<EOF" >> $GITHUB_OUTPUT
+          echo "$RAW_UPDATED" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          # Generate flat list for bash and GitHub ENV
           UPDATED_PACKAGES=$(echo "$RAW_UPDATED" | jq -r 'to_entries[] | "\(.key)@\(.value)"' | tr '\n' ' ')
           echo "UPDATED_PACKAGES=$UPDATED_PACKAGES" >> $GITHUB_ENV
 
