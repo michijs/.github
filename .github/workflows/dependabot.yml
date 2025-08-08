@@ -91,6 +91,14 @@ jobs:
             # Try to get changelog
             CHANGELOG_URL="https://registry.npmjs.org/${PKG_NAME}/${NEW_VERSION}"
             CHANGELOG=$(curl -s "$CHANGELOG_URL" | jq -r '.changelog // .description // empty' || true)
+            FINAL_CHANGELOG = ""
+            if [ -n "$CHANGELOG" ]; then
+              FINAL_CHANGELOG = "<details>
+                <summary>Changelog:</summary>
+                ${CHANGELOG}
+              </details>
+              "
+            fi
 
             # Get commit history for this package
             COMMITS=$(git log --pretty=format:"- %h %s (%an)" -G "\"${PKG_NAME}\"" -- package.json)
@@ -102,13 +110,7 @@ jobs:
             From: ${OLD_VERSION:-Not found}
             To: ${NEW_VERSION}
 
-            ${if [ -n "$CHANGELOG" ]; then
-              "<details>
-                <summary>Changelog:</summary>
-                ${CHANGELOG}
-              </details>
-              "
-            fi}
+            ${FINAL_CHANGELOG}
             <details>
               <summary>Commit history:</summary>
               ${COMMIT_HISTORY}
