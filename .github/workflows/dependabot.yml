@@ -101,8 +101,8 @@ jobs:
 
           for pkg in "${PKGS[@]}"; do
             COMMIT_HISTORY=""
-            PKG_NAME=$(echo "$pkg" | cut -d'@' -f1)
-            NEW_VERSION=$(echo "$pkg" | cut -d'@' -f2)
+            PKG_NAME="${pkg%@*}"
+            NEW_VERSION="${pkg##*@}"
             
             # Get previous version
             OLD_VERSION=$(echo "$OLD_JSON" | jq -r --arg pkg "$PKG_NAME" '(.dependencies[$pkg] // .devDependencies[$pkg]) // "Not found"')
