@@ -77,6 +77,8 @@ jobs:
         continue-on-error: true
         run: 
           gh pr close lint/${{ env.BRANCH_NAME }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create pull request
         if: env.CHANGES_DETECTED == 'true'

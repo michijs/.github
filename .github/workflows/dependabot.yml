@@ -69,6 +69,8 @@ jobs:
         continue-on-error: true
         run: 
           gh pr close michijs-dependabot
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create new PR
         id: package-analysis
