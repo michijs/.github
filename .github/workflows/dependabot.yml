@@ -106,9 +106,9 @@ jobs:
               "<details>
                 <summary>Changelog:</summary>
                 ${CHANGELOG}
-              </details>"
+              </details>
+              "
             fi}
-
             <details>
               <summary>Commit history:</summary>
               ${COMMIT_HISTORY}
