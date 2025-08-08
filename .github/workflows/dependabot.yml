@@ -64,7 +64,13 @@ jobs:
           branch: michijs-dependabot
           force: true
 
-      - name: Analyze package updates
+      - name: Close old PR
+        if: env.CHANGES_DETECTED == 'true'
+        continue-on-error: true
+        run: 
+          gh pr close michijs-dependabot
+
+      - name: Create new PR
         id: package-analysis
         if: env.CHANGES_DETECTED == 'true'
         run: |
@@ -95,8 +101,11 @@ jobs:
             if [ -n "$CHANGELOG" ]; then
               FINAL_CHANGELOG="<details>
                 <summary>Changelog:</summary>
+
                 ${CHANGELOG}
+
               </details>
+              
               "
             fi
 
@@ -111,10 +120,14 @@ jobs:
             To: ${NEW_VERSION}
 
             ${FINAL_CHANGELOG}
+
             <details>
               <summary>Commit history:</summary>
+
               ${COMMIT_HISTORY}
+
             </details>
+            
             "
           done
 

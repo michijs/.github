@@ -72,9 +72,14 @@ jobs:
           branch: lint/${{ env.BRANCH_NAME }}
           force: true
 
-      - name: Create pull request
+      - name: Close old PR
         if: env.CHANGES_DETECTED == 'true'
         continue-on-error: true
+        run: 
+          gh pr close lint/${{ env.BRANCH_NAME }}
+
+      - name: Create pull request
+        if: env.CHANGES_DETECTED == 'true'
         run: |
             SUGGESTIONS=$(biome check . 2>&1 || true)
             gh pr create -B ${{ env.BRANCH_NAME }} -H lint/${{ env.BRANCH_NAME }} --title '[${{ env.BRANCH_NAME }}] Linting changes' --body "This pull request includes linting changes based on the target branch.
