@@ -7,6 +7,9 @@ inputs:
   github_token:
     description: "Github token"
     required: true
+  ref:
+    description: "Branch to run the script"
+    required: false
 
 runs:
   using: "composite"
@@ -14,6 +17,7 @@ runs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
+        ref: ${{ inputs.ref }}
         fetch-depth: 0
 
     - name: Set up environment

@@ -6,6 +6,10 @@ on:
         description: "Script to execute"
         type: string
         required: true
+      ref:
+        description: "Branch to run the script"
+        type: string
+        required: false
   
 jobs:
   Run:
@@ -16,3 +20,4 @@ jobs:
         with: 
           script-name: ${{ inputs.script-name }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ inputs.ref }}
