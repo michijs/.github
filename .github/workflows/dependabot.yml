@@ -28,9 +28,7 @@ jobs:
         
       - name: Get previous package.json state
         id: previous-state
-        run: |
-          git show ${{ github.event.before }}:package.json > old_package.json
-          echo "old_json=$(jq -c . old_package.json)" >> $GITHUB_OUTPUT
+        run: echo "old_json=$(jq -c . package.json)" >> $GITHUB_OUTPUT
 
       - name: Detect updated packages (non-destructive)
         run: |
@@ -103,17 +101,22 @@ jobs:
             COMMIT_HISTORY=""
             PKG_NAME="${pkg%@*}"
             NEW_VERSION="${pkg##*@}"
-            
+
+            url=$(bunx npm view "$PKG_NAME" repository.url)
+
+            owner=$(echo "$url" | sed -E 's#^git\+https://github.com/([^/]+)/.*#\1#')
+            repo=$(echo "$url" | sed -E 's#^git\+https://github.com/[^/]+/([^\.]+)(\.git)?#\1#')
+
             # Get previous version
             OLD_VERSION=$(echo "$OLD_JSON" | jq -r --arg pkg "$PKG_NAME" '(.dependencies[$pkg] // .devDependencies[$pkg]) // "Not found"')
 
-            # Try to get changelog
-            CHANGELOG_URL="https://registry.npmjs.org/${PKG_NAME}/${NEW_VERSION}"
-            CHANGELOG=$(curl -s "$CHANGELOG_URL" | jq -r '.changelog // .description // empty' || true)
+            # Get changelog
+            CHANGELOG=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/${owner}/${repo}/releases --jq '.[] | "### "+(.tag_name)+"\n\n"+(.body)+"\n\n"' || true)
             FINAL_CHANGELOG=""
             if [ -n "$CHANGELOG" ]; then
               FINAL_CHANGELOG="<details>
                 <summary>Changelog:</summary>
+                <em>Sourced from <a href="https://github.com/${owner}/${repo}/releases">releases</a>.</em>
 
                 ${CHANGELOG}
 
@@ -122,25 +125,20 @@ jobs:
               "
             fi
 
-            # Get commit history for this package
-            COMMITS=$(git log --pretty=format:"- %h %s (%an)" -G "\"${PKG_NAME}\"" -- package.json)
-            if [ -n "$COMMITS" ]; then
-              COMMIT_HISTORY+="${COMMITS}"
-            fi
-            
+            # Get commit history
+            COMMIT_HISTORY=$(gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /repos/${owner}/${repo}/commits --jq '.[] | "<li><a href="+.commit.url+"><code>+"+.sha[0:6]+"</code></a> "+.commit.message+"</li>"')
+
             OUTPUT+="### ${PKG_NAME}
-            From: ${OLD_VERSION:-Not found}
-            To: ${NEW_VERSION}
+            - From: ${OLD_VERSION:-Not found}
+            - To: ${NEW_VERSION}
 
             ${FINAL_CHANGELOG}
 
             <details>
               <summary>Commit history:</summary>
-
-
+              <ul>
               ${COMMIT_HISTORY}
-
-
+              </ul>
             </details>
             
             "
