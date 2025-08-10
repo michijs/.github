@@ -1,11 +1,6 @@
 name: Dependabot
 on:
   workflow_call:
-    inputs:
-      tests-workflow:
-        description: "Tests to execute"
-        type: string
-        required: false
 permissions:
   contents: write
   pull-requests: write 
@@ -80,15 +75,6 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: michijs-dependabot
           force: true
-
-      - name: Test changes
-        if: ${{ env.CHANGES_DETECTED == 'true' && inputs.tests-workflow }}
-        continue-on-error: true
-        uses: michijs/.github/.github/actions/dispatch@main
-        with:
-          target: ${{ inputs.tests-workflow }}
-          ref: michijs-dependabot
-          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create new PR
         if: ${{ env.CHANGES_DETECTED == 'true' }}
