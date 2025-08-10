@@ -84,10 +84,12 @@ jobs:
       - name: Test changes
         if: ${{ env.CHANGES_DETECTED == 'true' && inputs.tests-workflow }}
         continue-on-error: true
-        uses: ${{ inputs.tests-workflow }}
+        uses: michijs/.github/.github/actions/dispatch@main
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          target: ${{ inputs.tests-workflow }}
           ref: michijs-dependabot
+        env:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create new PR
         if: ${{ env.CHANGES_DETECTED == 'true' }}
