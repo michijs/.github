@@ -1,6 +1,11 @@
 name: Dependabot
 on:
   workflow_call:
+    inputs:
+      tests-workflow:
+        description: "Tests to execute"
+        type: string
+        required: false
 permissions:
   contents: write
   pull-requests: write 
@@ -59,25 +64,33 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create new branch
-        if: env.CHANGES_DETECTED == 'true'
+        if: ${{ env.CHANGES_DETECTED == 'true' }}
         run: git checkout -B michijs-dependabot
 
       - name: Commit changes
-        if: env.CHANGES_DETECTED == 'true'
+        if: ${{ env.CHANGES_DETECTED == 'true' }}
         uses: michijs/.github/.github/actions/commit-if-changes@main
         with:
           message: "Michijs Dependabot changes"
 
       - name: push changes
-        if: env.CHANGES_DETECTED == 'true'
+        if: ${{ env.CHANGES_DETECTED == 'true' }}
         uses: ad-m/github-push-action@v0.8.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: michijs-dependabot
           force: true
 
+      - name: Test changes
+        if: ${{ env.CHANGES_DETECTED == 'true' && inputs.tests-workflow }}
+        continue-on-error: true
+        uses: ${{ inputs.tests-workflow }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          ref: michijs-dependabot
+
       - name: Create new PR
-        if: env.CHANGES_DETECTED == 'true'
+        if: ${{ env.CHANGES_DETECTED == 'true' }}
         run: |
           # Initialize output
           OUTPUT="## Updated Packages
