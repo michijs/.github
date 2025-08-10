@@ -1,0 +1,43 @@
+name: Run Tests Scripts
+
+on:
+  workflow_call:
+    inputs:
+      scripts:
+        description: 'JSON array of scripts with name and script fields'
+        required: true
+        type: string
+      ref:
+        description: 'Git ref to checkout'
+        required: false
+        type: string
+
+permissions:
+  pull-requests: write
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        scripts: ${{ fromJson(inputs.scripts) }}
+    steps:
+      - name: Run execute-script workflow
+        uses: michijs/.github/.github/workflows/execute-script.yml@main
+        with:
+          script-name: ${{ matrix.scripts.script }}
+          ref: ${{ inputs.ref }}
+
+      - name: Add PR comment if applicable
+        if: ${{ github.event.pull_request.number != '' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const result = '${{ job.status }}'; // "success" | "failure" | "cancelled"
+            const scriptName = '${{ matrix.scripts.name }}';
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `✅ **${scriptName} tests** ${result === 'success' ? 'passed' : 'failed'}`
+            });
