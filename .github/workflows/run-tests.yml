@@ -11,21 +11,21 @@ on:
         description: 'Git ref to checkout'
         required: false
         type: string
-
 permissions:
   contents: write
-  pull-requests: write
 
 jobs:
   run-tests:
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         scripts: ${{ fromJson(inputs.scripts) }}
-    uses: michijs/.github/.github/actions/execute-script/action.yml
-    with:
-      script-name: ${{ matrix.scripts.script }}
-      ref: ${{ inputs.ref }}
-      github_token: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: michijs/.github/.github/actions/execute-script@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          script-name: ${{ matrix.scripts.script }}
+          ref: ${{ inputs.ref }}
   comment:
     needs: run-tests
     runs-on: ubuntu-latest
