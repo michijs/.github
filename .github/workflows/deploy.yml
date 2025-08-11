@@ -1,6 +1,11 @@
 name: Deploy
 on:
   workflow_call:
+    inputs:
+      ref:
+        description: "Branch to run the script"
+        type: string
+        required: false
 permissions:
   contents: write
   pull-requests: write 
@@ -8,11 +13,13 @@ permissions:
 jobs:
   Run:
     runs-on: ubuntu-latest
-    if: github.ref_name == 'master'
+    if: github.ref_name == 'master' || inputs.ref == 'master'
     steps:
       # Setup
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
 
       # Configure Git
       - name: Git configuration
