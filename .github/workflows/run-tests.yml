@@ -21,11 +21,11 @@ jobs:
     strategy:
       matrix:
         scripts: ${{ fromJson(inputs.scripts) }}
-    uses: michijs/.github/.github/workflows/execute-script.yml@main
-    secrets: inherit
+    uses: michijs/.github/.github/actions/execute-script/action.yml
     with:
       script-name: ${{ matrix.scripts.script }}
       ref: ${{ inputs.ref }}
+      github_token: ${{ secrets.GITHUB_TOKEN }}
   comment:
     needs: run-tests
     runs-on: ubuntu-latest
