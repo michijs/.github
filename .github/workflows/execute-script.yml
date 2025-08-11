@@ -11,6 +11,9 @@ on:
         type: string
         required: false
   
+permissions:
+  contents: write
+
 jobs:
   Run:
     runs-on: ubuntu-latest
