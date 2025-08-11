@@ -22,6 +22,7 @@ jobs:
       matrix:
         scripts: ${{ fromJson(inputs.scripts) }}
     uses: michijs/.github/.github/workflows/execute-script.yml@main
+    secrets: inherit
     with:
       script-name: ${{ matrix.scripts.script }}
       ref: ${{ inputs.ref }}
