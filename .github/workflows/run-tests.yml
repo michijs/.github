@@ -24,7 +24,7 @@ jobs:
     with:
       script-name: ${{ matrix.scripts.script }}
       ref: ${{ inputs.ref }}
-
+    secrets: inherit
   comment:
     needs: run-tests
     runs-on: ubuntu-latest
