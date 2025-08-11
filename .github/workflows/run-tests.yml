@@ -32,7 +32,7 @@ jobs:
       - uses: actions/github-script@v7
         with:
           script: |
-            const branch = "${{ inputs.ref || github.ref_name }}"";
+            const branch = "${{ inputs.ref || github.ref_name }}";
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const head = `${owner}:${branch}`;
@@ -43,9 +43,13 @@ jobs:
               head,
               state: 'all',
             });
+            if (pulls.data.length === 0) {
+              console.log(`No PR found for branch ${branch}`);
+              return;
+            }
             const conclusion = '${{ needs.run-tests.result }}'; // success | failure
             await github.rest.issues.createComment({
-              issue_number: pulls[0],
+              issue_number: pulls.data[0].number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: `🔍 Test scripts ${conclusion === 'success' ? 'all passed ✅' : 'had failures ❌'}`
