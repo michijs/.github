@@ -1,4 +1,4 @@
-export default async ({ github, require, process, GITHUB_REPOSITORY, UPDATED_PACKAGES, OLD_JSON }) => {
+export default async ({ github, require, GITHUB_REPOSITORY, UPDATED_PACKAGES, OLD_JSON }) => {
   const semver = require('semver');
   const { exec } = require('child_process');
   const util = require('util');
