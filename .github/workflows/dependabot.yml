@@ -28,16 +28,7 @@ jobs:
 
       - name: Detect updated packages (non-destructive)
         run: |
-          RAW_UPDATED=$(bunx npm-check-updates --jsonUpgraded)
-
-          # Save raw JSON safely
-          echo "raw_json<<EOF" >> $GITHUB_OUTPUT
-          echo "$RAW_UPDATED" >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-          # Generate flat list for bash and GitHub ENV
-          UPDATED_PACKAGES=$(echo "$RAW_UPDATED" | jq -r 'to_entries[] | "\(.key)@\(.value)"' | tr '\n' ' ')
-          echo "UPDATED_PACKAGES=$UPDATED_PACKAGES" >> $GITHUB_ENV
+          echo "UPDATED_PACKAGES=$((bunx npm-check-updates --jsonUpgraded)" >> $GITHUB_ENV
 
       - name: Update dependencies
         run: bunx npm-check-updates -u
@@ -85,15 +76,11 @@ jobs:
 
             let output = "## Updated Packages\n\n";
 
-            const updatedPackages = process.env.UPDATED_PACKAGES?.split(' ') || [];
+            const updatedPackages = JSON.parse(process.env.UPDATED_PACKAGES);
             const oldJson = JSON.parse(process.env.OLD_JSON || '${{ steps.previous-state.outputs.old_json }}');
             const comments = [];
-            console.log({updatedPackages})
 
-            for (const pkg of updatedPackages) {
-              const atIndex = pkg.lastIndexOf('@');
-              const pkgName = atIndex !== -1 ? pkg.slice(0, atIndex): pkg;
-              const newVersion = pkg.slice(atIndex + 1);
+            for( const [pkgName, newVersion] of Object.entries(updatedPackages)){
               const url = execSync(`bunx npm view "${pkgName}" repository.url`, { encoding: 'utf-8' }).trim();
               const directory = execSync(`bunx --silent npm view "${pkgName}" repository.directory`, { encoding: 'utf-8' }).trim();
               
