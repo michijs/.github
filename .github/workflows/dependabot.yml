@@ -75,10 +75,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const script = require('${{ github.workspace }}/.github/workflows/dependabot.js')
-            await script({github, context, core})
-        env:
-          UPDATED_PACKAGES: ${{ env.UPDATED_PACKAGES }}
-          OLD_JSON: ${{ steps.previous-state.outputs.old_json }}
+            const script = require('https://raw.githubusercontent.com/michijs/.github/refs/heads/main/.github/workflows/dependabot.js');
+            script({ github })
 
             
