@@ -83,9 +83,7 @@ jobs:
             await Promise.all(Object.entries(updatedPackages).map(async ([pkgName, newVersion]) => {
               const url = execSync(`bunx npm view "${pkgName}" repository.url`, { encoding: 'utf-8' }).trim();
               const directory = execSync(`bunx --silent npm view "${pkgName}" repository.directory`, { encoding: 'utf-8' }).trim();
-              
-              let cleanUrl = url.replace(/^git\+/, '').replace(/\.git$/, '');
-              const [, , , owner, repo] = cleanUrl.split('/');
+              const [, , , owner, repo] = url.replace(/^git\+/, '').replace(/\.git$/, '').split('/');
               
               const oldVersion =
                 oldJson.dependencies?.[pkgName] ||
