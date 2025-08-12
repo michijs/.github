@@ -23,8 +23,7 @@ jobs:
         uses: michijs/.github/.github/actions/setup@main
         
       - name: Get previous package.json state
-        id: previous-state
-        run: echo "OLD_JSON=$(jq -c . package.json)" >> $GITHUB_OUTPUT
+        run: echo "OLD_JSON=$(jq -c . package.json)" >> $GITHUB_ENV
 
       - name: Detect updated packages (non-destructive)
         run: echo "UPDATED_PACKAGES=$(bunx npm-check-updates --jsonUpgraded --packageFile package.json | jq -c .)" >> $GITHUB_ENV
