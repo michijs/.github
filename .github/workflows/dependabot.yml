@@ -90,7 +90,9 @@ jobs:
             const comments = [];
 
             for (const pkg of updatedPackages) {
-              const [pkgName, newVersion] = pkg.split('@');
+              const atIndex = pkg.lastIndexOf('@');
+              const pkgName = pkg.slice(0, atIndex);
+              const newVersion = pkg.slice(atIndex + 1);
               const url = execSync(`bunx npm view "${pkgName}" repository.url`, { encoding: 'utf-8' }).trim();
               const directory = execSync(`bunx --silent npm view "${pkgName}" repository.directory`, { encoding: 'utf-8' }).trim();
               
