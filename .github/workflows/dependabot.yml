@@ -78,6 +78,17 @@ jobs:
             const { default: script } = await import('data:text/javascript,' + encodeURIComponent(await (await fetch(
               'https://raw.githubusercontent.com/michijs/.github/refs/heads/main/.github/workflows/dependabot.js'
             )).text()));
-            await script({ github, context, require, process });
+            await script(
+            { 
+              github, 
+              context, 
+              require, 
+              process: {
+                env: {
+                  UPDATED_PACKAGES: process.env.UPDATED_PACKAGES,
+                  OLD_JSON: process.env.OLD_JSON
+                }  
+              }
+            });
 
             
