@@ -27,7 +27,7 @@ jobs:
         run: echo "old_json=$(jq -c . package.json)" >> $GITHUB_OUTPUT
 
       - name: Detect updated packages (non-destructive)
-        run: echo "UPDATED_PACKAGES=$(bunx npm-check-updates --jsonUpgraded | jq -c .)" >> $GITHUB_ENV
+        run: echo "UPDATED_PACKAGES=$(bunx npm-check-updates --jsonUpgraded --packageFile package.json | jq -c .)" >> $GITHUB_ENV
 
       - name: Update dependencies
         run: bunx npm-check-updates -u
@@ -133,7 +133,7 @@ jobs:
               comments.push(`<h3>${bumpLabel}</h3>${finalChangelog}<details><summary>Commit history:</summary><ul>${commitHistory}</ul></details>`);
             }
 
-            const { number } = await github.rest.pulls.create({
+            const res = await github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: '[master] Michijs Dependabot changes',
@@ -143,7 +143,7 @@ jobs:
             });
 
             await Promise.all(comments.map(async comment => await github.rest.issues.createComment({
-              issue_number: number,
+              issue_number: res.data.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: comment
