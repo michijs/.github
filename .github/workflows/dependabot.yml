@@ -88,6 +88,8 @@ jobs:
               const oldVersion =
                 oldJson.dependencies?.[pkgName] ||
                 oldJson.devDependencies?.[pkgName] ||
+                oldJson.optionalDependencies?.[pkgName] ||
+                oldJson.peerDependencies?.[pkgName] ||
                 'Not found';
               
               const bumpLabel = `Bump ${pkgName} from ${oldVersion} to ${newVersion}`;
