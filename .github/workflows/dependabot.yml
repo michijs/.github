@@ -132,8 +132,8 @@ jobs:
                 } catch {
                   console.log(`Falling back to recent commits for ${pkgName}`);
                   try {
-                    commits = await github.rest.repos.listCommits({ owner, repo, per_page: 10 });
-                    commitHistory = commits.data;
+                    const { data } = await github.rest.repos.listCommits({ owner, repo, per_page: 10 });
+                    commits = data;
                   } catch (err) {
                     console.log(`No commit history for ${pkgName}:`, err.message);
                   }
