@@ -1,14 +1,15 @@
-export default async ({ github, require, GITHUB_REPOSITORY, UPDATED_PACKAGES, OLD_JSON }) => {
+export default async ({ github, require, params }) => {
   const semver = require('semver');
   const { exec } = require('child_process');
   const util = require('util');
   const execAsync = util.promisify(exec);
 
-  const REPO = GITHUB_REPOSITORY.split('/');
+  const REPO = params.githubRepository.split('/');
   const OWNER = REPO[0];
   const REPO_NAME = REPO[1];
   let updatedPackagesString = "";
-  const OLD_JSON = JSON.parse(OLD_JSON || '{}');
+  const updatedPackages = JSON.parse(params.updatedPackages);
+  const oldJson = JSON.parse(params.oldJson || '{}');
 
 
   async function getRepoInfo(pkgName) {
@@ -59,15 +60,15 @@ export default async ({ github, require, GITHUB_REPOSITORY, UPDATED_PACKAGES, OL
     return (comparePromise.value ?? listCommits.value).data.map(c => `<li><a href="${c.html_url}"><code>${c.sha.slice(0, 6)}</code></a> ${c.commit.message}</li>`).join('')
   }
 
-  const comments = await Promise.all(Object.entries(JSON.parse(UPDATED_PACKAGES)).map(async ([pkgName, newVersion]) => {
+  const comments = await Promise.all(Object.entries(updatedPackages).map(async ([pkgName, newVersion]) => {
     const repoInfo = await getRepoInfo(pkgName);
     if (!repoInfo.owner || !repoInfo.repo) return;
 
     const oldVersion =
-      OLD_JSON.dependencies?.[pkgName] ||
-      OLD_JSON.devDependencies?.[pkgName] ||
-      OLD_JSON.optionalDependencies?.[pkgName] ||
-      OLD_JSON.peerDependencies?.[pkgName] ||
+      oldJson.dependencies?.[pkgName] ||
+      oldJson.devDependencies?.[pkgName] ||
+      oldJson.optionalDependencies?.[pkgName] ||
+      oldJson.peerDependencies?.[pkgName] ||
       'Not found';
 
     const bumpLabel = `Bump ${pkgName} from ${oldVersion} to ${newVersion}`;
