@@ -83,12 +83,9 @@ jobs:
               github, 
               context, 
               require, 
-              process: {
-                env: {
-                  UPDATED_PACKAGES: process.env.UPDATED_PACKAGES,
-                  OLD_JSON: process.env.OLD_JSON
-                }  
-              }
+              GITHUB_REPOSITORY: process.env.GITHUB_REPOSITORY,
+              UPDATED_PACKAGES: process.env.UPDATED_PACKAGES,
+              OLD_JSON: process.env.OLD_JSON
             });
 
             
