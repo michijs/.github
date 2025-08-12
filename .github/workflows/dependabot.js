@@ -1,4 +1,4 @@
-export default async ({ github }) => {
+export default async ({ github, require, process }) => {
   const semver = require('semver');
   const { exec } = require('child_process');
   const util = require('util');
