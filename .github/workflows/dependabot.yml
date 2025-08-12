@@ -78,7 +78,7 @@ jobs:
             const semver = require('semver');
             const { execSync } = require('child_process');
 
-            let output = "## Updated Packages\n\n";
+            let updatedPackagesString = "";
 
             const updatedPackages = JSON.parse(process.env.UPDATED_PACKAGES);
             const oldJson = JSON.parse(process.env.OLD_JSON || '${{ steps.previous-state.outputs.old_json }}');
@@ -97,7 +97,7 @@ jobs:
                 'Not found';
               
               const bumpLabel = `Bump ${pkgName} from ${oldVersion} to ${newVersion}`;
-              output += `<li>${bumpLabel}</li>`;
+              updatedPackagesString += `<li>${bumpLabel}</li>`;
 
               async function getChangelog(){
                 if (!directory) {
@@ -112,7 +112,7 @@ jobs:
                       return `<details>
                         <summary>Changelog:</summary>
                         <blockquote><em>Sourced from <a href="https://github.com/${owner}/${repo}/releases">releases</a>.</em>
-                        
+
                         ${changelog}
                         
                         </blockquote></details>`;
@@ -157,7 +157,7 @@ jobs:
               title: '[master] Michijs Dependabot changes',
               head: 'michijs-dependabot',
               base: 'master',
-              body: output,
+              body: `## Updated Packages\n\n<ul>${updatedPackagesString}</ul>`,
             });
 
             await Promise.all(comments.map(async comment => await github.rest.issues.createComment({
