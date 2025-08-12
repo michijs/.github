@@ -91,7 +91,7 @@ jobs:
 
             for (const pkg of updatedPackages) {
               const atIndex = pkg.lastIndexOf('@');
-              const pkgName = pkg.slice(0, atIndex);
+              const pkgName = atIndex !== -1 ? pkg.slice(0, atIndex): pkg;
               const newVersion = pkg.slice(atIndex + 1);
               const url = execSync(`bunx npm view "${pkgName}" repository.url`, { encoding: 'utf-8' }).trim();
               const directory = execSync(`bunx --silent npm view "${pkgName}" repository.directory`, { encoding: 'utf-8' }).trim();
@@ -145,7 +145,7 @@ jobs:
               comments.push(`<h3>Bump ${pkgName} from ${oldVersion} to ${newVersion}</h3>${finalChangelog}<details><summary>Commit history:</summary><ul>${commitHistory}</ul></details>`);
             }
 
-            const { id } = await github.rest.pulls.create({
+            const { number } = await github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
               title: '[master] Michijs Dependabot changes',
@@ -154,8 +154,8 @@ jobs:
               body: output,
             });
 
-            await Promise.allSettled(comments.map(async comment => await github.rest.issues.createComment({
-              issue_number: id,
+            await Promise.all(comments.map(async comment => await github.rest.issues.createComment({
+              issue_number: number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: comment
