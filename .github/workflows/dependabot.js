@@ -8,7 +8,6 @@ export default async ({ github, require, GITHUB_REPOSITORY, UPDATED_PACKAGES, OL
   const OWNER = REPO[0];
   const REPO_NAME = REPO[1];
   let updatedPackagesString = "";
-  const UPDATED_PACKAGES = JSON.parse(UPDATED_PACKAGES);
   const OLD_JSON = JSON.parse(OLD_JSON || '{}');
 
 
@@ -60,7 +59,7 @@ export default async ({ github, require, GITHUB_REPOSITORY, UPDATED_PACKAGES, OL
     return (comparePromise.value ?? listCommits.value).data.map(c => `<li><a href="${c.html_url}"><code>${c.sha.slice(0, 6)}</code></a> ${c.commit.message}</li>`).join('')
   }
 
-  const comments = await Promise.all(Object.entries(UPDATED_PACKAGES).map(async ([pkgName, newVersion]) => {
+  const comments = await Promise.all(Object.entries(JSON.parse(UPDATED_PACKAGES)).map(async ([pkgName, newVersion]) => {
     const repoInfo = await getRepoInfo(pkgName);
     if (!repoInfo.owner || !repoInfo.repo) return;
 
