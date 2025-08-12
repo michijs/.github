@@ -66,6 +66,10 @@ jobs:
           branch: michijs-dependabot
           force: true
 
+      - name: Install semver
+        if: ${{ env.CHANGES_DETECTED == 'true' }}
+        run: bun add semver --dev
+
       - name: Create new PR
         if: ${{ env.CHANGES_DETECTED == 'true' }}
         uses: actions/github-script@v7
