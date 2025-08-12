@@ -88,6 +88,7 @@ jobs:
             const updatedPackages = process.env.UPDATED_PACKAGES?.split(' ') || [];
             const oldJson = JSON.parse(process.env.OLD_JSON || '${{ steps.previous-state.outputs.old_json }}');
             const comments = [];
+            console.log({updatedPackages})
 
             for (const pkg of updatedPackages) {
               const atIndex = pkg.lastIndexOf('@');
