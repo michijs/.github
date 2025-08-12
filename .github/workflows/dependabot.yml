@@ -144,7 +144,7 @@ jobs:
                 }
                 return commitHistory;
               }
-              const [changelog, commitHistory] = await Promise.all(getChangelog(), getCommitHistory())
+              const [changelog, commitHistory] = await Promise.all([getChangelog(), getCommitHistory()])
               
               comments.push(`<h3>${bumpLabel}</h3>${changelog}<details><summary>Commit history:</summary><ul>${commitHistory}</ul></details>`);
             }))
