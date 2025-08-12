@@ -130,7 +130,7 @@ jobs:
               }
 
               
-              comments.push(`<h3>Bump ${pkgName} from ${oldVersion} to ${newVersion}</h3>${finalChangelog}<details><summary>Commit history:</summary><ul>${commitHistory}</ul></details>`);
+              comments.push(`<h3>${bumpLabel}</h3>${finalChangelog}<details><summary>Commit history:</summary><ul>${commitHistory}</ul></details>`);
             }
 
             const { number } = await github.rest.pulls.create({
