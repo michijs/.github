@@ -80,7 +80,7 @@ jobs:
             const oldJson = JSON.parse(process.env.OLD_JSON || '${{ steps.previous-state.outputs.old_json }}');
             const comments = [];
 
-            for (const [pkgName, newVersion] of Object.entries(updatedPackages)) {
+            await Promise.all(Object.entries(updatedPackages).map(async ([pkgName, newVersion]) => {
               const url = execSync(`bunx npm view "${pkgName}" repository.url`, { encoding: 'utf-8' }).trim();
               const directory = execSync(`bunx --silent npm view "${pkgName}" repository.directory`, { encoding: 'utf-8' }).trim();
               
@@ -138,7 +138,7 @@ jobs:
               }
 
               comments.push(`<h3>${bumpLabel}</h3>${finalChangelog}<details><summary>Commit history:</summary><ul>${commitHistory}</ul></details>`);
-            }
+            }))
 
             const res = await github.rest.pulls.create({
               owner: context.repo.owner,
