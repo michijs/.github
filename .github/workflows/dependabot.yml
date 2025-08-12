@@ -111,7 +111,11 @@ jobs:
                     if (changelog) {
                       return `<details>
                         <summary>Changelog:</summary>
-                        <blockquote><em>Sourced from <a href="https://github.com/${owner}/${repo}/releases">releases</a>.</em>${changelog}</blockquote></details>`;
+                        <blockquote><em>Sourced from <a href="https://github.com/${owner}/${repo}/releases">releases</a>.</em>
+                        
+                        ${changelog}
+                        
+                        </blockquote></details>`;
                     }
                   } catch (err) {
                     console.log(`No changelog for ${pkgName}:`, err.message);
