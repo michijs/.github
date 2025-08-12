@@ -86,7 +86,7 @@ jobs:
               params: {
                 githubRepository: process.env.GITHUB_REPOSITORY,
                 updatedPackages: process.env.UPDATED_PACKAGES,
-                oldJson: process.env.OLD_JSON
+                oldJson: process.env.old_json
               }
             });
 
