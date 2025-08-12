@@ -1,15 +1,15 @@
-export default async ({ github, require, process }) => {
+export default async ({ github, require, process, GITHUB_REPOSITORY, UPDATED_PACKAGES, OLD_JSON }) => {
   const semver = require('semver');
   const { exec } = require('child_process');
   const util = require('util');
   const execAsync = util.promisify(exec);
 
-  const REPO = process.env.GITHUB_REPOSITORY.split('/');
+  const REPO = GITHUB_REPOSITORY.split('/');
   const OWNER = REPO[0];
   const REPO_NAME = REPO[1];
   let updatedPackagesString = "";
-  const UPDATED_PACKAGES = JSON.parse(process.env.UPDATED_PACKAGES);
-  const OLD_JSON = JSON.parse(process.env.OLD_JSON || '{}');
+  const UPDATED_PACKAGES = JSON.parse(UPDATED_PACKAGES);
+  const OLD_JSON = JSON.parse(OLD_JSON || '{}');
 
 
   async function getRepoInfo(pkgName) {
