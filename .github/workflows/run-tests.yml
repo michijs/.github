@@ -14,18 +14,21 @@ on:
 
 jobs:
   check-branch:
-   runs-on: ubuntu-latest
-   outputs:
-     exists: ${{ steps.check.outputs.exists }}
-   steps:
-     - name: Check if branch exists
-       id: check
-       run: |
-         if [ -n "${{ inputs.ref || github.ref_name }}" ] && git ls-remote --exit-code origin "${{ inputs.ref || github.ref_name }}"; then
-           echo "exists=true" >> $GITHUB_OUTPUT
-         else
-           echo "exists=false" >> $GITHUB_OUTPUT
-         fi
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: Check if branch exists
+        id: check
+        run: |
+          if [ -n "${{ inputs.ref || github.ref_name }}" ] && git ls-remote --exit-code origin "${{ inputs.ref || github.ref_name }}"; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
   run-tests:
     needs: check-branch
     runs-on: ubuntu-latest
