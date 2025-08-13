@@ -33,16 +33,13 @@ jobs:
             owner,
             repo,
             head,
-            state: 'all',
+            state: 'open',
+            per_page: 1
           });
-          if (pulls.data.length === 0) {
-            console.log(`No PR found for branch ${branch}`);
-            return "none";  // must return a string, not undefined
-          }
-          const result = String(pulls.data[0].number);
-          console.log({data: pulls.data, result});
-            
-          return result;
+          const prNumber = pulls.data.length > 0 ? String(pulls.data[0].number) : "none";
+
+          // **Set the output explicitly**
+          core.setOutput('pr_number', prNumber);
   run-tests:
     runs-on: ubuntu-latest
     needs: check-pr
