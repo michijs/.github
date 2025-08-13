@@ -69,7 +69,7 @@ export default async ({ github, require, params }) => {
       oldJson.devDependencies?.[pkgName] ||
       oldJson.optionalDependencies?.[pkgName] ||
       oldJson.peerDependencies?.[pkgName] ||
-      oldJson.package_manager?.split('@')?.[1] ||
+      oldJson.packageManager?.split('@')?.[1] ||
       'Not found';
 
     const bumpLabel = `Bump ${pkgName} from ${oldVersion} to ${newVersion}`;
