@@ -26,34 +26,24 @@ export default async ({ github, require, params }) => {
     }
   }
 
-  async function valid(version) {
-    try {
-      const result = (await execAsync(`bunx semver valid ${version}`, { encoding: 'utf-8' })).stdout?.trim?.();
-      return result || null; // returns the version string if valid, otherwise null
-    } catch {
-      return null;
-    }
+  function cleanVersion(version) {
+    return version.replace(/[^0-9.]/g, '');
   }
 
-  async function gt(v1, v2) {
-    return (await execAsync(`bunx semver gt ${v1} ${v2}`, { encoding: 'utf-8' })).stdout?.trim?.() === 'true';
+  async function isValid(v1, v2) {
+    return !!(await execAsync(`bunx semver "${cleanVersion(v1)}" -r ">=${cleanVersion(v2)}"`, { encoding: 'utf-8' })).stdout;
   }
 
-  async function lte(v1, v2) {
-    return (await execAsync(`bunx semver lte ${v1} ${v2}`, { encoding: 'utf-8' })).stdout?.trim?.() === 'true';
-  }
-
-  async function getChangelog(owner, repo, oldVersion, newVersion) {
+  async function getChangelog(owner, repo, oldVersion) {
     try {
       const { data: releases } = await github.rest.repos.listReleases({ owner, repo });
       const changelog = (
-        await Promise.all(
+        await Promise.allSettled(
           releases.map(async r => {
-            const isNotValid = (await Promise.all([valid(r.tag_name), gt(r.tag_name, oldVersion), lte(r.tag_name, newVersion)])).some(x => !x);
-            return isNotValid ? '' : `\n### ${r.tag_name}\n\n${r.body || ''}\n\n`
+            return isValid(r.tag_name, oldVersion) ? `\n### ${r.tag_name}\n\n${r.body || ''}\n\n` : ''
           })
         )
-      ).join('');
+      ).map(x => x.value ?? '').join('');
       if (changelog && changelog !== '') {
         return `<details>
         <summary>Changelog:</summary>
@@ -96,7 +86,7 @@ export default async ({ github, require, params }) => {
     updatedPackagesString += `<li><a href="#${idBump}">${bumpLabel}</a></li>`;
 
     const [changelog, commitHistory] = await Promise.all([
-      getChangelog(repoInfo.owner, repoInfo.repo, oldVersion, newVersion),
+      getChangelog(repoInfo.owner, repoInfo.repo, oldVersion),
       getCommitHistory(repoInfo.owner, repoInfo.repo, oldVersion, newVersion)
     ]);
 
