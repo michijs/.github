@@ -33,7 +33,11 @@ export default async ({ github, require, params }) => {
   }
 
   async function isValid(v1, v2) {
-    return !!(await execAsync(`bunx semver "${cleanVersion(v1)}" -r ">=${cleanVersion(v2)}"`, { encoding: 'utf-8' })).stdout;
+    try{
+      return await execAsync(`bunx semver "${cleanVersion(v1)}" -r ">=${cleanVersion(v2)}"`, { encoding: 'utf-8' });
+    } catch {
+      return false;
+    }
   }
 
   async function getChangelog(owner, repo, oldVersion) {
