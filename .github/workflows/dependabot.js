@@ -44,7 +44,7 @@ export default async ({ github, require, params }) => {
     try {
       const { data: releases } = await github.rest.repos.listReleases({ owner, repo });
       const changelog = (
-        await Promise.allSettled(
+        await Promise.all(
           releases.map(async r => {
             return isValid(r.tag_name, oldVersion) ? `\n### ${r.tag_name}\n\n${r.body || ''}\n\n` : ''
           })
