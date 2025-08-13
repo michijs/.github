@@ -1,8 +1,5 @@
 export default async ({ github, require, params }) => {
-  const { default: semver } = await import('data:text/javascript,' + encodeURIComponent(await (await fetch(
-    'https://unpkg.com/semver@7.7.2/index.js'
-  )).text()));
-  const { exec } = require('child_process');
+  const { exec, execSync } = require('child_process');
   const util = require('util');
   const execAsync = util.promisify(exec);
 
@@ -29,12 +26,28 @@ export default async ({ github, require, params }) => {
     }
   }
 
+  function valid(version) {
+    try {
+      const result = execSync(`bunx semver valid ${version}`, { encoding: 'utf-8' }).trim();
+      return result || null; // returns the version string if valid, otherwise null
+    } catch {
+      return null;
+    }
+  }
+
+  function gt(v1, v2) {
+    return execSync(`bunx semver gt ${v1} ${v2}`, { encoding: 'utf-8' }).trim() === 'true';
+  }
+
+  function lte(v1, v2) {
+    return execSync(`bunx semver lte ${v1} ${v2}`, { encoding: 'utf-8' }).trim() === 'true';
+  }
+
   async function getChangelog(owner, repo, oldVersion, newVersion) {
     try {
       const { data: releases } = await github.rest.repos.listReleases({ owner, repo });
       const changelog = releases
-        .filter(r => semver.valid(r.tag_name))
-        .filter(r => semver.gt(r.tag_name, oldVersion) && semver.lte(r.tag_name, newVersion))
+        .filter(r => valid(r.tag_name) && gt(r.tag_name, oldVersion) && lte(r.tag_name, newVersion))
         .map(r => `\n### ${r.tag_name}\n\n${r.body || ''}\n\n`)
         .join('');
       if (changelog) {
