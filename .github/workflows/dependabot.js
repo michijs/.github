@@ -92,7 +92,7 @@ export default async ({ github, require, params }) => {
       'Not found';
 
     const bumpLabel = `Bump ${pkgName} from ${oldVersion} to ${newVersion}`;
-    const idBump = `Bump-${pkgName}`
+    const idBump = `bump-${pkgName}`
     updatedPackagesString += `<li><a href="#${idBump}">${bumpLabel}</a></li>`;
 
     const [changelog, commitHistory] = await Promise.all([
