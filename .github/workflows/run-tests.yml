@@ -36,6 +36,7 @@ jobs:
             state: 'open',
             per_page: 1
           });
+          console.log({pulls})
           const pr = pulls.data.length > 0 ? JSON.stringify(pulls.data[0]) : "none";
 
           // **Set the output explicitly**
