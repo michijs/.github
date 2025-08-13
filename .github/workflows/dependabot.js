@@ -26,31 +26,37 @@ export default async ({ github, require, params }) => {
     }
   }
 
-  function valid(version) {
+  async function valid(version) {
     try {
-      const result = execSync(`bunx semver valid ${version}`, { encoding: 'utf-8' }).trim();
+      const result = (await execAsync(`bunx semver valid ${version}`, { encoding: 'utf-8' })).trim();
       return result || null; // returns the version string if valid, otherwise null
     } catch {
       return null;
     }
   }
 
-  function gt(v1, v2) {
-    return execSync(`bunx semver gt ${v1} ${v2}`, { encoding: 'utf-8' }).trim() === 'true';
+  async function gt(v1, v2) {
+    return (await execAsync(`bunx semver gt ${v1} ${v2}`, { encoding: 'utf-8' })).trim() === 'true';
   }
 
-  function lte(v1, v2) {
-    return execSync(`bunx semver lte ${v1} ${v2}`, { encoding: 'utf-8' }).trim() === 'true';
+  async function lte(v1, v2) {
+    return (await execAsync(`bunx semver lte ${v1} ${v2}`, { encoding: 'utf-8' })).trim() === 'true';
   }
 
   async function getChangelog(owner, repo, oldVersion, newVersion) {
     try {
       const { data: releases } = await github.rest.repos.listReleases({ owner, repo });
-      const changelog = releases
-        .filter(r => valid(r.tag_name) && gt(r.tag_name, oldVersion) && lte(r.tag_name, newVersion))
-        .map(r => `\n### ${r.tag_name}\n\n${r.body || ''}\n\n`)
-        .join('');
-      if (changelog) {
+      const changelog = (
+        await Promise.all(
+          releases.map(async r => {
+            const isValid = !(await Promise.all([valid(r.tag_name), gt(r.tag_name, oldVersion), lte(r.tag_name, newVersion)])).some(x => !x);
+            if (isValid)
+              return `\n### ${r.tag_name}\n\n${r.body || ''}\n\n`
+            return '';
+          })
+        )
+      ).join('');
+      if (changelog && changelog !== '') {
         return `<details>
         <summary>Changelog:</summary>
         <blockquote><em>Sourced from <a href="https://github.com/${owner}/${repo}/releases">releases</a>.</em>
