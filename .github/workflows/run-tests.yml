@@ -29,11 +29,37 @@ jobs:
           else
             echo "exists=false" >> $GITHUB_OUTPUT
           fi
-  run-tests:
-    needs: check-branch
+  check-pr:
     runs-on: ubuntu-latest
-    continue-on-error: true
-    if: needs.check-branch.outputs.exists == 'true'
+    outputs:
+      pr_number: ${{ steps.pr-check.outputs.pr_number }}
+    steps:
+    - name: Check if PR exists for branch
+      id: pr-check
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const branch = "${{ inputs.ref || github.ref_name }}";
+          const owner = context.repo.owner;
+          const repo = context.repo.repo;
+          const head = `${owner}:${branch}`;
+
+          const pulls = await github.rest.pulls.list({
+            owner,
+            repo,
+            head,
+            state: 'all',
+          });
+          if (pulls.data.length === 0) {
+            console.log(`No PR found for branch ${branch}`);
+            return;
+          }
+
+          return pulls.data[0]?.number;
+  run-tests:
+    runs-on: ubuntu-latest
+    needs: [check-branch, check-pr]
+    continue-on-error: ${{ needs.check-pr.outputs.pr_number }}
     strategy:
       matrix:
         scripts: ${{ fromJson(inputs.scripts) }}
@@ -44,31 +70,16 @@ jobs:
           script-name: ${{ matrix.scripts.script }}
           ref: ${{ inputs.ref }}
   comment:
-    needs: [run-tests, check-branch]
+    needs: [run-tests, check-branch, check-pr]
     runs-on: ubuntu-latest
     if: needs.check-branch.outputs.exists == 'true'
     steps:
       - uses: actions/github-script@v7
         with:
           script: |
-            const branch = "${{ inputs.ref || github.ref_name }}";
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
-            const head = `${owner}:${branch}`;
-
-            const pulls = await github.rest.pulls.list({
-              owner,
-              repo,
-              head,
-              state: 'all',
-            });
-            if (pulls.data.length === 0) {
-              console.log(`No PR found for branch ${branch}`);
-              return;
-            }
             const conclusion = '${{ needs.run-tests.result }}'; // success | failure
             await github.rest.issues.createComment({
-              issue_number: pulls.data[0].number,
+              issue_number: ${{ needs.check-pr.outputs.pr_number }},
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: `🔍 Test scripts ${conclusion === 'success' ? 'all passed ✅' : 'had failures ❌'}`
