@@ -13,22 +13,6 @@ on:
         type: string
 
 jobs:
-  check-branch:
-    runs-on: ubuntu-latest
-    outputs:
-      exists: ${{ steps.check.outputs.exists }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-      - name: Check if branch exists
-        id: check
-        run: |
-          if [ -n "${{ inputs.ref || github.ref_name }}" ] && git ls-remote --exit-code origin "${{ inputs.ref || github.ref_name }}"; then
-            echo "exists=true" >> $GITHUB_OUTPUT
-          else
-            echo "exists=false" >> $GITHUB_OUTPUT
-          fi
   check-pr:
     runs-on: ubuntu-latest
     outputs:
@@ -38,6 +22,7 @@ jobs:
       id: pr-check
       uses: actions/github-script@v7
       with:
+        result-encoding: string
         script: |
           const branch = "${{ inputs.ref || github.ref_name }}";
           const owner = context.repo.owner;
@@ -52,14 +37,14 @@ jobs:
           });
           if (pulls.data.length === 0) {
             console.log(`No PR found for branch ${branch}`);
-            return;
+            return "none";  // must return a string, not undefined
           }
 
-          return pulls.data[0]?.number;
+          return String(pulls.data[0].number);
   run-tests:
     runs-on: ubuntu-latest
-    needs: [check-branch, check-pr]
-    continue-on-error: ${{ needs.check-pr.outputs.pr_number == '' }}
+    needs: check-pr
+    continue-on-error: ${{ needs.check-pr.outputs.pr_number != 'none' }}
     strategy:
       matrix:
         scripts: ${{ fromJson(inputs.scripts) }}
@@ -70,9 +55,9 @@ jobs:
           script-name: ${{ matrix.scripts.script }}
           ref: ${{ inputs.ref }}
   comment:
-    needs: [run-tests, check-branch, check-pr]
+    needs: [run-tests, check-pr]
     runs-on: ubuntu-latest
-    if: needs.check-branch.outputs.exists == 'true'
+    if: needs.check-pr.outputs.pr_number != 'none'
     steps:
       - uses: actions/github-script@v7
         with:
