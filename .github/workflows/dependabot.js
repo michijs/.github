@@ -28,7 +28,7 @@ export default async ({ github, require, params }) => {
 
   async function valid(version) {
     try {
-      const result = (await execAsync(`bunx semver valid ${version}`, { encoding: 'utf-8' })).trim();
+      const result = (await execAsync(`bunx semver valid ${version}`, { encoding: 'utf-8' }))?.toString?.()?.trim?.();
       return result || null; // returns the version string if valid, otherwise null
     } catch {
       return null;
@@ -36,11 +36,11 @@ export default async ({ github, require, params }) => {
   }
 
   async function gt(v1, v2) {
-    return (await execAsync(`bunx semver gt ${v1} ${v2}`, { encoding: 'utf-8' })).trim() === 'true';
+    return (await execAsync(`bunx semver gt ${v1} ${v2}`, { encoding: 'utf-8' }))?.trim?.() === 'true';
   }
 
   async function lte(v1, v2) {
-    return (await execAsync(`bunx semver lte ${v1} ${v2}`, { encoding: 'utf-8' })).trim() === 'true';
+    return (await execAsync(`bunx semver lte ${v1} ${v2}`, { encoding: 'utf-8' }))?.trim?.() === 'true';
   }
 
   async function getChangelog(owner, repo, oldVersion, newVersion) {
