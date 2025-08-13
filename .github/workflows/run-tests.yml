@@ -59,7 +59,7 @@ jobs:
   run-tests:
     runs-on: ubuntu-latest
     needs: [check-branch, check-pr]
-    continue-on-error: ${{ needs.check-pr.outputs.pr_number }}
+    continue-on-error: ${{ needs.check-pr.outputs.pr_number == '' }}
     strategy:
       matrix:
         scripts: ${{ fromJson(inputs.scripts) }}
