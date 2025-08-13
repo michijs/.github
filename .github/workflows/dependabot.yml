@@ -47,6 +47,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Close old branch
+        continue-on-error: true
+        run: 
+          git branch -D origin/michijs-dependabot --remote
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create new branch
         if: ${{ env.CHANGES_DETECTED == 'true' }}
         run: git checkout -B michijs-dependabot
