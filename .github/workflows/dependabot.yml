@@ -47,7 +47,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Close old branch
+      - name: Remove old branch
         continue-on-error: true
         run: 
           git branch -D origin/michijs-dependabot --remote
