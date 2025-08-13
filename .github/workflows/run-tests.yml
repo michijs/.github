@@ -43,6 +43,8 @@ jobs:
   run-tests:
     runs-on: ubuntu-latest
     needs: check-pr
+    outputs:
+      failed: ${{ steps.set-failed.outputs.failed }}
     strategy:
       matrix:
         scripts: ${{ fromJson(inputs.scripts) }}
@@ -54,9 +56,11 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           script-name: ${{ matrix.scripts.script }}
           ref: ${{ inputs.ref }}
-      - name: Set step outcome
-        if: ${{ steps.execute.outcome == 'failure' }}
-        run: echo "step_failed=true" >> $GITHUB_ENV
+      - id: set-failed
+        run: |
+          if [ "${{ steps.execute.outcome }}" = "failure" ]; then
+            echo "failed=true" >> $GITHUB_OUTPUT
+          fi
   comment:
     needs: [run-tests, check-pr]
     runs-on: ubuntu-latest
@@ -65,7 +69,7 @@ jobs:
       - uses: actions/github-script@v7
         with:
           script: |
-            const failed = process.env.step_failed === 'true';
+            const failed = '${{ needs.run-tests.outputs.failed }}' === 'true';
             await github.rest.issues.createComment({
               issue_number: ${{ needs.check-pr.outputs.pr_number }},
               owner: context.repo.owner,
