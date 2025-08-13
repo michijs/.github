@@ -57,6 +57,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Remove old branch
+        continue-on-error: true
+        run: 
+          git branch -D lint/${{ env.BRANCH_NAME }} --remote
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create new branch
         if: env.CHANGES_DETECTED == 'true'
         run: git checkout -B lint/${{ env.BRANCH_NAME }}
