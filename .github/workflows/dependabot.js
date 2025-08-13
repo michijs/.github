@@ -27,7 +27,9 @@ export default async ({ github, require, params }) => {
   }
 
   function cleanVersion(version) {
-    return version.replace(/[^0-9.]/g, '');
+    // Match: major.minor.patch (all numeric)
+    const match = version.match(/\d+\.\d+\.\d+/);
+    return match ? match[0] : '';
   }
 
   async function isValid(v1, v2) {
