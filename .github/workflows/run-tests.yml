@@ -70,7 +70,7 @@ jobs:
         with:
           script: |
             const failed = '${{ needs.run-tests.outputs.failed }}' === 'true';
-            const pr = JSON.parse(${{ needs.check-pr.outputs.pr_number }});
+            const pr = JSON.parse(${{ needs.check-pr.outputs.pr }});
             await github.rest.pulls.update({
               owner: context.repo.owner,
               repo: context.repo.repo,
