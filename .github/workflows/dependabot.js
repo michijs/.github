@@ -1,5 +1,5 @@
 export default async ({ github, require, params }) => {
-  const semver = require('semver');
+  const semver = require('https://unpkg.com/semver@7.7.2/index.js');
   const { exec } = require('child_process');
   const util = require('util');
   const execAsync = util.promisify(exec);
