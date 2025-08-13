@@ -61,17 +61,14 @@ jobs:
           if [ "${{ steps.execute.outcome }}" = "failure" ]; then
             echo "failed=true" >> $GITHUB_OUTPUT
           fi
-  comment:
-    needs: [run-tests, check-pr]
-    runs-on: ubuntu-latest
-    if: needs.check-pr.outputs.pr != 'none'
-    steps:
-      - uses: actions/github-script@v7
+      - name: comment
+        uses: actions/github-script@v7
+        if: needs.check-pr.outputs.pr != 'none'
         with:
           script: |
-            const failed = '${{ needs.run-tests.outputs.failed }}' === 'true';
+            const failed = steps.execute.outcome === 'failure';
             const pr = JSON.parse(${{ needs.check-pr.outputs.pr_number }});
-            await github.rest.pulls.update, {
+            await github.rest.pulls.update({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: pr.number,
