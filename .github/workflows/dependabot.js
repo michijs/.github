@@ -92,14 +92,15 @@ export default async ({ github, require, params }) => {
       'Not found';
 
     const bumpLabel = `Bump ${pkgName} from ${oldVersion} to ${newVersion}`;
-    updatedPackagesString += `<li>${bumpLabel}</li>`;
+    const idBump = `Bump-${pkgName}`
+    updatedPackagesString += `<li><a href="#${idBump}"${bumpLabel}</a></li>`;
 
     const [changelog, commitHistory] = await Promise.all([
       getChangelog(repoInfo.owner, repoInfo.repo, oldVersion, newVersion),
       getCommitHistory(repoInfo.owner, repoInfo.repo, oldVersion, newVersion)
     ]);
 
-    return `<h3>${bumpLabel}</h3>${changelog}<details><summary>Commit history:</summary><ul>${commitHistory}</ul></details>`
+    return `<h3 id=${idBump}>${bumpLabel}</h3>${changelog}<details><summary>Commit history:</summary><ul>${commitHistory}</ul></details>`
   }));
 
   const pr = await github.rest.pulls.create({

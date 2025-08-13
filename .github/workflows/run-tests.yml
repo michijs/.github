@@ -75,5 +75,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: pr.number,
-              body: `${pr.body}\n\n${failed ? '> ## 🔴❌ FAILURE > Some tests failed. Please review the logs.': '> ## 🟢✅ SUCCESS > All tests passed successfully.'}`,
+              body: `${pr.body}\n\n${failed ? '> 🔴❌ FAILURE > Some tests failed. Please review the logs.': '> 🟢✅ SUCCESS > All tests passed successfully.'}`,
             })
