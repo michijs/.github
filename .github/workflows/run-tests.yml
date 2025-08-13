@@ -13,8 +13,23 @@ on:
         type: string
 
 jobs:
+  check-branch:
+   runs-on: ubuntu-latest
+   outputs:
+     exists: ${{ steps.check.outputs.exists }}
+   steps:
+     - name: Check if branch exists
+       id: check
+       run: |
+         if [ -n "${{ inputs.ref || github.ref_name }}" ] && git ls-remote --exit-code origin "${{ inputs.ref || github.ref_name }}"; then
+           echo "exists=true" >> $GITHUB_OUTPUT
+         else
+           echo "exists=false" >> $GITHUB_OUTPUT
+         fi
   run-tests:
+    needs: check-branch
     runs-on: ubuntu-latest
+    if: needs.check-branch.outputs.exists == 'true'
     strategy:
       matrix:
         scripts: ${{ fromJson(inputs.scripts) }}
@@ -25,8 +40,9 @@ jobs:
           script-name: ${{ matrix.scripts.script }}
           ref: ${{ inputs.ref }}
   comment:
-    needs: run-tests
+    needs: [run-tests, check-branch]
     runs-on: ubuntu-latest
+    if: needs.check-branch.outputs.exists == 'true'
     steps:
       - uses: actions/github-script@v7
         with:
