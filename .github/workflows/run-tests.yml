@@ -43,16 +43,20 @@ jobs:
   run-tests:
     runs-on: ubuntu-latest
     needs: check-pr
-    continue-on-error: ${{ needs.check-pr.outputs.pr_number != 'none' }}
     strategy:
       matrix:
         scripts: ${{ fromJson(inputs.scripts) }}
     steps:
       - uses: michijs/.github/.github/actions/execute-script@main
+        id: execute
+        continue-on-error: ${{ needs.check-pr.outputs.pr_number != 'none' }}
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           script-name: ${{ matrix.scripts.script }}
           ref: ${{ inputs.ref }}
+      - name: Set step outcome
+        if: ${{ steps.execute.outcome == 'failure' }}
+        run: echo "step_failed=true" >> $GITHUB_ENV
   comment:
     needs: [run-tests, check-pr]
     runs-on: ubuntu-latest
@@ -61,10 +65,10 @@ jobs:
       - uses: actions/github-script@v7
         with:
           script: |
-            const conclusion = '${{ needs.run-tests.result }}'; // success | failure
+            const failed = process.env.step_failed === 'true';
             await github.rest.issues.createComment({
               issue_number: ${{ needs.check-pr.outputs.pr_number }},
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `🔍 Test scripts ${conclusion === 'success' ? 'all passed ✅' : 'had failures ❌'}`
+              body: `🔍 Test scripts ${failed ? 'had failures ❌'} : 'all passed ✅'`
             });
