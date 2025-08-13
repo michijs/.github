@@ -93,7 +93,7 @@ export default async ({ github, require, params }) => {
 
     const bumpLabel = `Bump ${pkgName} from ${oldVersion} to ${newVersion}`;
     const idBump = `Bump-${pkgName}`
-    updatedPackagesString += `<li><a href="#${idBump}"${bumpLabel}</a></li>`;
+    updatedPackagesString += `<li><a href="#${idBump}">${bumpLabel}</a></li>`;
 
     const [changelog, commitHistory] = await Promise.all([
       getChangelog(repoInfo.owner, repoInfo.repo, oldVersion, newVersion),
