@@ -49,10 +49,8 @@ export default async ({ github, require, params }) => {
       const changelog = (
         await Promise.all(
           releases.map(async r => {
-            const isValid = !(await Promise.all([valid(r.tag_name), gt(r.tag_name, oldVersion), lte(r.tag_name, newVersion)])).some(x => !x);
-            if (isValid)
-              return `\n### ${r.tag_name}\n\n${r.body || ''}\n\n`
-            return '';
+            const isNotValid = (await Promise.all([valid(r.tag_name), gt(r.tag_name, oldVersion), lte(r.tag_name, newVersion)])).some(x => !x);
+            return isNotValid ? '' : `\n### ${r.tag_name}\n\n${r.body || ''}\n\n`
           })
         )
       ).join('');
