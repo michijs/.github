@@ -49,7 +49,7 @@ export default async ({ github, require, params }) => {
             return isValid(r.tag_name, oldVersion) ? `\n### ${r.tag_name}\n\n${r.body || ''}\n\n` : ''
           })
         )
-      ).map(x => x.value ?? '').join('');
+      ).join('');
       if (changelog && changelog !== '') {
         return `<details>
         <summary>Changelog:</summary>
