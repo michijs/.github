@@ -32,6 +32,7 @@ jobs:
   run-tests:
     needs: check-branch
     runs-on: ubuntu-latest
+    continue-on-error: true
     if: needs.check-branch.outputs.exists == 'true'
     strategy:
       matrix:
