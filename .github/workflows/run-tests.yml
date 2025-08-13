@@ -70,5 +70,5 @@ jobs:
               issue_number: ${{ needs.check-pr.outputs.pr_number }},
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `🔍 Test scripts ${failed ? 'had failures ❌'} : 'all passed ✅'`
+              body: `🔍 Test scripts ${failed ? 'had failures ❌' : 'all passed ✅'}`
             });
