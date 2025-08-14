@@ -77,5 +77,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: pr.number,
-              body: `${pr.body}\n\n${failed ? '> 🔴❌ FAILURE > Some tests failed. Please [Review the logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}?check_suite_focus=true).': '> 🟢✅ SUCCESS > All tests passed successfully.'}`,
+              body: `${pr.body}\n\n${failed ? '🔴❌ FAILURE > Some tests failed. Please [Review the logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}?check_suite_focus=true).': '🟢✅ SUCCESS > All tests passed successfully.'}`,
             })
