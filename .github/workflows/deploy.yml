@@ -17,9 +17,6 @@ jobs:
       - name: Git configuration
         uses: michijs/.github/.github/actions/set-git-config-github-actions@main
 
-      - name: Set up environment
-        uses: michijs/.github/.github/actions/setup@main
-
       - name: Create new branch
         run: git checkout -B production
 
