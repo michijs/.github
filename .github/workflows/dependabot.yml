@@ -30,6 +30,8 @@ jobs:
 
       - name: Update dependencies
         run: bunx npm-check-updates -u -p bun
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Check for changes
         run: |
