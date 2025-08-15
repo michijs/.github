@@ -58,9 +58,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Remove old branch
-        continue-on-error: true
         run: 
-          git branch -D lint/${{ env.BRANCH_NAME }} --remote
+          git branch -D origin/michijs-dependabot --remote || echo "No branch to delete"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
