@@ -1,4 +1,4 @@
-export default async ({ github, require, params, secrets }) => {
+export default async ({ github, require, params }) => {
   const { exec } = require('child_process');
   const util = require('util');
   const execAsync = util.promisify(exec);
@@ -11,15 +11,36 @@ export default async ({ github, require, params, secrets }) => {
   const oldJson = JSON.parse(params.oldJson || '{}');
 
 
-  async function getRepoInfo(pkgName) {
+  async function getPublicRepoInfo(pkgName) {
     try {
-      const { stdout } = await execAsync(`bunx --silent npm view "${pkgName}" --json repository`, { env: secrets });
+      const { stdout } = await execAsync(`bunx --silent npm view "${pkgName}" --json repository`);
       const repoInfo = JSON.parse(stdout || '{}');
       const url = (repoInfo.url || '').replace(/^git\+/, '').replace(/\.git$/, '');
       const parts = url.split('/');
       const owner = parts[parts.length - 2];
       const repo = parts[parts.length - 1];
       return { owner, repo, directory: repoInfo.directory || '' };
+    } catch (err) {
+      console.log(`Failed to get repo info for ${pkgName}: ${err.message}`);
+      return {};
+    }
+  }
+
+  async function getRepoInfo(pkgName) {
+    try {
+      const [org, package_name] = pkgName.split('/')
+      const { data } = await github.rest.packages.getPackageForOrg({
+        org: org.replace('@', ''),
+        package_type: 'npm',
+        package_name
+      });
+      console.log({ data })
+
+      return {
+        owner: data.owner.login,
+        repo: data.url,
+        directory: data?.directory
+      };
     } catch (err) {
       console.log(`Failed to get repo info for ${pkgName}: ${err.message}`);
       return {};
@@ -33,7 +54,7 @@ export default async ({ github, require, params, secrets }) => {
   }
 
   async function isValid(v1, v2) {
-    try{
+    try {
       return await execAsync(`bunx semver "${cleanVersion(v1)}" -r ">=${cleanVersion(v2)}"`, { encoding: 'utf-8' });
     } catch {
       return false;
@@ -76,8 +97,9 @@ export default async ({ github, require, params, secrets }) => {
   }
 
   const comments = await Promise.all(Object.entries(updatedPackages).map(async ([pkgName, newVersion]) => {
-    const repoInfo = await getRepoInfo(pkgName);
-    if (!repoInfo.owner || !repoInfo.repo) return;
+    const [result, resultPublic] = await Promise.allSettled([await getRepoInfo(pkgName), await getPublicRepoInfo(pkgName)]);;
+    const [owner, repo] = [result.value.owner ?? resultPublic.value.owner, result.value.repo ?? resultPublic.value.repo]
+    if (!owner || !repo) return;
 
     const oldVersion =
       oldJson.dependencies?.[pkgName] ||
@@ -92,8 +114,8 @@ export default async ({ github, require, params, secrets }) => {
     updatedPackagesString += `<li><a href="#${idBump}">${bumpLabel}</a></li>`;
 
     const [changelog, commitHistory] = await Promise.all([
-      getChangelog(repoInfo.owner, repoInfo.repo, oldVersion),
-      getCommitHistory(repoInfo.owner, repoInfo.repo, oldVersion, newVersion)
+      getChangelog(owner, repo, oldVersion),
+      getCommitHistory(owner, repo, oldVersion, newVersion)
     ]);
 
     return `<h3 id=${idBump}>${bumpLabel}</h3>${changelog}<details><summary>Commit history:</summary><ul>${commitHistory}</ul></details>`
