@@ -26,10 +26,10 @@ jobs:
         run: echo "OLD_JSON=$(jq -c . package.json)" >> $GITHUB_ENV
 
       - name: Detect updated packages (non-destructive)
-        run: echo "UPDATED_PACKAGES=$(bunx npm-check-updates --jsonUpgraded --packageFile package.json | jq -c .)" >> $GITHUB_ENV
+        run: echo "UPDATED_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -p bun --packageFile package.json | jq -c .)" >> $GITHUB_ENV
 
       - name: Update dependencies
-        run: bunx npm-check-updates -u
+        run: bunx npm-check-updates -u -p bun
 
       - name: Check for changes
         run: |
