@@ -27,6 +27,8 @@ jobs:
 
       - name: Detect updated packages (non-destructive)
         run: echo "UPDATED_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -p bun --packageFile package.json | jq -c .)" >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Update dependencies
         run: bunx npm-check-updates -u -p bun
