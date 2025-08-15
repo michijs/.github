@@ -12,40 +12,30 @@ export default async ({ github, require, params }) => {
 
 
   async function getPublicRepoInfo(pkgName) {
-    try {
-      const { stdout } = await execAsync(`bunx --silent npm view "${pkgName}" --json repository`);
-      const repoInfo = JSON.parse(stdout || '{}');
-      const url = (repoInfo.url || '').replace(/^git\+/, '').replace(/\.git$/, '');
-      const parts = url.split('/');
-      const owner = parts[parts.length - 2];
-      const repo = parts[parts.length - 1];
-      return { owner, repo, directory: repoInfo.directory || '' };
-    } catch (err) {
-      console.log(`Failed to get repo info for ${pkgName}: ${err.message}`);
-      return {};
-    }
+    const { stdout } = await execAsync(`bunx --silent npm view "${pkgName}" --json repository`);
+    const repoInfo = JSON.parse(stdout || '{}');
+    const url = (repoInfo.url || '').replace(/^git\+/, '').replace(/\.git$/, '');
+    const parts = url.split('/');
+    const owner = parts[parts.length - 2];
+    const repo = parts[parts.length - 1];
+    return { owner, repo, directory: repoInfo.directory || '' };
   }
 
   async function getRepoInfo(pkgName) {
-    try {
-      const [org, package_name] = pkgName.split('/');
-      console.log({rest: github.rest})
-      const { data } = await github.rest.packages.get({
-        org: org.replace('@', ''),
-        package_type: 'npm',
-        package_name
-      });
-      console.log({ data })
+    const [org, package_name] = pkgName.split('/');
+    console.log({ rest: github.rest })
+    const { data } = await github.rest.packages.get({
+      org: org.replace('@', ''),
+      package_type: 'npm',
+      package_name
+    });
+    console.log({ data })
 
-      return {
-        owner: data.owner.login,
-        repo: data.url,
-        directory: data?.directory
-      };
-    } catch (err) {
-      console.log(`Failed to get repo info for ${pkgName}: ${err.message}`);
-      return {};
-    }
+    return {
+      owner: data.owner.login,
+      repo: data.url,
+      directory: data?.directory
+    };
   }
 
   function cleanVersion(version) {
