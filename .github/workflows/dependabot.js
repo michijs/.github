@@ -28,8 +28,9 @@ export default async ({ github, require, params }) => {
 
   async function getRepoInfo(pkgName) {
     try {
-      const [org, package_name] = pkgName.split('/')
-      const { data } = await github.rest.packages.getPackageForOrg({
+      const [org, package_name] = pkgName.split('/');
+      console.log({rest: github.rest})
+      const { data } = await github.rest.packages.get({
         org: org.replace('@', ''),
         package_type: 'npm',
         package_name
