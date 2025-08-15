@@ -23,12 +23,12 @@ export default async ({ github, require, params }) => {
 
   async function getRepoInfo(pkgName) {
     const [org, package_name] = pkgName.split('/');
+    console.log({pkgName, org, package_name})
     const { data } = await github.rest.getAllPackageVersionsForPackageOwnedByOrg({
       org: org.replace('@', ''),
       package_type: 'npm',
       package_name
     });
-    console.log({ data })
 
     return {
       owner: data.owner.login,
@@ -87,7 +87,7 @@ export default async ({ github, require, params }) => {
   }
 
   const comments = await Promise.all(Object.entries(updatedPackages).map(async ([pkgName, newVersion]) => {
-    const [result, resultPublic] = await Promise.allSettled([getRepoInfo(pkgName), getPublicRepoInfo(pkgName)]);;
+    const [result, resultPublic] = await Promise.allSettled([getRepoInfo(pkgName), getPublicRepoInfo(pkgName)]);
     const [owner, repo] = [result.value?.owner ?? resultPublic.value?.owner, result.value?.repo ?? resultPublic.value?.repo]
     if (!owner || !repo) return;
 
