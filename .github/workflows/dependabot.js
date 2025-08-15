@@ -1,4 +1,4 @@
-export default async ({ github, require, params, GITHUB_TOKEN }) => {
+export default async ({ github, require, params, secrets }) => {
   const { exec } = require('child_process');
   const util = require('util');
   const execAsync = util.promisify(exec);
@@ -13,7 +13,7 @@ export default async ({ github, require, params, GITHUB_TOKEN }) => {
 
   async function getRepoInfo(pkgName) {
     try {
-      const { stdout } = await execAsync(`bunx --silent npm view "${pkgName}" --json repository`, { env: { ...process.env, GITHUB_TOKEN } });
+      const { stdout } = await execAsync(`bunx --silent npm view "${pkgName}" --json repository`, { env: secrets });
       const repoInfo = JSON.parse(stdout || '{}');
       const url = (repoInfo.url || '').replace(/^git\+/, '').replace(/\.git$/, '');
       const parts = url.split('/');

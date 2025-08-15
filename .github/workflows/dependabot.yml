@@ -90,7 +90,7 @@ jobs:
                 updatedPackages: process.env.UPDATED_PACKAGES,
                 oldJson: process.env.OLD_JSON
               },
-              GITHUB_TOKEN: secrets.GITHUB_TOKEN
+              secrets: { GITHUB_TOKEN: process.env.GITHUB_TOKEN }
             });
 
             
