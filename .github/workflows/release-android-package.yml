@@ -1,4 +1,4 @@
-name: Release Android package
+name: .
 on:
   workflow_call:
     inputs:

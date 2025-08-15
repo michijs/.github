@@ -1,4 +1,4 @@
-name: Deploy
+name: .
 on:
   workflow_call:
 permissions:

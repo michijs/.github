@@ -1,4 +1,4 @@
-name: Run Tests Scripts
+name: .
 
 on:
   workflow_call:

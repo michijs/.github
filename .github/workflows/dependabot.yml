@@ -1,4 +1,4 @@
-name: Dependabot
+name: .
 on:
   workflow_call:
 
@@ -89,7 +89,8 @@ jobs:
                 githubRepository: process.env.GITHUB_REPOSITORY,
                 updatedPackages: process.env.UPDATED_PACKAGES,
                 oldJson: process.env.OLD_JSON
-              }
+              },
+              GITHUB_TOKEN: secrets.GITHUB_TOKEN
             });
 
             

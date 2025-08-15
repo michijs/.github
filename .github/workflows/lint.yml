@@ -1,4 +1,4 @@
-name: Lint
+name: .
 on:
   workflow_call:
 permissions:
