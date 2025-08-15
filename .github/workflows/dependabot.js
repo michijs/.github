@@ -23,12 +23,14 @@ export default async ({ github, require, params }) => {
 
   async function getRepoInfo(pkgName) {
     const [org, package_name] = pkgName.split('/');
-    console.log({pkgName, org, package_name})
+    if (!package_name)
+      throw 'Not an org package'
     const { data } = await github.rest.getPackageForOrganization({
       org: org.replace('@', ''),
       package_type: 'npm',
       package_name
     });
+    console.log({ data })
 
     return {
       owner: data.owner.login,
