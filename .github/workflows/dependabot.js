@@ -96,7 +96,8 @@ export default async ({ github, require, params }) => {
 
   const comments = await Promise.all(Object.entries(updatedPackages).map(async ([pkgName, newVersion]) => {
     const [result, resultPublic] = await Promise.allSettled([getRepoInfo(pkgName), getPublicRepoInfo(pkgName)]);
-    const [owner, repo] = [result.value?.owner ?? resultPublic.value?.owner, result.value?.repo ?? resultPublic.value?.repo]
+    const [owner, repo] = [result.value?.owner ?? resultPublic.value?.owner, result.value?.repo ?? resultPublic.value?.repo];
+    console.log({ owner, repo })
     if (!owner || !repo) return;
 
     const oldVersion =
@@ -128,12 +129,15 @@ export default async ({ github, require, params }) => {
     body: `## Updated Packages\n\n<ul>${updatedPackagesString}</ul>`,
   });
 
-  await Promise.all(comments.map(comment =>
-    github.rest.issues.createComment({
-      issue_number: pr.data.number,
-      owner: OWNER,
-      repo: REPO_NAME,
-      body: comment
-    })
+  await Promise.all(comments.map(comment => {
+
+    if (comment)
+      return github.rest.issues.createComment({
+        issue_number: pr.data.number,
+        owner: OWNER,
+        repo: REPO_NAME,
+        body: comment
+      })
+  }
   ));
 }
