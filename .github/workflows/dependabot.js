@@ -51,7 +51,7 @@ export default async ({ github, require, params }) => {
       const changelog = (
         await Promise.all(
           releases.map(async r => {
-            return isValid(r.tag_name, oldVersion) ? `\n### ${r.tag_name}\n\n${r.body || ''}\n\n` : ''
+            return await isValid(r.tag_name, oldVersion) ? `\n### ${r.tag_name}\n\n${r.body || ''}\n\n` : ''
           })
         )
       ).join('');
@@ -76,9 +76,8 @@ export default async ({ github, require, params }) => {
         head: `v${newVersion}`,
       }), github.rest.repos.listCommits({ owner, repo, per_page: 10 })
     ])
-    console.log({owner, repo, comparePromise, listCommits})
 
-    return (comparePromise.value?.commits ?? listCommits.value).data.map(c => `<li><a href="${c.html_url}"><code>${c.sha.slice(0, 6)}</code></a> ${c.commit.message}</li>`).join('')
+    return (comparePromise.value?.commits ?? listCommits.value).data?.map(c => `<li><a href="${c.html_url}"><code>${c.sha.slice(0, 6)}</code></a> ${c.commit.message}</li>`).join('')
   }
 
   const comments = await Promise.all(Object.entries(updatedPackages).map(async ([pkgName, newVersion]) => {
@@ -103,7 +102,7 @@ export default async ({ github, require, params }) => {
       getCommitHistory(owner, repo, oldVersion, newVersion)
     ]);
 
-    return `<h3 id=${idBump}>${bumpLabel}</h3>${changelog}<details><summary>Commit history:</summary><ul>${commitHistory}</ul></details>`
+    return `<h3 id=${idBump}>${bumpLabel}</h3>${changelog}${commitHistory ? `<details><summary>Commit history:</summary><ul>${commitHistory}</ul></details>` : ''}`
   }));
 
   const pr = await github.rest.pulls.create({
