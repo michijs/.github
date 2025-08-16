@@ -25,19 +25,24 @@ export default async ({ github, require, params }) => {
     const [org, package_name] = pkgName.split('/');
     if (!package_name)
       throw 'Not an org package'
-    console.log({org, package_name})
-    const { data } = await github.rest.getPackageForOrganization({
-      org: org.replace('@', ''),
-      package_type: 'npm',
-      package_name
-    });
-    console.log({ data })
+    console.log({ org, package_name })
+    try {
+      const { data } = await github.rest.getPackageForOrganization({
+        org: org.replace('@', ''),
+        package_type: 'npm',
+        package_name: pkgName
+      });
+      console.log({ data })
 
-    return {
-      owner: data.owner.login,
-      repo: data.url,
-      directory: data?.directory
-    };
+      return {
+        owner: data.owner.login,
+        repo: data.url,
+        directory: data?.directory
+      };
+    }
+    catch {
+      return {}
+    }
   }
 
   function cleanVersion(version) {
