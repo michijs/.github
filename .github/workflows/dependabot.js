@@ -24,7 +24,7 @@ export default async ({ github, require, params }) => {
   function getRepoInfo(pkgName) {
     const [org, package_name] = pkgName.split('/');
     if (!package_name)
-      throw 'Not an org package'
+      return {}
     return {
       owner: org.replace('@', ''),
       repo: package_name
