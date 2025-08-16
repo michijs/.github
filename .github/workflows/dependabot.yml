@@ -22,13 +22,10 @@ jobs:
       - name: Get previous package.json state
         run: echo "OLD_JSON=$(jq -c . package.json)" >> $GITHUB_ENV
 
-      - name: Detect updated packages (non-destructive)
-        run: echo "UPDATED_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -p bun --packageFile package.json | jq -c .)" >> $GITHUB_ENV
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Update dependencies
-        run: bunx npm-check-updates -u -p bun
+        run: |
+          echo "UPDATED_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -u -p bun | jq -c .)" >> $GITHUB_ENV
+          echo "UPDATED_BETA_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -u -p bun --target greatest --filterVersion '/beta/' | jq -c .)" >> $GITHUB_ENV
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -41,15 +38,9 @@ jobs:
             echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
           fi
 
-      - name: Close old PR
-        continue-on-error: true
-        run: 
-          gh pr close michijs-dependabot
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Remove old branch
-        run: 
+      - name: Close old PR and old branch
+        run: |
+          gh pr close michijs-dependabot || echo "No PR to close"
           git branch -D origin/michijs-dependabot --remote || echo "No branch to delete"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -87,7 +78,7 @@ jobs:
               require, 
               params: {
                 githubRepository: process.env.GITHUB_REPOSITORY,
-                updatedPackages: process.env.UPDATED_PACKAGES,
+                updatedPackages: {...process.env.UPDATED_PACKAGES, ...process.env.UPDATED_BETA_PACKAGES},
                 oldJson: process.env.OLD_JSON
               },
             });
