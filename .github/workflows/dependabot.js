@@ -25,6 +25,7 @@ export default async ({ github, require, params }) => {
     const [org, package_name] = pkgName.split('/');
     if (!package_name)
       throw 'Not an org package'
+    console.log({org, package_name})
     const { data } = await github.rest.getPackageForOrganization({
       org: org.replace('@', ''),
       package_type: 'npm',
