@@ -1,0 +1,16 @@
+name: .
+on:
+  workflow_call:
+
+jobs:
+  Run:
+    runs-on: ubuntu-latest
+    steps:
+      - name: List org repositories
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const result = await github.rest.repos.listForOrg({"michijs"});
+            console.log({result})
+
+            
