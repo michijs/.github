@@ -93,9 +93,9 @@ export default async ({ github, require, params }) => {
       oldJson.packageManager?.split('@')?.[1] ||
       'Not found';
 
-    const bumpLabel = `Bump ${pkgName} from ${oldVersion} to ${newVersion}`;
+    const bumpLabel = `Bump <a href="https://github.com/${owner}/${repo}">${pkgName}</a> from <a href="#user-content-${idBump}">${oldVersion} to ${newVersion}</a>`;
     const idBump = `bump-${pkgName}`
-    updatedPackagesString += `<li><a href="#${idBump}">${bumpLabel}</a></li>`;
+    updatedPackagesString += `<li>${bumpLabel}</li>`;
 
     const [changelog, commitHistory] = await Promise.all([
       getChangelog(owner, repo, oldVersion),
