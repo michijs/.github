@@ -21,29 +21,14 @@ export default async ({ github, require, params }) => {
     return { owner, repo, directory: repoInfo.directory || '' };
   }
 
-  async function getRepoInfo(pkgName) {
+  function getRepoInfo(pkgName) {
     const [org, package_name] = pkgName.split('/');
     if (!package_name)
       throw 'Not an org package'
-    console.log({ org, package_name })
-    try {
-      const data = await github.rest.packages.getPackageForOrganization({
-        org: org.replace('@', ''),
-        package_type: 'npm',
-        package_name
-      });
-      console.log({ data })
-
-      return {
-        owner: data.owner.login,
-        repo: data.url,
-        directory: data?.directory
-      };
-    }
-    catch(e) {
-      console.log({e})
-      return {}
-    }
+    return {
+      owner: org.replace('@', ''),
+      repo: package_name
+    };
   }
 
   function cleanVersion(version) {
@@ -97,7 +82,7 @@ export default async ({ github, require, params }) => {
 
   const comments = await Promise.all(Object.entries(updatedPackages).map(async ([pkgName, newVersion]) => {
     const [result, resultPublic] = await Promise.allSettled([getRepoInfo(pkgName), getPublicRepoInfo(pkgName)]);
-    console.log({result: [result, resultPublic]})
+    console.log({ result: [result, resultPublic] })
     const [owner, repo] = [result.value?.owner ?? resultPublic.value?.owner, result.value?.repo ?? resultPublic.value?.repo];
     console.log({ owner, repo })
     if (!owner || !repo) return;
