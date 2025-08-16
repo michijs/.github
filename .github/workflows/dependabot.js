@@ -30,7 +30,7 @@ export default async ({ github, require, params }) => {
       const { data } = await github.rest.getPackageForOrganization({
         org: org.replace('@', ''),
         package_type: 'npm',
-        package_name: pkgName
+        package_name
       });
       console.log({ data })
 
@@ -40,7 +40,8 @@ export default async ({ github, require, params }) => {
         directory: data?.directory
       };
     }
-    catch {
+    catch(e) {
+      console.log(e)
       return {}
     }
   }
@@ -129,15 +130,10 @@ export default async ({ github, require, params }) => {
     body: `## Updated Packages\n\n<ul>${updatedPackagesString}</ul>`,
   });
 
-  await Promise.all(comments.map(comment => {
-
-    if (comment)
-      return github.rest.issues.createComment({
-        issue_number: pr.data.number,
-        owner: OWNER,
-        repo: REPO_NAME,
-        body: comment
-      })
-  }
-  ));
+  await Promise.all(comments.filter(Boolean).map(comment => github.rest.issues.createComment({
+    issue_number: pr.data.number,
+    owner: OWNER,
+    repo: REPO_NAME,
+    body: comment
+  })));
 }
