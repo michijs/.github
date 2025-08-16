@@ -11,7 +11,7 @@ jobs:
         with:
           github-token: ${{ secrets.PAT }}
           script: |
-            const result = await github.rest.repos.listForOrg({"michijs"});
+            const result = await github.rest.repos.listForOrg({org: "michijs"});
             console.log({result})
 
             
