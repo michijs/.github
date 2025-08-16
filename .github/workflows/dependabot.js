@@ -7,7 +7,7 @@ export default async ({ github, require, params }) => {
   const OWNER = REPO[0];
   const REPO_NAME = REPO[1];
   let updatedPackagesString = "";
-  const updatedPackages = JSON.parse(params.updatedPackages);
+  const updatedPackages = params.updatedPackages;
   const oldJson = JSON.parse(params.oldJson || '{}');
 
 

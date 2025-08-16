@@ -78,7 +78,7 @@ jobs:
               require, 
               params: {
                 githubRepository: process.env.GITHUB_REPOSITORY,
-                updatedPackages: {...process.env.UPDATED_PACKAGES, ...process.env.UPDATED_BETA_PACKAGES},
+                updatedPackages: {...JSON.parse(process.env.UPDATED_PACKAGES), ...JSON.parse(process.env.UPDATED_BETA_PACKAGES)},
                 oldJson: process.env.OLD_JSON
               },
             });
