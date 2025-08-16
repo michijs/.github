@@ -9,6 +9,7 @@ jobs:
       - name: List org repositories
         uses: actions/github-script@v7
         with:
+          github-token: ${{ secrets.PAT }}
           script: |
             const result = await github.rest.repos.listForOrg({"michijs"});
             console.log({result})
