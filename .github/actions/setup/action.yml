@@ -1,8 +1,17 @@
 name: "Setup runtime"
 description: "Setup runtime"
+inputs:
+  github_token:
+    description: "Github token"
+    required: false
 runs:
   using: "composite"
   steps:
+    - name: Set default github token
+      shell: bash
+      if: ${{ inputs.github_token }}
+      run: |
+        echo "GITHUB_TOKEN=${{ inputs.github_token }}" >> $GITHUB_ENV
     - name: Extract Bun version from package.json (default to latest)
       id: extract-bun-version
       shell: bash

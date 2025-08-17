@@ -28,6 +28,8 @@ runs:
 
     - name: Set up environment
       uses: michijs/.github/.github/actions/setup@main
+      with:
+        github_token: ${{ inputs.github_token }}
       
     - name: Get previous package.json state
       shell: bash
