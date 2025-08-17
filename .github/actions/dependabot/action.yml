@@ -75,6 +75,7 @@ runs:
       uses: ad-m/github-push-action@v0.8.0
       with:
         github_token: ${{ inputs.github_token }}
+        repository: ${{ inputs.repository }}
         branch: michijs-dependabot
         force: true
 
