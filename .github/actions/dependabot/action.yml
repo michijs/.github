@@ -1,13 +1,12 @@
 name: "Dependabot"
+description: "Execute dependabot in the selected repository"
 inputs:
   repository:
     description: 'Repository to checkout'
     required: false
-    type: string
   ref:
     description: 'Ref to checkout'
     required: false
-    type: string
   github_token:
     description: "Github token"
     required: true
@@ -30,9 +29,11 @@ runs:
       uses: michijs/.github/.github/actions/setup@main
       
     - name: Get previous package.json state
+      shell: bash
       run: echo "OLD_JSON=$(jq -c . package.json)" >> $GITHUB_ENV
 
     - name: Update dependencies
+      shell: bash
       run: |
         echo "UPDATED_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -u -p bun | jq -c .)" >> $GITHUB_ENV
         echo "UPDATED_BETA_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -u -p bun --target greatest --filterVersion '/beta/' | jq -c .)" >> $GITHUB_ENV
@@ -40,6 +41,7 @@ runs:
         GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
 
     - name: Check for changes
+      shell: bash
       run: |
         if git diff-index --quiet HEAD --; then
           echo "No changes detected. Skipping next steps."
@@ -49,6 +51,7 @@ runs:
         fi
 
     - name: Close old PR and old branch
+      shell: bash
       run: |
         gh pr close michijs-dependabot || echo "No PR to close"
         git branch -D origin/michijs-dependabot --remote || echo "No branch to delete"
@@ -56,6 +59,7 @@ runs:
         GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
 
     - name: Create new branch
+      shell: bash
       if: ${{ env.CHANGES_DETECTED == 'true' }}
       run: git checkout -B michijs-dependabot
 
