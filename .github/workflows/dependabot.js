@@ -110,7 +110,6 @@ export default async ({ github, require, params }) => {
     repo: REPO_NAME,
     title: '[master] Michijs Dependabot changes',
     head: 'michijs-dependabot',
-    head_repo: REPO,
     base: 'master',
     body: `## Updated Packages\n\n<ul>${updatedPackagesString}</ul>`,
   });
