@@ -109,7 +109,8 @@ export default async ({ github, require, params }) => {
     owner: OWNER,
     repo: REPO_NAME,
     title: '[master] Michijs Dependabot changes',
-    head: `${OWNER}:michijs-dependabot`,
+    head: 'michijs-dependabot',
+    head_repo: REPO,
     base: 'master',
     body: `## Updated Packages\n\n<ul>${updatedPackagesString}</ul>`,
   });
