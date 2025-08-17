@@ -20,6 +20,7 @@ runs:
       with:
         repository: ${{ inputs.repository }}
         ref: ${{ inputs.ref }}
+        token: ${{ inputs.github_token }}
 
     # Configure Git
     - name: Git configuration
@@ -38,7 +39,7 @@ runs:
         echo "UPDATED_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -u -p bun | jq -c .)" >> $GITHUB_ENV
         echo "UPDATED_BETA_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -u -p bun --target greatest --filterVersion '/beta/' | jq -c .)" >> $GITHUB_ENV
       env:
-        GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
 
     - name: Check for changes
       shell: bash
@@ -56,7 +57,7 @@ runs:
         gh pr close michijs-dependabot || echo "No PR to close"
         git branch -D origin/michijs-dependabot --remote || echo "No branch to delete"
       env:
-        GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ inputs.github_token }}
 
     - name: Create new branch
       shell: bash
@@ -73,7 +74,7 @@ runs:
       if: ${{ env.CHANGES_DETECTED == 'true' }}
       uses: ad-m/github-push-action@v0.8.0
       with:
-        github_token: ${{ inputs.GITHUB_TOKEN }}
+        github_token: ${{ inputs.github_token }}
         branch: michijs-dependabot
         force: true
 
@@ -96,5 +97,6 @@ runs:
               oldJson: process.env.OLD_JSON
             },
           });
+        github-token: ${{ inputs.github_token }}
 
             
