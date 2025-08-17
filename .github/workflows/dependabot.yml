@@ -1,6 +1,15 @@
 name: .
 on:
   workflow_call:
+    inputs:
+      repository:
+        description: 'Repository to checkout'
+        required: false
+        type: string
+      ref:
+        description: 'Ref to checkout'
+        required: false
+        type: string
 
 jobs:
   Run:
@@ -11,6 +20,9 @@ jobs:
       # Setup
       - name: Checkout repository
         uses: actions/checkout@v5
+        with:
+          repository: ${{ inputs.repository }}
+          ref: ${{ inputs.ref }}
 
       # Configure Git
       - name: Git configuration

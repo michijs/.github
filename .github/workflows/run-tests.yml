@@ -50,7 +50,8 @@ jobs:
       matrix:
         scripts: ${{ fromJson(inputs.scripts) }}
     steps:
-      - uses: michijs/.github/.github/actions/execute-script@main
+      - name: "Run ${{ matrix.scripts.name }} tests"
+        uses: michijs/.github/.github/actions/execute-script@main
         id: execute
         continue-on-error: ${{ needs.check-pr.outputs.pr != '' }}
         with:
