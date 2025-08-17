@@ -54,8 +54,7 @@ runs:
     - name: Close old PR and old branch
       shell: bash
       run: |
-        gh pr close michijs-dependabot || echo "No PR to close"
-        git branch -D origin/michijs-dependabot --remote || echo "No branch to delete"
+        gh pr close michijs-dependabot -R ${{inputs.repository}} -D || echo "No PR to close"
 
     - name: Create new branch
       shell: bash
