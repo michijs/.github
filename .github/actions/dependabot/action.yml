@@ -93,7 +93,7 @@ runs:
             context, 
             require, 
             params: {
-              githubRepository: ${{ inputs.repository || process.env.GITHUB_REPOSITORY }},
+              githubRepository: ${{ inputs.repository || env.GITHUB_REPOSITORY }},
               updatedPackages: {...JSON.parse(process.env.UPDATED_PACKAGES), ...JSON.parse(process.env.UPDATED_BETA_PACKAGES)},
               oldJson: process.env.OLD_JSON
             },
