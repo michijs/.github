@@ -39,7 +39,7 @@ jobs:
     steps:
       - name: "Run dependabot on ${{matrix.repository.name}}"
         uses: michijs/.github/.github/actions/dependabot@main
-        if: ${{ matrix.repository.archived == 'false' && matrix.repository.disabled == 'false' }}
+        if: ${{ matrix.repository.archived != false && matrix.repository.disabled != false }}
         with:
           github_token: ${{ secrets.PAT }}
           repository: ${{ matrix.repository.full_name }}
