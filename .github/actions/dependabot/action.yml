@@ -1,0 +1,96 @@
+name: "Dependabot"
+inputs:
+  repository:
+    description: 'Repository to checkout'
+    required: false
+    type: string
+  ref:
+    description: 'Ref to checkout'
+    required: false
+    type: string
+  github_token:
+    description: "Github token"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    # Setup
+    - name: Checkout repository
+      uses: actions/checkout@v5
+      with:
+        repository: ${{ inputs.repository }}
+        ref: ${{ inputs.ref }}
+
+    # Configure Git
+    - name: Git configuration
+      uses: michijs/.github/.github/actions/set-git-config-github-actions@main
+
+    - name: Set up environment
+      uses: michijs/.github/.github/actions/setup@main
+      
+    - name: Get previous package.json state
+      run: echo "OLD_JSON=$(jq -c . package.json)" >> $GITHUB_ENV
+
+    - name: Update dependencies
+      run: |
+        echo "UPDATED_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -u -p bun | jq -c .)" >> $GITHUB_ENV
+        echo "UPDATED_BETA_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -u -p bun --target greatest --filterVersion '/beta/' | jq -c .)" >> $GITHUB_ENV
+      env:
+        GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
+
+    - name: Check for changes
+      run: |
+        if git diff-index --quiet HEAD --; then
+          echo "No changes detected. Skipping next steps."
+        else
+          echo "Changes detected. Proceeding with next steps."
+          echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
+        fi
+
+    - name: Close old PR and old branch
+      run: |
+        gh pr close michijs-dependabot || echo "No PR to close"
+        git branch -D origin/michijs-dependabot --remote || echo "No branch to delete"
+      env:
+        GITHUB_TOKEN: ${{ inputs.GITHUB_TOKEN }}
+
+    - name: Create new branch
+      if: ${{ env.CHANGES_DETECTED == 'true' }}
+      run: git checkout -B michijs-dependabot
+
+    - name: Commit changes
+      if: ${{ env.CHANGES_DETECTED == 'true' }}
+      uses: michijs/.github/.github/actions/commit-if-changes@main
+      with:
+        message: "Michijs Dependabot changes"
+
+    - name: push changes
+      if: ${{ env.CHANGES_DETECTED == 'true' }}
+      uses: ad-m/github-push-action@v0.8.0
+      with:
+        github_token: ${{ inputs.GITHUB_TOKEN }}
+        branch: michijs-dependabot
+        force: true
+
+    - name: Create new PR
+      if: ${{ env.CHANGES_DETECTED == 'true' }}
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const { default: script } = await import('data:text/javascript,' + encodeURIComponent(await (await fetch(
+            'https://raw.githubusercontent.com/michijs/.github/refs/heads/main/.github/workflows/dependabot.js'
+          )).text()));
+          await script(
+          { 
+            github, 
+            context, 
+            require, 
+            params: {
+              githubRepository: process.env.GITHUB_REPOSITORY,
+              updatedPackages: {...JSON.parse(process.env.UPDATED_PACKAGES), ...JSON.parse(process.env.UPDATED_BETA_PACKAGES)},
+              oldJson: process.env.OLD_JSON
+            },
+          });
+
+            
