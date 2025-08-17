@@ -22,7 +22,14 @@ jobs:
           result-encoding: string
           script: |
             const result = await github.rest.repos.listForOrg({org: "michijs"});
-            core.setOutput('repositories', JSON.stringify(result));
+            const repositories = data.map(r => ({
+              name: r.name,
+              full_name: r.full_name,
+              archived: r.archived,
+              disabled: r.disabled,
+              default_branch: r.default_branch
+            }));
+            core.setOutput('repositories', JSON.stringify(repositories));
   run-dependabot:
     runs-on: ubuntu-latest
     needs: list-repositories
