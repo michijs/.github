@@ -29,7 +29,7 @@ runs:
             context, 
             require, 
             core,
-            params: JSON.parse(${{ inputs.params }}),
+            params: ${{ inputs.params }},
           });
 
             
