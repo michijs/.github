@@ -20,8 +20,7 @@ export default async ({ require, core, params }) => {
           const { stdout, stderr } = await execAsync(`bun run ${script}`, {
             maxBuffer: 10 * 1024 * 1024,
           });
-          if (stdout) core.info(stdout);
-          if (stderr) core.warning(stderr);
+          core.info(stdout ?? stderr);
           core.endGroup();
           return { script, success: true };
         } catch (err) {
