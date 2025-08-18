@@ -46,7 +46,7 @@ jobs:
         id: execute
         continue-on-error: ${{ steps.pr-check.outputs.pr != '' }}
         with:
-          script-name: ${{ fromJson(inputs.scripts) }}
+          script-name: ${{ inputs.scripts }}
 
       - name: Comment on PR
         if: steps.pr-check.outputs.pr != ''
