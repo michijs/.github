@@ -31,3 +31,4 @@ runs:
       uses: michijs/.github/.github/actions/run@main
       with: 
         command: ${{ inputs.script-name }}
+        github_token: ${{ inputs.github_token }}
