@@ -79,6 +79,7 @@ runs:
       if: ${{ env.CHANGES_DETECTED == 'true' }}
       uses: actions/github-script@v7
       with:
+        github-token: ${{ inputs.github_token }}
         script: |
           const { default: script } = await import('data:text/javascript,' + encodeURIComponent(await (await fetch(
             'https://raw.githubusercontent.com/michijs/.github/refs/heads/main/.github/actions/dependabot/dependabot.js'
