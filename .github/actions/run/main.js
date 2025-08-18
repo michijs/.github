@@ -14,7 +14,7 @@ export default async ({ require, core, params }) => {
     const commands = normalizeCommands(params.command);
     let error;
     // Run all commands in parallel
-    const results = await Promise.allSettled(
+    await Promise.allSettled(
       commands.map(async ({ name, script }) => {
         try {
           const { stdout, stderr } = await execAsync(`bun run ${script}`, {
@@ -23,7 +23,6 @@ export default async ({ require, core, params }) => {
           core.startGroup(`▶️ ${name}`);
           core.info(stdout ?? stderr);
           core.endGroup();
-          return { script, success: true };
         } catch (err) {
           core.startGroup(`▶️ ${name}`);
           error = err;
@@ -36,6 +35,6 @@ export default async ({ require, core, params }) => {
     if (error)
       core.setFailed(error);
   } catch (error) {
-    core.setFailed(error.message);
+    core.setFailed(error);
   }
 }
