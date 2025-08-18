@@ -1,0 +1,35 @@
+name: "Execute javascript"
+description: "Execute javascript in the selected repository"
+inputs:
+  params:
+    description: 'Params'
+    required: false
+    default: "{}"
+  github_token:
+    description: "Github token"
+    required: true
+  script:
+    description: "Script to execute"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Exeute JS
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ inputs.github_token }}
+        script: |
+          const { default: script } = await import('data:text/javascript,' + encodeURIComponent(await (await fetch(
+            '${{ inputs.script }}'
+          )).text()));
+          await script(
+          { 
+            github, 
+            context, 
+            require, 
+            core,
+            params: JSON.parse(${{ inputs.params }}),
+          });
+
+            
