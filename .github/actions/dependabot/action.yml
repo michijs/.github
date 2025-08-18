@@ -54,7 +54,7 @@ runs:
     - name: Close old PR and old branch
       shell: bash
       run: |
-        gh pr close michijs-dependabot -D || echo "No PR to close"
+        gh pr close michijs-dependabot -d || echo "No PR to close"
 
     - name: Create new branch
       shell: bash
