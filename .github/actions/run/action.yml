@@ -15,7 +15,7 @@ runs:
   steps:
     - shell: bash
       run: |
-        cmds='${{ toJson(fromJson( inputs.command )) }}'
+        cmds=$(jq -c . <<< '${{ toJson(inputs.command) }}')
 
         if [[ $cmds == \[* ]]; then
           # Check if it's array of objects (has "script" field)
