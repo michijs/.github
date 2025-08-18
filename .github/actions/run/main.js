@@ -17,10 +17,10 @@ export default async ({ require, core, params }) => {
     await Promise.allSettled(
       commands.map(async ({ name, script }) => {
         try {
-          const { stdout, stderr,...test } = await execAsync(`bun run ${script}`, {
+          const { stdout, stderr, ...test } = await execAsync(`bun run ${script}`, {
             maxBuffer: 10 * 1024 * 1024,
           });
-          console.log(stderr, stdout,...test)
+          console.log({ stderr, stdout, test })
           core.startGroup(`▶️ ${name}`);
           core.info(stdout ?? stderr);
           core.endGroup();
