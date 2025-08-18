@@ -111,9 +111,9 @@ export default async ({ github, require, params }) => {
   const pr = await github.rest.pulls.create({
     owner: OWNER,
     repo: REPO_NAME,
-    title: '[master] Michijs Dependabot changes',
+    title: `[${params.ref}] Michijs Dependabot changes`,
     head: 'michijs-dependabot',
-    base: 'master',
+    base: params.ref,
     body: `## Updated Packages\n\n<ul>${updatedPackagesString}</ul>`,
   });
 
