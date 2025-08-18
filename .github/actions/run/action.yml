@@ -9,36 +9,19 @@ inputs:
         ["build","test","lint"]
         [{"name":"run typescript tests","script":"test-tsc"}]
     required: true
+  github_token:
+    description: "Github token"
+    required: true
 
 runs:
   using: "composite"
   steps:
-    - shell: bash
-      run: |
-        cmds=$(jq -c . <<< '${{ toJson(inputs.command) }}')
-
-        if [[ $cmds == \[* ]]; then
-          # Check if it's array of objects (has "script" field)
-          if echo "$cmds" | jq '.[0] | has("script")' 2>/dev/null | grep -q true; then
-            # Array of objects
-            echo "$cmds" | jq -c '.[]' | while read -r row; do
-              name=$(echo "$row" | jq -r '.name')
-              script=$(echo "$row" | jq -r '.script')
-              echo "▶️ $name"
-              bun run "$script" &
-            done
-          else
-            # Array of strings
-            for cmd in $(echo "$cmds" | jq -r '.[]'); do
-              echo "▶️ bun run $cmd"
-              bun run "$cmd" &
-            done
-          fi
-        else
-          # Single string
-          echo "▶️ bun run $cmds"
-          bun run "$cmds" &
-        fi
-
-        # Wait for all background jobs
-        wait
+    - name: Run script
+      uses: michijs/.github/.github/actions/execute-javascript@main
+      with:
+        github_token: ${{ inputs.github_token }}
+        script: https://raw.githubusercontent.com/michijs/.github/refs/heads/main/.github/actions/run/main.js
+        params: |
+          {
+            command: "${{ inputs.command }}",
+          }
