@@ -46,6 +46,7 @@ jobs:
         id: execute
         continue-on-error: ${{ steps.pr-check.outputs.pr != '' }}
         with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           script-name: ${{ inputs.scripts }}
 
       - name: Comment on PR
