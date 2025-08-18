@@ -13,70 +13,55 @@ on:
         type: string
 
 jobs:
-  check-pr:
+  ci:
     runs-on: ubuntu-latest
-    outputs:
-      pr: ${{ steps.pr-check.outputs.pr }}
     steps:
-    - name: Check if PR exists for branch
-      if: inputs.ref != ''
-      id: pr-check
-      uses: actions/github-script@v7
-      with:
-        result-encoding: string
-        script: |
-          const branch = "${{ inputs.ref }}";
-          const owner = context.repo.owner;
-          const repo = context.repo.repo;
-          const head = `${owner}:${branch}`;
+      - name: Check if PR exists for branch
+        if: inputs.ref != ''
+        id: pr-check
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          script: |
+            const branch = "${{ inputs.ref }}";
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const head = `${owner}:${branch}`;
 
-          const pulls = await github.rest.pulls.list({
-            owner,
-            repo,
-            head,
-            state: 'open',
-            per_page: 1
-          });
-          // **Set the output explicitly**
-          core.setOutput('pr', pulls.data.length > 0 ? JSON.stringify(pulls.data[0]) : "");
-          
-  run-tests:
-    runs-on: ubuntu-latest
-    needs: check-pr
-    if: ${{ inputs.ref == '' || needs.check-pr.outputs.pr != '' }}
-    outputs:
-      failed: ${{ steps.set-failed.outputs.failed }}
-    strategy:
-      matrix:
-        scripts: ${{ fromJson(inputs.scripts) }}
-    steps:
-      - name: "Run ${{ matrix.scripts.name }} tests"
+            const pulls = await github.rest.pulls.list({
+              owner,
+              repo,
+              head,
+              state: 'open',
+              per_page: 1
+            });
+
+            core.setOutput(
+              'pr',
+              pulls.data.length > 0 ? JSON.stringify(pulls.data[0]) : ""
+            );
+
+      - name: Run scripts
         uses: michijs/.github/.github/actions/execute-script@main
         id: execute
-        continue-on-error: ${{ needs.check-pr.outputs.pr != '' }}
+        continue-on-error: ${{ steps.pr-check.outputs.pr != '' }}
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          script-name: ${{ matrix.scripts.script }}
-          ref: ${{ inputs.ref }}
-      - id: set-failed
-        if: ${{ needs.check-pr.outputs.pr != '' }}
-        run: |
-          if [ "${{ steps.execute.outcome }}" = "failure" ]; then
-            echo "failed=true" >> $GITHUB_OUTPUT
-          fi
-  comment:
-    needs: [run-tests, check-pr]
-    runs-on: ubuntu-latest
-    if: needs.check-pr.outputs.pr != ''
-    steps:
-      - uses: actions/github-script@v7
+          script-name: ${{ fromJson(inputs.scripts) }}
+
+      - name: Comment on PR
+        if: steps.pr-check.outputs.pr != ''
+        uses: actions/github-script@v7
         with:
           script: |
-            const failed = ${{ needs.run-tests.outputs.failed == 'true' }};
-            const pr = ${{ needs.check-pr.outputs.pr }};
+            const failed = "${{ steps.execute.outcome }}" === 'failure';
+            const pr = ${{ steps.pr-check.outputs.pr }};
             await github.rest.pulls.update({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: pr.number,
-              body: `${pr.body}\n\n${failed ? '🔴❌ FAILURE > Some tests failed. Please [Review the logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}?check_suite_focus=true).': '🟢✅ SUCCESS > All tests passed successfully.'}`,
-            })
+              body: `${pr.body}\n\n${
+                failed
+                  ? "🔴❌ FAILURE > Some tests failed. Please [Review the logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}?check_suite_focus=true)."
+                  : "🟢✅ SUCCESS > All tests passed successfully."
+              }`,
+            });

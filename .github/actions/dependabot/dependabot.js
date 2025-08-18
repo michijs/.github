@@ -85,7 +85,6 @@ export default async ({ github, require, params }) => {
   const comments = await Promise.all(Object.entries(updatedPackages).map(async ([pkgName, newVersion]) => {
     const [resultPublic, result] = await Promise.allSettled([getPublicRepoInfo(pkgName), getRepoInfo(pkgName)]);
     const [owner, repo] = [resultPublic.value?.owner ?? result.value?.owner, resultPublic.value?.repo ?? result.value?.repo];
-    console.log({ pkgName, owner, repo })
     if (!owner || !repo) return;
 
     const oldVersion =

@@ -1,13 +1,44 @@
 name: "Run command"
-description: "Run command"
+description: "Run one or multiple commands"
 inputs:
   command:
-    description: "Command to run"
+    description: |
+      Command(s) to run.
+      Examples:
+        "build"
+        ["build","test","lint"]
+        [{"name":"run typescript tests","script":"test-tsc"}]
     required: true
 
 runs:
   using: "composite"
   steps:
-    - run: bun run ${{ inputs.command }}
-      shell: bash
+    - shell: bash
+      run: |
+        cmds='${{ inputs.command }}'
 
+        if [[ $cmds == \[* ]]; then
+          # Check if it's array of objects (has "script" field)
+          if echo "$cmds" | jq '.[0] | has("script")' 2>/dev/null | grep -q true; then
+            # Array of objects
+            echo "$cmds" | jq -c '.[]' | while read -r row; do
+              name=$(echo "$row" | jq -r '.name')
+              script=$(echo "$row" | jq -r '.script')
+              echo "▶️ $name"
+              bun run "$script" &
+            done
+          else
+            # Array of strings
+            for cmd in $(echo "$cmds" | jq -r '.[]'); do
+              echo "▶️ bun run $cmd"
+              bun run "$cmd" &
+            done
+          fi
+        else
+          # Single string
+          echo "▶️ bun run $cmds"
+          bun run "$cmds" &
+        fi
+
+        # Wait for all background jobs
+        wait
