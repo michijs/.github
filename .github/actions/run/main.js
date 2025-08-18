@@ -1,9 +1,9 @@
 function normalizeCommands(input) {
   // Normalize to array of {name, script}
   if (typeof input === "string")
-    return [{ name: `bun run ${commands}`, script: commands }];
+    return [{ name: `bun run ${input}`, script: input }];
   else
-    return JSON.parse(input);
+    return input;
 }
 
 export default async ({ require, core, params }) => {
