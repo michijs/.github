@@ -7,27 +7,42 @@ function normalizeCommands(input) {
 }
 
 export default async ({ require, core, params }) => {
-  const { exec } = require('child_process');
-  const util = require('util');
-  const execAsync = util.promisify(exec);
+  const { spawn } = require("child_process");
+
+  async function runCommand(script) {
+    return new Promise((resolve, reject) => {
+      const child = spawn("bun", ["run", script], { stdio: ["ignore", "pipe", "pipe"] });
+      let result = ''
+
+      child.stdout.on("data", (data) => {
+        result+= data.toString().trimEnd();
+      });
+
+      child.stderr.on("data", (data) => {
+        result+= data.toString().trimEnd();
+      });
+
+      child.on("close", (code) => {
+        code === 0 ? resolve(result): reject(result);
+      });
+    });
+  }
   try {
     const commands = normalizeCommands(params.command);
     let error;
     // Run all commands in parallel
-    await Promise.allSettled(
+    const result = await Promise.allSettled(
       commands.map(async ({ name, script }) => {
         try {
-          const { stdout, stderr, ...test } = await execAsync(`bun run ${script}`, {
+          const result = await runCommand(script, {
             maxBuffer: 10 * 1024 * 1024,
           });
-          console.log({ stderr, stdout, test })
           core.startGroup(`▶️ ${name}`);
-          core.info(stdout ?? stderr);
+          core.info(result);
           core.endGroup();
         } catch (err) {
           core.startGroup(`⛔ ${name}`);
           error = err;
-          if (err.stdout) core.error(err.stdout);
           core.error(err);
           core.endGroup();
           throw err;
@@ -35,7 +50,7 @@ export default async ({ require, core, params }) => {
       })
     );
     if (error)
-      core.setFailed(error);
+      core.setFailed(`${result.filter(x => x.reason).length} errors found`);
   } catch (error) {
     core.setFailed(error);
   }
