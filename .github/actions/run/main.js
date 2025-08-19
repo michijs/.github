@@ -1,8 +1,10 @@
 function normalizeCommands(input) {
   // Normalize to array of {name, script}
-  if (typeof input === "string")
-    return [{ name: `bun run ${input}`, script: input }];
-  else
+  if (typeof input === "string") {
+    if (input === '')
+      throw 'Script is empty'
+      return [{ name: `bun run ${input}`, script: input }];
+  } else
     return input;
 }
 
@@ -15,15 +17,15 @@ export default async ({ require, core, params }) => {
       let result = ''
 
       child.stdout.on("data", (data) => {
-        result+= data.toString().trimEnd();
+        result += data.toString().trimEnd();
       });
 
       child.stderr.on("data", (data) => {
-        result+= data.toString().trimEnd();
+        result += data.toString().trimEnd();
       });
 
       child.on("close", (code) => {
-        code === 0 ? resolve(result): reject(result);
+        code === 0 ? resolve(result) : reject(result);
       });
     });
   }
