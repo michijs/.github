@@ -89,9 +89,21 @@ runs:
         "
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
-        
+
+    - name: Detect if token is a PAT
+      shell: bash
+      run: |
+        if [[ "${{ inputs.github_token }}" =~ ^gh(p|o|u|r)_ ]]; then
+          echo "IS_PAT=true" >> $GITHUB_ENV
+          echo "Detected token is a PAT"
+        else
+          echo "IS_PAT=false" >> $GITHUB_ENV
+          echo "Detected token is likely GITHUB_TOKEN"
+        fi
+
     - name: "Run tests"
       uses: michijs/.github/.github/actions/run-tests@main
+      if: ${{ env.IS_PAT == 'false' }}
       with:
         ref: lint/${{ env.BRANCH_NAME }}
         github_token: ${{ inputs.github_token }}
