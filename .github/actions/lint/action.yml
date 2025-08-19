@@ -22,6 +22,9 @@ runs:
 
     - name: Set up environment
       uses: michijs/.github/.github/actions/setup@main
+      with:
+        github_token: ${{ inputs.github_token }}
+
 
     - name: Run formatter
       uses: michijs/.github/.github/actions/run-linter@main

@@ -3,7 +3,7 @@ description: "Setup runtime"
 inputs:
   github_token:
     description: "Github token"
-    required: false
+    required: true
 runs:
   using: "composite"
   steps:
