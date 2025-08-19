@@ -6,7 +6,7 @@ inputs:
     required: true
   npm_access_token:
     description: "NPM access token"
-    required: true
+    required: false
   release-type:
     description: "Release type"
     required: true
@@ -75,13 +75,13 @@ runs:
       # Setup Node.js environment
     - name: Set up registry.npmjs.org registry
       shell: bash
-      if: env.VISIBILITY == 'public'
+      if: ${{ env.VISIBILITY == 'public' && inputs.npm_access_token != '' }}
       run: |
         echo "//registry.npmjs.org/:_authToken=${{ inputs.npm_access_token }}" > ~/.npmrc
 
     - name: Publish to registry.npmjs.org
       shell: bash
-      if: env.VISIBILITY == 'public'
+      if: ${{ env.VISIBILITY == 'public' && inputs.npm_access_token != '' }}
       run: |
         bunx npm publish --provenance --access ${{ env.VISIBILITY }} --tag ${{ env.RELEASE_TAG }}
 
