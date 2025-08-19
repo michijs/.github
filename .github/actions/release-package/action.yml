@@ -26,9 +26,6 @@ inputs:
   dist-script:
     description: "Distribution script to execute"
     default: "dist"
-  visibility:
-    description: "Package visibility"
-    default: "public"
 
 runs:
   using: "composite"
@@ -46,6 +43,12 @@ runs:
 
     - name: Configure Git
       uses: michijs/.github/.github/actions/set-git-config-github-actions@main
+
+    - name: Configure registry from publishConfig
+      id: registry
+      shell: bash
+      run: |
+        echo "VISIBILITY=${jq -r '.publishConfig.access // \"public\"' package.json}" >> $GITHUB_ENV
 
     - name: Bump package version
       shell: bash
@@ -89,15 +92,15 @@ runs:
       # Setup Node.js environment
     - name: Set up registry.npmjs.org registry
       shell: bash
-      if: inputs.visibility == 'public'
+      if: env.VISIBILITY == 'public'
       run: |
         echo "//registry.npmjs.org/:_authToken=${{ inputs.npm_access_token }}" > ~/.npmrc
 
     - name: Publish to registry.npmjs.org
       shell: bash
-      if: inputs.visibility == 'public'
+      if: env.VISIBILITY == 'public'
       run: |
-        bunx npm publish --provenance --access ${{ inputs.visibility }} --tag ${{ env.RELEASE_TAG }}
+        bunx npm publish --provenance --access ${{ env.VISIBILITY }} --tag ${{ env.RELEASE_TAG }}
 
       # If private or public publish to github packages
     - name: Set up npm.pkg.github.com registry
@@ -109,7 +112,7 @@ runs:
     - name: Publish to npm.pkg.github.com
       shell: bash
       run: |
-        bunx npm publish --access ${{ inputs.visibility }} --tag ${{ env.RELEASE_TAG }} $([[ "${{ inputs.visibility }}" = "public" ]] && echo "--provenance")
+        bunx npm publish --access ${{ env.VISIBILITY }} --tag ${{ env.RELEASE_TAG }} $([[ "${{ env.VISIBILITY }}" = "public" ]] && echo "--provenance")
       # Necessary when having an existing local .npmrc
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
