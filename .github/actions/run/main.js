@@ -27,6 +27,7 @@ export default async ({ require, core, params }) => {
         } catch (err) {
           core.startGroup(`▶️ ${name}`);
           error = err;
+          if (err.stderr) core.error(err.stderr);
           core.error(err);
           core.endGroup();
           throw err;
