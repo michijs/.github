@@ -11,6 +11,8 @@ runs:
     # Setup
     - name: Checkout repository
       uses: actions/checkout@v5
+      with:
+        token: ${{ inputs.github_token }}
 
     - name: Get Branch Name
       shell: bash
