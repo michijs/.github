@@ -3,14 +3,10 @@ description: "Deploys the project"
 inputs:
   github_token:
     description: "Github token"
-    required: true
   npm_access_token:
     description: "NPM access token"
-    required: false
   release-type:
     description: "Release type"
-    required: true
-    default: 'prerelease'
     # type: choice
     # options:
     #   - major
@@ -22,7 +18,6 @@ inputs:
     #   - prerelease
   release-notes:
     description: "Release notes"
-    default: 'Automatic release'
   release-notes-path:
     description: "Release notes path"
   dist-script:
@@ -71,7 +66,7 @@ runs:
       uses: softprops/action-gh-release@v2
       with:
         tag_name: ${{ env.NEW_VERSION }}
-        body: ${{ inputs.release-notes }}
+        body: ${{ inputs.release-notes || 'Automatic release' }}
         body_path: ${{ inputs.release-notes-path }}
         prerelease: ${{ startsWith(inputs.release-type, 'pre') }}
 
