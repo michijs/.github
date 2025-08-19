@@ -124,6 +124,7 @@ jobs:
         uses: michijs/.github/.github/actions/run@main
         with: 
           command: ${{ inputs.dist-script }}
+          github_token: ${{ inputs.github_token }}
 
       # Cargo dependency
       - name: Install system dependencies
@@ -143,6 +144,7 @@ jobs:
         uses: michijs/.github/.github/actions/run@main
         with: 
           command: cargo install --path ./src-tauri
+          github_token: ${{ inputs.github_token }}
 
       - name: Install Rust Android dependency
         run: rustup target add aarch64-linux-android
@@ -151,6 +153,7 @@ jobs:
         uses: michijs/.github/.github/actions/run@main
         with: 
           command: tauri android build --target aarch64
+          github_token: ${{ inputs.github_token }}
 
       - name: Extract Android signing key from env
         run: |

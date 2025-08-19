@@ -65,6 +65,7 @@ runs:
       uses: michijs/.github/.github/actions/run@main
       with:
         command: ${{ inputs.dist-script }}
+        github_token: ${{ inputs.github_token }}
 
     - name: Commit package.json changes and create tag
       shell: bash
