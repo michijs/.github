@@ -1,0 +1,28 @@
+name: "Deploy"
+description: "Deploys the project"
+inputs:
+  github_token:
+    description: "Github token"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    # Setup
+    - name: Checkout repository
+      uses: actions/checkout@v5
+
+    # Configure Git
+    - name: Git configuration
+      uses: michijs/.github/.github/actions/set-git-config-github-actions@main
+
+    - name: Create new branch
+      shell: bash
+      run: git checkout -B production
+
+    - name: push changes
+      uses: ad-m/github-push-action@v0.8.0
+      with:
+        github_token: ${{ inputs.github_token }}
+        branch: production
+        force: true

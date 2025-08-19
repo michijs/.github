@@ -1,9 +1,6 @@
 name: "Run lint"
 description: "Runs linter on the project"
 inputs:
-  command:
-    description: "Command to run"
-    default: "format --write ."
   github_token:
     description: "Github token"
     required: true
@@ -11,21 +8,84 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Setup Biome
-      uses: michijs/.github/.github/actions/install@main
-      with: 
-        package: -g @biomejs/biome
+    # Setup
+    - name: Checkout repository
+      uses: actions/checkout@v5
+
+    - name: Get Branch Name
+      shell: bash
+      run: echo "BRANCH_NAME=${{ github.head_ref || github.ref_name }}" >> $GITHUB_ENV
+
+    # Configure Git
+    - name: Git configuration
+      uses: michijs/.github/.github/actions/set-git-config-github-actions@main
+
+    - name: Set up environment
+      uses: michijs/.github/.github/actions/setup@main
+
+    - name: Run formatter
+      uses: michijs/.github/.github/actions/lint@main
+      with:
         github_token: ${{ inputs.github_token }}
 
-    - name: Import Biome config file
-      shell: bash
-      run: wget -O biome.json https://raw.githubusercontent.com/michijs/.github/main/biome.json
+    # Linter
 
-    - name: Run Biome
-      shell: bash
-      run: biome ${{ inputs.command }}
+    - name: Run linter
+      uses: michijs/.github/.github/actions/lint@main
+      with:
+        command: check --apply . || true
+        github_token: ${{ inputs.github_token }}
 
-    - name: Remove biome file
+    - name: Check for changes
       shell: bash
-      run: rm biome.json
+      run: |
+        if git diff-index --quiet HEAD --; then
+          echo "No changes detected. Skipping next steps."
+        else
+          echo "Changes detected. Proceeding with next steps."
+          echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
+        fi
 
+    - name: Close old PR and old branch
+      shell: bash
+      run: |
+        gh pr close lint/${{ env.BRANCH_NAME }} || echo "No PR to close"
+        git branch -D origin/lint/${{ env.BRANCH_NAME }} --remote || echo "No branch to delete"
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
+
+    - name: Create new branch
+      shell: bash
+      if: env.CHANGES_DETECTED == 'true'
+      run: git checkout -B lint/${{ env.BRANCH_NAME }}
+
+    - name: Commit changes
+      if: env.CHANGES_DETECTED == 'true'
+      uses: michijs/.github/.github/actions/commit-if-changes@main
+      with:
+        message: "Linting changes"
+
+    - name: push changes
+      if: env.CHANGES_DETECTED == 'true'
+      uses: ad-m/github-push-action@v0.8.0
+      with:
+        github_token: ${{ inputs.github_token }}
+        branch: lint/${{ env.BRANCH_NAME }}
+        force: true
+
+    - name: Create pull request
+      shell: bash
+      if: env.CHANGES_DETECTED == 'true'
+      run: |
+        SUGGESTIONS=$(biome check . 2>&1 || true)
+        gh pr create -B ${{ env.BRANCH_NAME }} -H lint/${{ env.BRANCH_NAME }} --title '[${{ env.BRANCH_NAME }}] Linting changes' --body "This pull request includes linting changes based on the target branch.
+
+        Please review and merge if everything looks good.
+
+        <details>
+          <summary>Additional suggestions:</summary>
+          ${SUGGESTIONS}
+        </details>
+        "
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}

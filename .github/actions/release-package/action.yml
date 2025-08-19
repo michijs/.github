@@ -1,0 +1,115 @@
+name: "Release package"
+description: "Deploys the project"
+inputs:
+  github_token:
+    description: "Github token"
+    required: true
+  npm_access_token:
+    description: "NPM access token"
+    required: true
+  release-type:
+    description: "Release type"
+    required: true
+    # type: choice
+    # options:
+    #   - major
+    #   - minor
+    #   - patch
+    #   - premajor
+    #   - preminor
+    #   - prepatch
+    #   - prerelease
+  release-notes:
+    description: "Release notes"
+  release-notes-path:
+    description: "Release notes path"
+  dist-script:
+    description: "Distribution script to execute"
+    default: "dist"
+  visibility:
+    description: "Package visibility"
+    default: "public"
+
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v5
+
+    - name: Set up environment
+      uses: michijs/.github/.github/actions/setup@main
+
+    - name: Install dependencies
+      uses: michijs/.github/.github/actions/install@main
+      with:
+        github_token: ${{ inputs.github_token }}
+
+    - name: Configure Git
+      uses: michijs/.github/.github/actions/set-git-config-github-actions@main
+
+    - name: Bump package version
+      shell: bash
+      run: |
+        if [[ "${{ inputs.release-type }}" == pre* ]]; then
+          NEW_VERSION=$(bunx npm --no-git-tag-version --preid=beta version ${{ inputs.release-type }})
+          echo "RELEASE_TAG=beta" >> $GITHUB_ENV
+        else
+          NEW_VERSION=$(bunx npm --no-git-tag-version version ${{ inputs.release-type }})
+          echo "RELEASE_TAG=latest" >> $GITHUB_ENV
+        fi
+        echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
+
+    - name: Build
+      uses: michijs/.github/.github/actions/run@main
+      with:
+        command: ${{ inputs.dist-script }}
+
+    - name: Commit package.json changes and create tag
+      shell: bash
+      run: |
+        git add package.json
+        git commit -m "chore: release ${{ env.NEW_VERSION }}"
+        git tag ${{ env.NEW_VERSION }}
+
+    - name: Push changes
+      uses: michijs/.github/.github/actions/pull-and-push@main
+      with:
+        github_token: ${{ inputs.github_token }}
+        tags: true
+
+    - name: Update GitHub release documentation
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ env.NEW_VERSION }}
+        body: ${{ inputs.release-notes }}
+        body_path: ${{ inputs.release-notes-path }}
+        prerelease: ${{ startsWith(inputs.release-type, 'pre') }}
+
+      # If public publish to npm
+      # Setup Node.js environment
+    - name: Set up registry.npmjs.org registry
+      shell: bash
+      if: inputs.visibility == 'public'
+      run: |
+        echo "//registry.npmjs.org/:_authToken=${{ inputs.npm_access_token }}" > ~/.npmrc
+
+    - name: Publish to registry.npmjs.org
+      shell: bash
+      if: inputs.visibility == 'public'
+      run: |
+        bunx npm publish --provenance --access ${{ inputs.visibility }} --tag ${{ env.RELEASE_TAG }}
+
+      # If private or public publish to github packages
+    - name: Set up npm.pkg.github.com registry
+      shell: bash
+      run: |
+        echo "@michijs:registry=https://npm.pkg.github.com
+        //npm.pkg.github.com/:_authToken=${{ inputs.github_token }}" > ~/.npmrc
+
+    - name: Publish to npm.pkg.github.com
+      shell: bash
+      run: |
+        bunx npm publish --access ${{ inputs.visibility }} --tag ${{ env.RELEASE_TAG }} $([[ "${{ inputs.visibility }}" = "public" ]] && echo "--provenance")
+      # Necessary when having an existing local .npmrc
+      env:
+        GITHUB_TOKEN: ${{ inputs.github_token }}
