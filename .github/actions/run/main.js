@@ -35,7 +35,7 @@ export default async ({ require, core, params }) => {
       commands.map(async ({ name, script }) => {
         try {
           const result = await runCommand(script);
-          core.startGroup(`▶️ ${name}`);
+          core.startGroup(`✅ ${name}`);
           core.info(result);
           core.endGroup();
         } catch (err) {
