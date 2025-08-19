@@ -42,7 +42,7 @@ runs:
 
     - name: Get tests to run
       shell: bash
-      run: echo "SCRIPTS=${jq -r . .github/workflows/tests.json}" >> $GITHUB_ENV
+      run: echo "SCRIPTS=$(jq -r '.' .github/workflows/tests.json)" >> $GITHUB_ENV
 
     - name: Run scripts
       uses: michijs/.github/.github/actions/execute-script@main
