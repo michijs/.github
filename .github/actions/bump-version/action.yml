@@ -16,8 +16,7 @@ runs:
       shell: bash
       # RELEASE_TRACK is for android  
       run: |
-        RELEASE_TYPE="${{ inputs.release-type }}"
-        RELEASE_TYPE="${RELEASE_TYPE:-prerelease}"
+        RELEASE_TYPE="${{ default('prerelease', inputs.release-type) }}"
         if [[ "$RELEASE_TYPE" == pre* ]]; then
           NEW_VERSION=$(bunx npm --no-git-tag-version --preid=beta version "$RELEASE_TYPE")
           echo "RELEASE_TAG=beta" >> $GITHUB_ENV
