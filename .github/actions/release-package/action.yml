@@ -47,7 +47,7 @@ runs:
     - name: Configure registry from publishConfig
       id: registry
       shell: bash
-      run: echo "VISIBILITY=$(jq -r '.publishConfig.access // "public"' package.json)" >> $GITHUB_ENV
+      run: echo "VISIBILITY=$(jq -r -c '.publishConfig.access // "public"' package.json)" >> $GITHUB_ENV
 
     - name: Bump package version
       shell: bash
