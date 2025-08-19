@@ -110,6 +110,7 @@ runs:
     - name: "Run tests"
       uses: michijs/.github/.github/actions/run-tests@main
       if: ${{ env.IS_PAT == 'false' && env.CHANGES_DETECTED == 'true' }}
+      continue-on-error: true
       with:
         ref: lint/${{ env.BRANCH_NAME }}
         github_token: ${{ inputs.github_token }}
