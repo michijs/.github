@@ -89,3 +89,9 @@ runs:
         "
       env:
         GITHUB_TOKEN: ${{ inputs.github_token }}
+        
+    - name: "Run tests"
+      uses: michijs/.github/.github/actions/run-tests@main
+      with:
+        ref: lint/${{ env.BRANCH_NAME }}
+        github_token: ${{ inputs.github_token }}
