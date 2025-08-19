@@ -10,6 +10,7 @@ inputs:
   release-type:
     description: "Release type"
     required: true
+    default: 'prerelease'
     # type: choice
     # options:
     #   - major
@@ -21,6 +22,7 @@ inputs:
     #   - prerelease
   release-notes:
     description: "Release notes"
+    default: 'Automatic release'
   release-notes-path:
     description: "Release notes path"
   dist-script:
@@ -49,36 +51,17 @@ runs:
       shell: bash
       run: echo "VISIBILITY=$(jq -r -c '.publishConfig.access // "public"' package.json)" >> $GITHUB_ENV
 
-    - name: Bump package version
-      shell: bash
-      run: |
-        if [[ "${{ inputs.release-type }}" == pre* ]]; then
-          NEW_VERSION=$(bunx npm --no-git-tag-version --preid=beta version ${{ inputs.release-type }})
-          echo "RELEASE_TAG=beta" >> $GITHUB_ENV
-        else
-          NEW_VERSION=$(bunx npm --no-git-tag-version version ${{ inputs.release-type }})
-          echo "RELEASE_TAG=latest" >> $GITHUB_ENV
-        fi
-        echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
-
     - name: Build
       uses: michijs/.github/.github/actions/run@main
       with:
         command: ${{ inputs.dist-script }}
         github_token: ${{ inputs.github_token }}
 
-    - name: Commit package.json changes and create tag
-      shell: bash
-      run: |
-        git add package.json
-        git commit -m "chore: release ${{ env.NEW_VERSION }}"
-        git tag ${{ env.NEW_VERSION }}
-
-    - name: Push changes
-      uses: michijs/.github/.github/actions/pull-and-push@main
-      with:
+    - name: Bump package version
+      uses: michijs/.github/.github/actions/bump-version@main
+      with: 
         github_token: ${{ inputs.github_token }}
-        tags: true
+        release-type: ${{ inputs.release-type }}
 
     - name: Update GitHub release documentation
       uses: softprops/action-gh-release@v2

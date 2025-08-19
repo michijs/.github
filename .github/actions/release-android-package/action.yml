@@ -1,0 +1,191 @@
+name: "Release package"
+description: "Deploys the project"
+inputs:
+  status:
+    description: "Release status"
+    default: "completed"
+    # type: choice
+    # options:
+    #   - completed
+    #   - inProgress
+    #   - halted
+    #   - draft
+  release-type:
+    description: "Release type"
+    required: true
+    # type: choice
+    # options:
+    #   - major
+    #   - minor
+    #   - patch
+    #   - premajor
+    #   - preminor
+    #   - prepatch
+    #   - prerelease
+  release-notes:
+    description: "Release notes"
+  dist-script:
+    description: "Build script to execute"
+    default: "build"
+  deploy-to-play-store:
+    description: "Deploy to Play Store"
+    default: "true"
+  github_token:
+    description: "Github token"
+  android_release_keystore:
+    description: "Android keystore"
+  android_release_keystore_password:
+    description: "Android keystore password"
+  service_account_json:
+    description: "Android keystore password"
+runs:
+  using: "composite"
+  steps:
+    - name: Checkout repository
+      uses: actions/checkout@v5
+
+    - name: Set up java
+      uses: actions/setup-java@v4
+      with:
+        distribution: "microsoft"
+        java-version: "17.0.3"
+        cache: "gradle"
+
+      # Setup Node.js environment
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 18
+        # Important!
+        registry-url: "https://registry.npmjs.org"
+        always-auth: true
+
+    - name: Set up environment
+      uses: michijs/.github/.github/actions/setup@main
+
+    - name: Install dependencies
+      uses: michijs/.github/.github/actions/install@main
+      with:
+        github_token: ${{ inputs.github_token }}
+
+    - name: Cache Rust dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          ./src-tauri/target
+        key: rust-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+        restore-keys: |
+          rust-${{ runner.os }}-
+
+    - name: Cache Gradle build and wrappers
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+          ./src-tauri/gen/android/.gradle
+        key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          gradle-${{ runner.os }}-
+
+    # Configure Git
+    - name: Git configuration
+      uses: michijs/.github/.github/actions/set-git-config-github-actions@main
+
+    # Build
+    - name: Build
+      uses: michijs/.github/.github/actions/run@main
+      with:
+        command: ${{ inputs.dist-script }}
+        github_token: ${{ inputs.github_token }}
+
+    # Cargo dependency
+    - name: Install system dependencies
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libgtk-3-dev libsoup-3.0-dev libwebkit2gtk-4.1-dev pkg-config
+
+    - name: Install Android SDK and NDK
+      uses: android-actions/setup-android@v3
+      with:
+        packages: "ndk;25.2.9519653"
+
+    - name: Set NDK_HOME
+      shell: bash
+      run: echo "NDK_HOME=$ANDROID_SDK_ROOT/ndk/25.2.9519653" >> $GITHUB_ENV
+
+    - name: Android install
+      uses: michijs/.github/.github/actions/run@main
+      with:
+        command: cargo install --path ./src-tauri
+        github_token: ${{ inputs.github_token }}
+
+    - name: Install Rust Android dependency
+      shell: bash
+      run: rustup target add aarch64-linux-android
+
+    - name: Build app APK
+      uses: michijs/.github/.github/actions/run@main
+      with:
+        command: tauri android build --target aarch64
+        github_token: ${{ inputs.github_token }}
+
+    - name: Extract Android signing key from env
+      shell: bash
+      run: |
+        echo "${{ inputs.android_release_keystore }}" > ./src-tauri/gen/android/release.jks.base64
+        base64 -d ./src-tauri/gen/android/release.jks.base64 > ./src-tauri/gen/android/release.decrypted.jks
+
+    - name: Sign app bundle (AAB)
+      shell: bash
+      run: jarsigner -keystore ./src-tauri/gen/android/release.decrypted.jks -storepass "${{ inputs.android_release_keystore_password }}" -signedjar ./src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-release-signed.aab ./src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-universal-release.aab play_store
+
+    - name: Sign app APK
+      shell: bash
+      run: jarsigner -keystore ./src-tauri/gen/android/release.decrypted.jks -storepass "${{ inputs.android_release_keystore_password }}" -signedjar ./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-debug-signed.apk ./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk play_store
+
+    - name: Create whats new directory
+      shell: bash
+      run: |
+        mkdir whatsnew
+        cd whatsnew && echo "${{ inputs.release-notes }}" >> "whatsnew-en-US"
+
+    - name: Get Package Name
+      shell: bash
+      if: inputs.deploy-to-play-store
+      run: echo "ANDROID_PACKAGE_NAME=$(jq -r .identifier src-tauri/tauri.conf.json)" >> $GITHUB_ENV
+
+    - name: Bump package version
+      uses: michijs/.github/.github/actions/bump-version@main
+      with:
+        github_token: ${{ inputs.github_token }}
+        release-type: ${{ inputs.release-type }}
+
+    - name: Deploy to Play Store
+      if: inputs.deploy-to-play-store
+      uses: r0adkll/upload-google-play@v1
+      with:
+        serviceAccountJsonPlainText: ${{ inputs.service_account_json }}
+        packageName: ${{ env.ANDROID_PACKAGE_NAME }}
+        whatsNewDirectory: "whatsnew"
+        status: ${{ inputs.STATUS }}
+        releaseFiles: ./src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-release-signed.aab
+        track: ${{ env.RELEASE_TRACK }}
+
+    # End Android
+
+    # Update GitHub release with changelog
+    - name: Update GitHub release documentation
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: ${{ env.NEW_VERSION }}
+        body: ${{ inputs.release-notes }}
+        prerelease: ${{ startsWith(inputs.release-type, 'pre') }}
+        files: |
+          ./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-debug-signed.apk
+          ./src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release-unsigned.apk
+          ./src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-universal-release.aab
+          ./src-tauri/gen/android/app/build/outputs/bundle/universalRelease/app-release-signed.aab

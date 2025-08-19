@@ -1,0 +1,40 @@
+
+name: "Bump version"
+description: "Deploys the project"
+inputs:
+  github_token:
+    description: "Github token"
+    required: true
+  release-type:
+    description: "Release type"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Bump package version
+      shell: bash
+      # RELEASE_TRACK is for android  
+      run: |
+        if [[ "${{ inputs.release-type }}" == pre* ]]; then
+          NEW_VERSION=$(bunx npm --no-git-tag-version --preid=beta version ${{ inputs.release-type }})
+          echo "RELEASE_TAG=beta" >> $GITHUB_ENV
+          echo "RELEASE_TRACK=qa" >> $GITHUB_ENV
+        else
+          NEW_VERSION=$(bunx npm --no-git-tag-version version ${{ inputs.release-type }})
+          echo "RELEASE_TAG=latest" >> $GITHUB_ENV
+          echo "RELEASE_TRACK=production" >> $GITHUB_ENV
+        fi
+        echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_ENV
+    - name: Commit package.json changes and create tag
+      shell: bash
+      run: |
+        git add package.json
+        git commit -m "chore: release ${{ env.NEW_VERSION }}"
+        git tag ${{ env.NEW_VERSION }}
+
+    - name: Push changes
+      uses: michijs/.github/.github/actions/pull-and-push@main
+      with:
+        github_token: ${{ inputs.github_token }}
+        tags: true
