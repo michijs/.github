@@ -24,14 +24,14 @@ runs:
       uses: michijs/.github/.github/actions/setup@main
 
     - name: Run formatter
-      uses: michijs/.github/.github/actions/lint@main
+      uses: michijs/.github/.github/actions/run-linter@main
       with:
         github_token: ${{ inputs.github_token }}
 
     # Linter
 
     - name: Run linter
-      uses: michijs/.github/.github/actions/lint@main
+      uses: michijs/.github/.github/actions/run-linter@main
       with:
         command: check --apply . || true
         github_token: ${{ inputs.github_token }}
