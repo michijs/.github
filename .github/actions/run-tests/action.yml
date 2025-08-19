@@ -6,7 +6,7 @@ inputs:
     required: false
   scripts:
     description: 'JSON array of scripts with name and script fields'
-    required: true
+    required: false
   ref:
     description: 'Git ref to checkout'
     required: false
@@ -40,13 +40,17 @@ runs:
             pulls.data.length > 0 ? JSON.stringify(pulls.data[0]) : ""
           );
 
+    - name: Get tests to run
+      shell: bash
+      run: echo "SCRIPTS=${jq -r . .github/workflows/tests.json}" >> $GITHUB_ENV
+
     - name: Run scripts
       uses: michijs/.github/.github/actions/execute-script@main
       id: execute
       continue-on-error: ${{ steps.pr-check.outputs.pr != '' }}
       with:
         github_token: ${{ inputs.github_token }}
-        script-name: ${{ inputs.scripts }}
+        script-name: ${{ env.SCRIPTS != '' && env.SCRIPTS || inputs.scripts }}
 
     - name: Comment on PR
       if: steps.pr-check.outputs.pr != ''
