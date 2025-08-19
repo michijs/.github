@@ -23,5 +23,5 @@ runs:
         script: https://raw.githubusercontent.com/michijs/.github/refs/heads/main/.github/actions/run/main.js
         params: |
           {
-            command: ${{ inputs.command && (startsWith(inputs.command, '[') ? inputs.command) : toJSON(inputs.command) }}
+            command: ${{ (inputs.command && startsWith(inputs.command, '[')) && inputs.command || toJSON(inputs.command) }}
           }
