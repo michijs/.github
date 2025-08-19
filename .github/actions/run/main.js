@@ -34,9 +34,7 @@ export default async ({ require, core, params }) => {
     const result = await Promise.allSettled(
       commands.map(async ({ name, script }) => {
         try {
-          const result = await runCommand(script, {
-            maxBuffer: 10 * 1024 * 1024,
-          });
+          const result = await runCommand(script);
           core.startGroup(`▶️ ${name}`);
           core.info(result);
           core.endGroup();
