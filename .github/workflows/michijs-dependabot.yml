@@ -18,7 +18,7 @@ jobs:
         id: list-repositories
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.PAT }}
+          github-token: ${{ secrets.PAT2 }}
           result-encoding: string
           script: |
             const { data } = await github.rest.repos.listForOrg({ org: "michijs" });
@@ -42,7 +42,7 @@ jobs:
         if: ${{ !matrix.repository.archived && !matrix.repository.disabled }}
         continue-on-error: true
         with:
-          github_token: ${{ secrets.PAT }}
+          github_token: ${{ secrets.PAT2 }}
           repository: ${{ matrix.repository.full_name }}
           ref: ${{ matrix.repository.default_branch }}
             
