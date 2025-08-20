@@ -48,7 +48,7 @@ export default async ({ github, require, params }) => {
   }
 
   function clearBody(body){
-    return body.replaceAll('@', '@&ZeroWidthSpace;').replaceAll('github.com', 'redirect.github.com') + '<a href="https://github.com/lsegurado">@&ZeroWidthSpace;lsegurado</a>'
+    return body.replaceAll('@', '@&ZeroWidthSpace;').replaceAll('github.com', 'redirect.github.com') + '<a href="https://github.com/lsegurado">@lsegurado</a>'
   }
 
   async function getChangelog(owner, repo, oldVersion) {
@@ -64,7 +64,7 @@ export default async ({ github, require, params }) => {
       if (changelog && changelog !== '') {
         return `<details>
         <summary>Changelog:</summary>
-        <blockquote><em>Sourced from <a href="https://github.com/${owner}/${repo}/releases">releases</a>.</em>
+        <blockquote><em>Sourced from <a href="https://redirect.github.com/${owner}/${repo}/releases">releases</a>.</em>
         ${clearBody(changelog)}</blockquote></details>`;
       }
     } catch (err) {
@@ -100,7 +100,7 @@ export default async ({ github, require, params }) => {
       'Not found';
 
     const idBump = `bump-${pkgName}`
-    const bumpLabel = `Bump <a href="https://github.com/${owner}/${repo}">${pkgName}</a> from <a href="#user-content-${idBump}">${oldVersion} to ${newVersion}</a>`;
+    const bumpLabel = `Bump <a href="https://redirect.github.com/${owner}/${repo}">${clearBody(pkgName)}</a> from <a href="#user-content-${idBump}">${oldVersion} to ${newVersion}</a>`;
     updatedPackagesString += `<li>${bumpLabel}</li>`;
 
     const [changelog, commitHistory] = await Promise.all([
