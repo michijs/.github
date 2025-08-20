@@ -20,6 +20,7 @@ runs:
       with:
         app-id: ${{ inputs.michijs_bot_app_id }}
         private-key: ${{ inputs.michijs_bot_private_key }}
+        owner: ${{ github.repository_owner }}
     - name: Set default github token
       shell: bash
       if: ${{ steps.generate-token.outputs.token || inputs.github_token }}
