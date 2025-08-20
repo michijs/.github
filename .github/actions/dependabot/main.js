@@ -48,7 +48,7 @@ export default async ({ github, require, params }) => {
   }
 
   function clearBody(body){
-    return body.replaceAll('@', '@&ZeroWidthSpace;').replaceAll('github.com', 'redirect.github.com') + '<a href="https://github.com/dayanaramirez601">@&ZeroWidthSpace;dayanaramirez601</a>'
+    return body.replaceAll('@', '@&ZeroWidthSpace;').replaceAll('github.com', 'redirect.github.com') + '<a href="https://github.com/dayanaramirez601">@dayanaramirez601</a>'
   }
 
   async function getChangelog(owner, repo, oldVersion) {
