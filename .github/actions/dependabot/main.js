@@ -61,7 +61,7 @@ export default async ({ github, require, params }) => {
         return `<details>
         <summary>Changelog:</summary>
         <blockquote><em>Sourced from <a href="https://github.com/${owner}/${repo}/releases">releases</a>.</em>
-        ${changelog}</blockquote></details>`;
+        ${changelog.replaceAll('@', '@&ZeroWidthSpace;')}</blockquote></details>`;
       }
     } catch (err) {
       console.log(`No changelog for ${owner}/${repo}: ${err.message}`);
@@ -79,7 +79,7 @@ export default async ({ github, require, params }) => {
       }), github.rest.repos.listCommits({ owner, repo, per_page: 10 })
     ])
 
-    return (comparePromise.value?.commits ?? listCommits.value)?.data?.map(c => `<li><a href="${c.html_url}"><code>${c.sha.slice(0, 6)}</code></a> ${c.commit.message}</li>`)?.join('')
+    return (comparePromise.value?.commits ?? listCommits.value)?.data?.map(c => `<li><a href="${c.html_url}"><code>${c.sha.slice(0, 6)}</code></a> ${c.commit.message}</li>`)?.join('').replaceAll('@', '@&ZeroWidthSpace;')
   }
 
   const comments = await Promise.all(Object.entries(updatedPackages).map(async ([pkgName, newVersion]) => {
