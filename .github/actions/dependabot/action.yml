@@ -10,6 +10,12 @@ inputs:
   github_token:
     description: "Github token"
     required: true
+  michijs_bot_app_id:
+    description: "Bot app id"
+    required: true
+  michijs_bot_private_key:
+    description: "Bot private key"
+    required: true
 
 runs:
   using: "composite"
@@ -30,6 +36,8 @@ runs:
       uses: michijs/.github/.github/actions/setup@main
       with:
         github_token: ${{ inputs.github_token }}
+        michijs_bot_app_id: ${{ inputs.michijs_bot_app_id }}
+        michijs_bot_private_key: ${{ inputs.michijs_bot_private_key }}
       
     - name: Get previous package.json state
       shell: bash
@@ -79,7 +87,7 @@ runs:
       if: ${{ env.CHANGES_DETECTED == 'true' }}
       uses: michijs/.github/.github/actions/execute-javascript@main
       with:
-        github_token: ${{ inputs.github_token }}
+        github_token: ${{ env.github_token }}
         script: https://raw.githubusercontent.com/michijs/.github/refs/heads/main/.github/actions/dependabot/main.js
         params: |
           {

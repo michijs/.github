@@ -3,7 +3,6 @@ on:
   workflow_dispatch:
   #schedule:
     #- cron: '0 0 * * 1'  # Every Monday at 00:00 UTC
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
@@ -42,6 +41,8 @@ jobs:
         if: ${{ !matrix.repository.archived && !matrix.repository.disabled }}
         continue-on-error: true
         with:
+          michijs_bot_app_id: ${{ vars.MICHIJS_BOT_APP_ID }}
+          michijs_bot_private_key: ${{ secrets.MICHIJS_BOT_PRIVATE_KEY }}
           github_token: ${{ secrets.PAT }}
           repository: ${{ matrix.repository.full_name }}
           ref: ${{ matrix.repository.default_branch }}
