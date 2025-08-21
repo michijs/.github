@@ -55,11 +55,10 @@ runs:
           echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
         fi
 
-    - name: Close old PR and old branch
+    - name: Close old PR and remove old branch
       shell: bash
       run: |
-        gh pr close lint/${{ env.BRANCH_NAME }} || echo "No PR to close"
-        git branch -D origin/lint/${{ env.BRANCH_NAME }} --remote || echo "No branch to delete"
+        gh pr close lint/${{ env.BRANCH_NAME }} -d || echo "No PR to close"
 
     - name: Create new branch
       shell: bash

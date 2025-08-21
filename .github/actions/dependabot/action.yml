@@ -59,7 +59,7 @@ runs:
           echo "CHANGES_DETECTED=true" >> $GITHUB_ENV
         fi
 
-    - name: Close old PR and old branch
+    - name: Close old PR and remove old branch
       shell: bash
       run: |
         gh pr close michijs-dependabot -d || echo "No PR to close"
