@@ -79,6 +79,7 @@ runs:
       if: ${{ env.CHANGES_DETECTED == 'true' }}
       uses: ad-m/github-push-action@v0.8.0
       with:
+        github_token: ${{ env.GITHUB_TOKEN }}
         repository: ${{ inputs.repository }}
         branch: michijs-dependabot
         force: true
