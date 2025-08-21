@@ -47,7 +47,7 @@ runs:
       shell: bash
       run: |
         echo "UPDATED_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -u -p bun | jq -c .)" >> $GITHUB_ENV
-        echo "UPDATED_BETA_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -u -p bun --target greatest --filterVersion '/beta/' | jq -c .)" >> $GITHUB_ENV
+        echo "UPDATED_BETA_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -u -p bun --target greatest --filterVersion '/-.*\.\d+$/' | jq -c .)" >> $GITHUB_ENV
 
     - name: Check for changes
       shell: bash
