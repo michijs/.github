@@ -1,10 +1,10 @@
 name: Michijs dependabot
 on:
   workflow_dispatch:
-  #schedule:
-    #- cron: '0 0 * * 1'  # Every Monday at 00:00 UTC
+  schedule:
+    - cron: '0 0 * * 1'  # Every Monday at 00:00 UTC
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
           result-encoding: string
           script: |
             const { data } = await github.rest.repos.listForOrg({ org: "michijs" });
-            const repositories = data.filter(x => x.name === 'vscode-modern-dark-purple-theme').map(r => ({
+            const repositories = data.map(r => ({
               name: r.name,
               full_name: r.full_name,
               archived: r.archived,
