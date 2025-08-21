@@ -75,7 +75,7 @@ runs:
       id: execute
       continue-on-error: ${{ steps.pr-check.outputs.pr != '' }}
       with:
-        script-name: ${{ env.SCRIPTS != '' && env.SCRIPTS || inputs.scripts }}
+        command: ${{ env.SCRIPTS != '' && env.SCRIPTS || inputs.scripts }}
 
     - name: Comment on PR
       if: steps.pr-check.outputs.pr != ''
