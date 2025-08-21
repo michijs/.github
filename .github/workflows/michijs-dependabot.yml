@@ -21,11 +21,9 @@ jobs:
           result-encoding: string
           script: |
             const { data } = await github.rest.repos.listForOrg({ org: "michijs" });
-            const repositories = data.map(r => ({
+            const repositories = data.filter(x => !x.disabled && !x.archived).map(r => ({
               name: r.name,
               full_name: r.full_name,
-              archived: r.archived,
-              disabled: r.disabled,
               default_branch: r.default_branch
             }));
             core.setOutput('repositories', JSON.stringify(repositories));
@@ -38,7 +36,6 @@ jobs:
     steps:
       - name: "Run dependabot on ${{matrix.repository.name}}"
         uses: michijs/.github/.github/actions/dependabot@main
-        if: ${{ !matrix.repository.archived && !matrix.repository.disabled }}
         continue-on-error: true
         with:
           michijs_bot_app_id: ${{ vars.MICHIJS_BOT_APP_ID }}
