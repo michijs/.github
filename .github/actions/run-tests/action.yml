@@ -4,12 +4,6 @@ inputs:
   github_token:
     description: "Github token"
     required: false
-  michijs_bot_app_id:
-    description: "Bot app id"
-    required: false
-  michijs_bot_private_key:
-    description: "Bot private key"
-    required: false
   scripts:
     description: 'JSON array of scripts with name and script fields'
     required: false
@@ -31,8 +25,6 @@ runs:
       uses: michijs/.github/.github/actions/setup-credentials@main
       with:
         github_token: ${{ inputs.github_token }}
-        michijs_bot_app_id: ${{ inputs.michijs_bot_app_id }}
-        michijs_bot_private_key: ${{ inputs.michijs_bot_private_key }}
         
     - name: Set up environment
       uses: michijs/.github/.github/actions/setup@main
