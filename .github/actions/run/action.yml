@@ -9,9 +9,6 @@ inputs:
         ["build","test","lint"]
         [{"name":"run typescript tests","script":"test-tsc"}]
     required: true
-  github_token:
-    description: "Github token"
-    required: true
 
 runs:
   using: "composite"
@@ -19,7 +16,6 @@ runs:
     - name: Run script
       uses: michijs/.github/.github/actions/execute-javascript@main
       with:
-        github_token: ${{ inputs.github_token }}
         script: https://raw.githubusercontent.com/michijs/.github/refs/heads/main/.github/actions/run/main.js
         params: |
           {

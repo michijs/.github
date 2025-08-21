@@ -3,6 +3,13 @@ description: "Deploys the project"
 inputs:
   github_token:
     description: "Github token"
+    required: false
+  michijs_bot_app_id:
+    description: "Bot app id"
+    required: false
+  michijs_bot_private_key:
+    description: "Bot private key"
+    required: false
   npm_access_token:
     description: "NPM access token"
   release-type:
@@ -31,19 +38,20 @@ runs:
       uses: actions/checkout@v5
       with:
         token: ${{ inputs.github_token }}
+        persist-credentials: false
+
+    - name: Setup credentials
+      uses: michijs/.github/.github/actions/setup-credentials@main
+      with:
+        github_token: ${{ inputs.github_token }}
+        michijs_bot_app_id: ${{ inputs.michijs_bot_app_id }}
+        michijs_bot_private_key: ${{ inputs.michijs_bot_private_key }}
 
     - name: Set up environment
       uses: michijs/.github/.github/actions/setup@main
-      with:
-        github_token: ${{ inputs.github_token }}
 
     - name: Install dependencies
       uses: michijs/.github/.github/actions/install@main
-      with:
-        github_token: ${{ inputs.github_token }}
-
-    - name: Configure Git
-      uses: michijs/.github/.github/actions/set-git-config-github-actions@main
 
     - name: Configure registry from publishConfig
       id: registry
@@ -54,12 +62,10 @@ runs:
       uses: michijs/.github/.github/actions/run@main
       with:
         command: ${{ inputs.dist-script }}
-        github_token: ${{ inputs.github_token }}
 
     - name: Bump package version
       uses: michijs/.github/.github/actions/bump-version@main
       with: 
-        github_token: ${{ inputs.github_token }}
         release-type: ${{ inputs.release-type }}
 
     - name: Update GitHub release documentation

@@ -3,7 +3,7 @@ function normalizeCommands(input) {
   if (typeof input === "string") {
     if (input === '')
       throw 'Script is empty'
-      return [{ name: `bun run ${input}`, script: input }];
+      return [{ name: input, script: input }];
   } else
     return input;
 }

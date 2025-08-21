@@ -3,7 +3,13 @@ description: "Runs linter on the project"
 inputs:
   github_token:
     description: "Github token"
-    required: true
+    required: false
+  michijs_bot_app_id:
+    description: "Bot app id"
+    required: false
+  michijs_bot_private_key:
+    description: "Bot private key"
+    required: false
 
 runs:
   using: "composite"
@@ -13,33 +19,31 @@ runs:
       uses: actions/checkout@v5
       with:
         token: ${{ inputs.github_token }}
+        persist-credentials: false
 
     - name: Get Branch Name
       shell: bash
       run: echo "BRANCH_NAME=${{ github.head_ref || github.ref_name }}" >> $GITHUB_ENV
 
     # Configure Git
-    - name: Git configuration
-      uses: michijs/.github/.github/actions/set-git-config-github-actions@main
+    - name: Setup credentials
+      uses: michijs/.github/.github/actions/setup-credentials@main
+      with:
+        github_token: ${{ inputs.github_token }}
+        michijs_bot_app_id: ${{ inputs.michijs_bot_app_id }}
+        michijs_bot_private_key: ${{ inputs.michijs_bot_private_key }}
 
     - name: Set up environment
       uses: michijs/.github/.github/actions/setup@main
-      with:
-        github_token: ${{ inputs.github_token }}
-
 
     - name: Run formatter
       uses: michijs/.github/.github/actions/run-linter@main
-      with:
-        github_token: ${{ inputs.github_token }}
 
     # Linter
-
     - name: Run linter
       uses: michijs/.github/.github/actions/run-linter@main
       with:
         command: check --apply . || true
-        github_token: ${{ inputs.github_token }}
 
     - name: Check for changes
       shell: bash
@@ -56,8 +60,6 @@ runs:
       run: |
         gh pr close lint/${{ env.BRANCH_NAME }} || echo "No PR to close"
         git branch -D origin/lint/${{ env.BRANCH_NAME }} --remote || echo "No branch to delete"
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
 
     - name: Create new branch
       shell: bash
@@ -74,7 +76,7 @@ runs:
       if: env.CHANGES_DETECTED == 'true'
       uses: ad-m/github-push-action@v0.8.0
       with:
-        github_token: ${{ inputs.github_token }}
+        github_token: ${{ env.GITHUB_TOKEN }}
         branch: lint/${{ env.BRANCH_NAME }}
         force: true
 
@@ -92,14 +94,12 @@ runs:
           ${SUGGESTIONS}
         </details>
         "
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
 
     - name: Detect if token is a PAT
       shell: bash
       if: env.CHANGES_DETECTED == 'true'
       run: |
-        if [[ "${{ inputs.github_token }}" =~ ^gh(p|o|u|r)_ ]]; then
+        if [[ "${{ env.GITHUB_TOKEN }}" =~ ^gh(p|o|u|r)_ ]]; then
           echo "IS_PAT=true" >> $GITHUB_ENV
           echo "Detected token is a PAT"
         else
@@ -113,4 +113,3 @@ runs:
       continue-on-error: true
       with:
         ref: lint/${{ env.BRANCH_NAME }}
-        github_token: ${{ inputs.github_token }}

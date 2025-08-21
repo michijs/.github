@@ -1,31 +1,8 @@
 name: "Setup runtime"
 description: "Setup runtime"
-inputs:
-  github_token:
-    description: "Github token"
-    required: false
-  michijs_bot_app_id:
-    description: "Bot app id"
-    required: false
-  michijs_bot_private_key:
-    description: "Bot private key"
-    required: false
 runs:
   using: "composite"
   steps:
-    - name: Generate a token (if possible)
-      id: generate-token
-      if: ${{ inputs.michijs_bot_private_key != '' && inputs.michijs_bot_app_id != '' }}
-      uses: actions/create-github-app-token@v2
-      with:
-        app-id: ${{ inputs.michijs_bot_app_id }}
-        private-key: ${{ inputs.michijs_bot_private_key }}
-        owner: ${{ github.repository_owner }}
-    - name: Set default github token
-      shell: bash
-      if: ${{ steps.generate-token.outputs.token || inputs.github_token }}
-      run: |
-        echo "GITHUB_TOKEN=${{ steps.generate-token.outputs.token || inputs.github_token }}" >> $GITHUB_ENV
     - name: Extract Bun version from package.json (default to latest)
       id: extract-bun-version
       shell: bash

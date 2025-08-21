@@ -4,11 +4,17 @@ inputs:
   script-name:
     description: "Script to execute"
     required: true
-  github_token:
-    description: "Github token"
-    required: true
   ref:
     description: "Branch to run the script"
+    required: false
+  github_token:
+    description: "Github token"
+    required: false
+  michijs_bot_app_id:
+    description: "Bot app id"
+    required: false
+  michijs_bot_private_key:
+    description: "Bot private key"
     required: false
 
 runs:
@@ -19,19 +25,22 @@ runs:
       with:
         ref: ${{ inputs.ref }}
         token: ${{ inputs.github_token }}
+        persist-credentials: false
+
+    - name: Setup credentials
+      uses: michijs/.github/.github/actions/setup-credentials@main
+      with:
+        github_token: ${{ inputs.github_token }}
+        michijs_bot_app_id: ${{ inputs.michijs_bot_app_id }}
+        michijs_bot_private_key: ${{ inputs.michijs_bot_private_key }}
 
     - name: Set up environment
       uses: michijs/.github/.github/actions/setup@main
-      with:
-        github_token: ${{ inputs.github_token }}
 
     - name: Install dependencies
       uses: michijs/.github/.github/actions/install@main
-      with:
-        github_token: ${{ inputs.github_token }}
 
     - name: Run script
       uses: michijs/.github/.github/actions/run@main
       with: 
         command: ${{ inputs.script-name }}
-        github_token: ${{ inputs.github_token }}

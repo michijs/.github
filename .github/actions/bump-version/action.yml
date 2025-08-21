@@ -2,9 +2,6 @@
 name: "Bump version"
 description: "Deploys the project"
 inputs:
-  github_token:
-    description: "Github token"
-    required: true
   release-type:
     description: "Release type"
     required: true
@@ -37,5 +34,5 @@ runs:
     - name: Push changes
       uses: michijs/.github/.github/actions/pull-and-push@main
       with:
-        github_token: ${{ inputs.github_token }}
+        github_token: ${{ env.GITHUB_TOKEN }}
         tags: true

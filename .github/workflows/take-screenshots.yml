@@ -29,6 +29,8 @@ jobs:
         PAGE: ${{fromJSON(needs.convert-string-to-array.outputs.ARRAY)}}
     steps:
       - uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - name: Install Node.js
         uses: actions/setup-node@v4

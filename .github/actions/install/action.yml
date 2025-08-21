@@ -1,9 +1,6 @@
 name: "Install packages"
 description: "Install packages"
 inputs:
-  github_token:
-    description: "Github token"
-    required: true
   package:
     description: "Package to install"
     default: ""
@@ -16,6 +13,4 @@ runs:
     #   shell: bash
     # Save the current bunfig.toml
     - run: bun install ${{ inputs.package }}
-      env:
-        GITHUB_TOKEN: ${{ inputs.github_token }}
       shell: bash

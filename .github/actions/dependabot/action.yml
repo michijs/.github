@@ -27,17 +27,17 @@ runs:
         repository: ${{ inputs.repository }}
         ref: ${{ inputs.ref }}
         token: ${{ inputs.github_token }}
+        persist-credentials: false
 
-    # Configure Git
-    - name: Git configuration
-      uses: michijs/.github/.github/actions/set-git-config-michijs-bot@main
-
-    - name: Set up environment
-      uses: michijs/.github/.github/actions/setup@main
+    - name: Setup credentials
+      uses: michijs/.github/.github/actions/setup-credentials@main
       with:
         github_token: ${{ inputs.github_token }}
         michijs_bot_app_id: ${{ inputs.michijs_bot_app_id }}
         michijs_bot_private_key: ${{ inputs.michijs_bot_private_key }}
+
+    - name: Set up environment
+      uses: michijs/.github/.github/actions/setup@main
       
     - name: Get previous package.json state
       shell: bash

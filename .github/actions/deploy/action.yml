@@ -3,7 +3,13 @@ description: "Deploys the project"
 inputs:
   github_token:
     description: "Github token"
-    required: true
+    required: false
+  michijs_bot_app_id:
+    description: "Bot app id"
+    required: false
+  michijs_bot_private_key:
+    description: "Bot private key"
+    required: false
 
 runs:
   using: "composite"
@@ -13,10 +19,14 @@ runs:
       uses: actions/checkout@v5
       with:
         token: ${{ inputs.github_token }}
+        persist-credentials: false
 
-    # Configure Git
-    - name: Git configuration
-      uses: michijs/.github/.github/actions/set-git-config-github-actions@main
+    - name: Setup credentials
+      uses: michijs/.github/.github/actions/setup-credentials@main
+      with:
+        github_token: ${{ inputs.github_token }}
+        michijs_bot_app_id: ${{ inputs.michijs_bot_app_id }}
+        michijs_bot_private_key: ${{ inputs.michijs_bot_private_key }}
 
     - name: Create new branch
       shell: bash
@@ -25,6 +35,6 @@ runs:
     - name: push changes
       uses: ad-m/github-push-action@v0.8.0
       with:
-        github_token: ${{ inputs.github_token }}
+        github_token: ${{ env.GITHUB_TOKEN }}
         branch: production
         force: true
