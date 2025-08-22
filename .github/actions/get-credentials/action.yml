@@ -13,6 +13,7 @@ inputs:
   skip-token-revoke:
     description: "Revoke token when job finishes"
     required: false
+    default: 'false'
 outputs:
   github_token:
     description: "Github token"

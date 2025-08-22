@@ -36,6 +36,8 @@ jobs:
           michijs_bot_app_id: ${{ vars.MICHIJS_BOT_APP_ID }}
           michijs_bot_private_key: ${{ secrets.MICHIJS_BOT_PRIVATE_KEY }}
           github_token: ${{ secrets.PAT }}
+          skip-token-revoke: true
+          
       - name: Set TEMP_GITHUB_TOKEN on secrets
         run: gh secret set --org michijs TEMP_GITHUB_TOKEN --visibility all
   run-dependabot:
