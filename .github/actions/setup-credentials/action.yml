@@ -39,6 +39,8 @@ runs:
       if: ${{ steps.generate-token.outputs.app-slug != ''}}
       shell: bash
       run: echo "user-id=$(gh api "/users/${{ steps.generate-token.outputs.app-slug }}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
+      env:
+        GITHUB_TOKEN: ${{ github_token }}
       
     - name: Git configuration data
       id: get-user-data
