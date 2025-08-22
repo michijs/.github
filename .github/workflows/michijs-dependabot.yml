@@ -39,7 +39,7 @@ jobs:
           skip-token-revoke: true
           
       - name: Set TEMP_GITHUB_TOKEN on secrets
-        run: gh secret set --org michijs TEMP_GITHUB_TOKEN --visibility all ${{ steps.get-credentials.outputs.github_token }}
+        run: gh secret set --org michijs TEMP_GITHUB_TOKEN --visibility all --body ${{ steps.get-credentials.outputs.github_token }}
         env: 
           GITHUB_TOKEN: ${{ secrets.PAT }}
         
