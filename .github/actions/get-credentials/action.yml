@@ -10,6 +10,9 @@ inputs:
   michijs_bot_private_key:
     description: "Bot private key"
     required: false
+  skip-token-revoke:
+    description: "Revoke token when job finishes"
+    required: false
 outputs:
   github_token:
     description: "Github token"
@@ -31,6 +34,7 @@ runs:
         app-id: ${{ inputs.michijs_bot_app_id }}
         private-key: ${{ inputs.michijs_bot_private_key }}
         owner: ${{ github.repository_owner }}
+        skip-token-revoke: ${{ inputs.skip-token-revoke }}
 
     - name: Get GitHub App User ID
       id: get-user-id
