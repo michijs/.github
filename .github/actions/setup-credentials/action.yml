@@ -53,6 +53,6 @@ runs:
     - name: Set credentials
       uses: michijs/.github/.github/actions/set-credentials@main
       with:
-        github_token: ${{ steps.generate-token.outputs.token }}
+        github_token: ${{ steps.generate-token.outputs.token != '' && steps.generate-token.outputs.token || inputs.github_token }}
         email: ${{ steps.get-user-data.outputs.email }}
         name: ${{ steps.get-user-data.outputs.name }}

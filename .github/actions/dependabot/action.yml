@@ -7,6 +7,9 @@ inputs:
   ref:
     description: 'Ref to checkout'
     required: false
+  pat: 
+    description: 'pat'
+    required: true
 
 runs:
   using: "composite"
@@ -23,24 +26,26 @@ runs:
     - name: Set up environment
       uses: michijs/.github/.github/actions/setup@main
 
-    - name: Install dependencies
-      uses: michijs/.github/.github/actions/install@main
-      
     - name: Get previous package.json state
       shell: bash
       run: echo "OLD_JSON=$(jq -c . package.json)" >> $GITHUB_ENV
 
+    # For some reason I cant get private packages with the bot token
     - name: Update dependencies
       shell: bash
       run: |
         UPDATED_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -u -p bun | jq -c .)
         echo "UPDATED_PACKAGES=$UPDATED_PACKAGES" >> $GITHUB_ENV
+      env: 
+        GITHUB_TOKEN: ${{ inputs.pat }}
 
     - name: Update beta dependencies
       shell: bash
       run: |
         UPDATED_BETA_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -u -p bun --target greatest --filterVersion '/-.*\.\d+$/' | jq -c .)
         echo "UPDATED_BETA_PACKAGES=$UPDATED_BETA_PACKAGES" >> $GITHUB_ENV
+      env: 
+        GITHUB_TOKEN: ${{ inputs.pat }}
 
     - name: Check for changes
       shell: bash
