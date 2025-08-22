@@ -7,15 +7,6 @@ inputs:
   ref:
     description: 'Ref to checkout'
     required: false
-  github_token:
-    description: "Github token"
-    required: true
-  michijs_bot_app_id:
-    description: "Bot app id"
-    required: true
-  michijs_bot_private_key:
-    description: "Bot private key"
-    required: true
 
 runs:
   using: "composite"
@@ -29,13 +20,6 @@ runs:
         token: ${{ inputs.github_token }}
         persist-credentials: false
 
-    - name: Setup credentials
-      uses: michijs/.github/.github/actions/setup-credentials@main
-      with:
-        github_token: ${{ inputs.github_token }}
-        michijs_bot_app_id: ${{ inputs.michijs_bot_app_id }}
-        michijs_bot_private_key: ${{ inputs.michijs_bot_private_key }}
-
     - name: Set up environment
       uses: michijs/.github/.github/actions/setup@main
       
@@ -46,8 +30,10 @@ runs:
     - name: Update dependencies
       shell: bash
       run: |
-        echo "UPDATED_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -u -p bun | jq -c .)" >> $GITHUB_ENV
-        echo "UPDATED_BETA_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -u -p bun --target greatest --filterVersion '/-.*\.\d+$/' | jq -c .)" >> $GITHUB_ENV
+        UPDATED_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -u -p bun | jq -c .)
+        UPDATED_BETA_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -u -p bun --target greatest --filterVersion '/-.*\.\d+$/' | jq -c .)
+        echo "$UPDATED_PACKAGES" >> $GITHUB_ENV
+        echo "$UPDATED_BETA_PACKAGES" >> $GITHUB_ENV
 
     - name: Check for changes
       shell: bash

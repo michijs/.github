@@ -12,6 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       repositories: ${{ steps.list-repositories.outputs.repositories }}
+      name: ${{ steps.get-credentials.outputs.name}}
+      email: ${{ steps.get-credentials.outputs.email}}
+      github_token: ${{ steps.get-credentials.outputs.github_token}}
     steps:
       - name: List org repositories
         id: list-repositories
@@ -21,12 +24,19 @@ jobs:
           result-encoding: string
           script: |
             const { data } = await github.rest.repos.listForOrg({ org: "michijs" });
-            const repositories = data.filter(x => !x.disabled && !x.archived).map(r => ({
+            const repositories = data.filter(x => x.name === 'screen-recorder' && !x.disabled && !x.archived).map(r => ({
               name: r.name,
               full_name: r.full_name,
               default_branch: r.default_branch
             }));
             core.setOutput('repositories', JSON.stringify(repositories));
+      - name: Get credentials
+        id: get-credentials
+        uses: michijs/.github/.github/actions/get-credentials@main
+        with:
+          michijs_bot_app_id: ${{ vars.MICHIJS_BOT_APP_ID }}
+          michijs_bot_private_key: ${{ secrets.MICHIJS_BOT_PRIVATE_KEY }}
+          github_token: ${{ secrets.PAT }}
   run-dependabot:
     runs-on: ubuntu-latest
     needs: list-repositories
@@ -34,13 +44,16 @@ jobs:
       matrix:
         repository: ${{ fromJson(needs.list-repositories.outputs.repositories) }}
     steps:
+      - name: Set credentials
+        uses: michijs/.github/.github/actions/set-credentials@main
+        with:
+          github_token: ${{ needs.list-repositories.outputs.github_token }}
+          email: ${{ needs.list-repositories.outputs.email }}
+          name: ${{ needs.list-repositories.outputs.name }}
       - name: "Run dependabot on ${{matrix.repository.name}}"
         uses: michijs/.github/.github/actions/dependabot@main
         continue-on-error: true
         with:
-          michijs_bot_app_id: ${{ vars.MICHIJS_BOT_APP_ID }}
-          michijs_bot_private_key: ${{ secrets.MICHIJS_BOT_PRIVATE_KEY }}
-          github_token: ${{ secrets.PAT }}
           repository: ${{ matrix.repository.full_name }}
           ref: ${{ matrix.repository.default_branch }}
             
