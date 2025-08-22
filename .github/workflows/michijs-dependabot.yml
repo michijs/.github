@@ -38,7 +38,7 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           skip-token-revoke: true
       - name: Saves token in a temp variable
-        run: echo "TEMP_GITHUB_TOKEN=${{env.GITHUB_TOKEN}}" >> "$GITHUB_OUTPUT"
+        run: echo "TEMP_GITHUB_TOKEN=${{env.GITHUB_TOKEN}}" >> "$GITHUB_ENV"
       - name: Set TEMP_GITHUB_TOKEN on secrets
         run: gh secret set --org michijs TEMP_GITHUB_TOKEN --visibility all --body ${{ env.TEMP_GITHUB_TOKEN }}
         env: 
