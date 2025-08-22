@@ -12,8 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       repositories: ${{ steps.list-repositories.outputs.repositories }}
-      name: ${{ steps.get-credentials.outputs.name}}
-      email: ${{ steps.get-credentials.outputs.email}}
+      name: ${{ steps.setup-credentials.outputs.name}}
+      email: ${{ steps.setup-credentials.outputs.email}}
     steps:
       - name: List org repositories
         id: list-repositories
@@ -29,18 +29,17 @@ jobs:
               default_branch: r.default_branch
             }));
             core.setOutput('repositories', JSON.stringify(repositories));
-      - name: Get credentials
-        id: get-credentials
-        uses: michijs/.github/.github/actions/get-credentials@main
+      - name: Setup credentials
+        id: setup-credentials
+        uses: michijs/.github/.github/actions/setup-credentials@main
         with:
           michijs_bot_app_id: ${{ vars.MICHIJS_BOT_APP_ID }}
           michijs_bot_private_key: ${{ secrets.MICHIJS_BOT_PRIVATE_KEY }}
-          github_token: ${{ secrets.PAT }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
           skip-token-revoke: true
-          
       - name: Set TEMP_GITHUB_TOKEN on secrets
         run: |
-          gh secret set --org michijs TEMP_GITHUB_TOKEN --visibility all --body ${{ steps.get-credentials.outputs.github_token }}
+          gh secret set --org michijs TEMP_GITHUB_TOKEN --visibility all --body ${{ env.GITHUB_TOKEN }}
         env: 
           GITHUB_TOKEN: ${{ secrets.PAT }}
         

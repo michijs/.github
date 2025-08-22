@@ -10,20 +10,47 @@ inputs:
   michijs_bot_private_key:
     description: "Bot private key"
     required: false
-
+  skip-token-revoke:
+    description: "Revoke token when job finishes"
+    required: false
+    default: 'false'
+outputs:
+  email:
+    description: "Bot email"
+    value: ${{ steps.get-user-data.outputs.email || '41898282+github-actions[bot]@users.noreply.github.com' }}
+  name:
+    description: "Bot name"
+    value: ${{ steps.get-user-data.outputs.name || 'GitHub Actions' }}
 runs:
   using: "composite"
   steps:
-    - name: Get credentials
-      id: get-credentials
-      uses: michijs/.github/.github/actions/get-credentials@main
+    - name: Generate a token (if possible)
+      id: generate-token
+      if: ${{ inputs.michijs_bot_private_key != '' && inputs.michijs_bot_app_id != '' }}
+      uses: actions/create-github-app-token@v2
       with:
-        github_token: ${{ inputs.github_token }}
-        michijs_bot_private_key: ${{ inputs.michijs_bot_private_key }}
-        michijs_bot_app_id: ${{ inputs.michijs_bot_app_id }}
+        app-id: ${{ inputs.michijs_bot_app_id }}
+        private-key: ${{ inputs.michijs_bot_private_key }}
+        owner: ${{ github.repository_owner }}
+        skip-token-revoke: ${{ inputs.skip-token-revoke }}
+
+    - name: Get GitHub App User ID
+      id: get-user-id
+      if: ${{ steps.generate-token.outputs.app-slug != ''}}
+      shell: bash
+      run: echo "user-id=$(gh api "/users/${{ steps.generate-token.outputs.app-slug }}[bot]" --jq .id)" >> "$GITHUB_OUTPUT"
+      
+    - name: Git configuration data
+      id: get-user-data
+      shell: bash
+      if: ${{ inputs.michijs_bot_private_key != '' && inputs.michijs_bot_app_id != '' && steps.get-user-id.outputs.user-id != '' }}
+      run: |
+        echo "email='${{ steps.get-user-id.outputs.user-id }}+${{ steps.generate-token.outputs.app-slug }}[bot]@users.noreply.github.com'" >> "$GITHUB_OUTPUT"
+        echo "name='${{ steps.generate-token.outputs.app-slug }}[bot]'" >> "$GITHUB_OUTPUT"
+        
     - name: Set credentials
       uses: michijs/.github/.github/actions/set-credentials@main
       with:
-        github_token: ${{ steps.get-credentials.outputs.github_token }}
-        email: ${{ steps.get-credentials.outputs.email }}
-        name: ${{ steps.get-credentials.outputs.name }}
+        github_token: ${{ steps.generate-token.outputs.token || inputs.github_token }}
+        email: ${{ steps.get-user-data.outputs.email }}
+        name: ${{ steps.get-user-data.outputs.name }}
