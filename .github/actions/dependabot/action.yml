@@ -17,7 +17,7 @@ runs:
       with:
         repository: ${{ inputs.repository }}
         ref: ${{ inputs.ref }}
-        token: ${{ inputs.github_token }}
+        token: ${{ env.GITHUB_TOKEN }}
         persist-credentials: false
 
     - name: Set up environment
