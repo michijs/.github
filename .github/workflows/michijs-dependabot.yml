@@ -41,7 +41,7 @@ jobs:
         run: |
           gh secret set --org michijs TEMP_GITHUB_TOKEN --visibility all --body ${{ env.GITHUB_TOKEN }}
         env: 
-          GITHUB_TOKEN: ${{ secrets.PAT }}
+          GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
         
   run-dependabot:
     runs-on: ubuntu-latest
