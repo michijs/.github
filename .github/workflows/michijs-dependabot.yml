@@ -40,7 +40,6 @@ jobs:
           
       - name: Set TEMP_GITHUB_TOKEN on secrets
         run: |
-          gh auth refresh -h github.com -s admin:org
           gh secret set --org michijs TEMP_GITHUB_TOKEN --visibility all --body ${{ steps.get-credentials.outputs.github_token }}
         env: 
           GITHUB_TOKEN: ${{ secrets.PAT }}
