@@ -14,7 +14,6 @@ jobs:
       repositories: ${{ steps.list-repositories.outputs.repositories }}
       name: ${{ steps.get-credentials.outputs.name}}
       email: ${{ steps.get-credentials.outputs.email}}
-      github_token: ${{ steps.get-credentials.outputs.github_token}}
     steps:
       - name: List org repositories
         id: list-repositories
@@ -37,7 +36,8 @@ jobs:
           michijs_bot_app_id: ${{ vars.MICHIJS_BOT_APP_ID }}
           michijs_bot_private_key: ${{ secrets.MICHIJS_BOT_PRIVATE_KEY }}
           github_token: ${{ secrets.PAT }}
-          skip-token-revoke: true
+      - name: Set TEMP_GITHUB_TOKEN on secrets
+        run: gh secret set --org michijs TEMP_GITHUB_TOKEN --visibility all
   run-dependabot:
     runs-on: ubuntu-latest
     needs: list-repositories
@@ -48,7 +48,7 @@ jobs:
       - name: Set credentials
         uses: michijs/.github/.github/actions/set-credentials@main
         with:
-          github_token: ${{ needs.list-repositories.outputs.github_token }}
+          github_token: ${{ secrets.TEMP_GITHUB_TOKEN }}
           email: ${{ needs.list-repositories.outputs.email }}
           name: ${{ needs.list-repositories.outputs.name }}
       - name: "Run dependabot on ${{matrix.repository.name}}"
