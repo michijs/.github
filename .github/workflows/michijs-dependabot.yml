@@ -40,6 +40,9 @@ jobs:
           
       - name: Set TEMP_GITHUB_TOKEN on secrets
         run: gh secret set --org michijs TEMP_GITHUB_TOKEN --visibility all
+        env: 
+          GITHUB_TOKEN: ${{ secrets.PAT }}
+        
   run-dependabot:
     runs-on: ubuntu-latest
     needs: list-repositories
