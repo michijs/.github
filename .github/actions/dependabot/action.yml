@@ -31,8 +31,12 @@ runs:
       shell: bash
       run: |
         UPDATED_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -u -p bun | jq -c .)
-        UPDATED_BETA_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -u -p bun --target greatest --filterVersion '/-.*\.\d+$/' | jq -c .)
         echo "$UPDATED_PACKAGES" >> $GITHUB_ENV
+
+    - name: Update beta dependencies
+      shell: bash
+      run: |
+        UPDATED_BETA_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -u -p bun --target greatest --filterVersion '/-.*\.\d+$/' | jq -c .)
         echo "$UPDATED_BETA_PACKAGES" >> $GITHUB_ENV
 
     - name: Check for changes
