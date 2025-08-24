@@ -7,9 +7,6 @@ inputs:
   ref:
     description: 'Ref to checkout'
     required: false
-  pat: 
-    description: 'pat'
-    required: true
 
 runs:
   using: "composite"
@@ -36,8 +33,6 @@ runs:
       run: |
         UPDATED_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -u -p bun | jq -c .)
         echo "UPDATED_PACKAGES=$UPDATED_PACKAGES" >> $GITHUB_ENV
-      env: 
-        GITHUB_TOKEN: ${{ inputs.pat }}
 
     - name: Update beta dependencies
       shell: bash
