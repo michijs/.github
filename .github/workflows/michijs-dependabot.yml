@@ -23,7 +23,7 @@ jobs:
           result-encoding: string
           script: |
             const { data } = await github.rest.repos.listForOrg({ org: "michijs" });
-            const repositories = data.filter(x => x.name === 'screen-recorder' && !x.disabled && !x.archived).map(r => ({
+            const repositories = data.filter(x => !x.disabled && !x.archived).map(r => ({
               name: r.name,
               full_name: r.full_name,
               default_branch: r.default_branch
