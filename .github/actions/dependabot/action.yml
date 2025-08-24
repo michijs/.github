@@ -39,8 +39,6 @@ runs:
       run: |
         UPDATED_BETA_PACKAGES=$(bunx npm-check-updates --jsonUpgraded -u -p bun --target greatest --filterVersion '/-.*\.\d+$/' | jq -c .)
         echo "UPDATED_BETA_PACKAGES=$UPDATED_BETA_PACKAGES" >> $GITHUB_ENV
-      env: 
-        GITHUB_TOKEN: ${{ inputs.pat }}
 
     - name: Check for changes
       shell: bash
