@@ -63,4 +63,5 @@ jobs:
         with:
           repository: ${{ matrix.repository.full_name }}
           ref: ${{ matrix.repository.default_branch }}
+          pat: ${{ secrets.PAT }}
             
