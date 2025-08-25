@@ -120,7 +120,7 @@ jobs:
           script: https://raw.githubusercontent.com/michijs/.github/refs/heads/main/.github/workflows/michijs-dependabot.js
           params: |
             {
-              ref: "${{ inputs.ref || 'master' }}",
+              ref: "${{ matrix.repository.default_branch || 'master' }}",
               githubRepository: "${{ matrix.repository.full_name || env.GITHUB_REPOSITORY }}",
               updatedPackages: {...JSON.parse(process.env.UPDATED_PACKAGES), ...JSON.parse(process.env.UPDATED_BETA_PACKAGES)},
               oldJson: process.env.OLD_JSON
