@@ -17,10 +17,10 @@ inputs:
 outputs:
   email:
     description: "Bot email"
-    value: ${{ steps.get-user-data.outputs.email || '41898282+github-actions[bot]@users.noreply.github.com' }}
+    value: ${{ steps.get-user-data.outputs.email }}
   name:
     description: "Bot name"
-    value: ${{ steps.get-user-data.outputs.name || 'GitHub Actions' }}
+    value: ${{ steps.get-user-data.outputs.name }}
 runs:
   using: "composite"
   steps:
@@ -54,5 +54,5 @@ runs:
       uses: michijs/.github/.github/actions/set-credentials@main
       with:
         github_token: ${{ steps.generate-token.outputs.token != '' && steps.generate-token.outputs.token || inputs.github_token }}
-        email: ${{ steps.get-user-data.outputs.email || '41898282+github-actions[bot]@users.noreply.github.com' }}
-        name: ${{ steps.get-user-data.outputs.name || 'GitHub Actions' }}
+        email: ${{ steps.get-user-data.outputs.email }}
+        name: ${{ steps.get-user-data.outputs.name }}
