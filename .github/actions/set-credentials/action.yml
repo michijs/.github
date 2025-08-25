@@ -6,10 +6,10 @@ inputs:
     required: true
   email:
     description: "Bot email"
-    required: true
+    required: false
   name:
     description: "Bot name"
-    required: true
+    required: false
 runs:
   using: "composite"
   steps:
