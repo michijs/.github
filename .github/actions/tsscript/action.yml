@@ -11,4 +11,6 @@ runs:
     - name: Execute ts
       shell: bash
       run: |
-        echo "${{ inputs.script }}" | bun run -
+        bun run - <<'EOF'
+          ${{ inputs.script }}
+        EOF
