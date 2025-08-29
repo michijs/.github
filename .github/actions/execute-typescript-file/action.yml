@@ -15,17 +15,17 @@ runs:
     - name: Execute TS file
       uses: michijs/.github/.github/actions/tsscript@main
       with:
-        script: https://raw.githubusercontent.com/michijs/.github/refs/heads/main/.github/actions/run/main.js
+        script: michijs/.github/.github/actions/tsscript@main
         params: |
-          const { default: script } = await import('data:text/javascript,' + encodeURIComponent(await (await fetch(
-            '${{ inputs.script }}'
-          )).text()));
+          import { promises as fs } from 'fs';
+          import $ from 'bun';
+          const scriptText = await (await fetch('${{ inputs.script }}')).text();
+          await fs.writeFile('/tmp/temp-script.ts', scriptText);
+          const { default: script } = await import('file:///tmp/temp-script.ts');
+          const github = ${{ toJson(github) }};
           await script(
           { 
             github, 
-            context, 
-            require, 
-            core,
             params: ${{ inputs.params }},
           });
 

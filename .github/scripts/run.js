@@ -8,7 +8,7 @@ function normalizeCommands(input) {
     return input;
 }
 
-export default async ({ require, core, params }) => {
+export default async ({ require, params }) => {
   const { spawn } = require("child_process");
 
   async function runCommand(script) {
@@ -37,21 +37,22 @@ export default async ({ require, core, params }) => {
       commands.map(async ({ name, script }) => {
         try {
           const result = await runCommand(script);
-          core.startGroup(`✅ ${name}`);
-          core.info(result);
-          core.endGroup();
+          console.log(`::group::✅ ${name}`);
+          console.log(result);
+          console.log(`::endgroup::`);
         } catch (err) {
-          core.startGroup(`⛔ ${name}`);
+          console.log(`::group::⛔ ${name}`);
+          console.log(`⛔ ${name}`);
           error = err;
-          core.error(err);
-          core.endGroup();
+          console.log(`::error::${err}`);
+          console.log(`::endgroup::`);
           throw err;
         }
       })
     );
     if (error)
-      core.setFailed(`${result.filter(x => x.reason).length} errors found`);
+      throw `${result.filter(x => x.reason).length} errors found`;
   } catch (error) {
-    core.setFailed(error);
+    throw error;
   }
 }
