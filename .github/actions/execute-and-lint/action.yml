@@ -1,5 +1,5 @@
-name: "Execute script"
-description: "Execute script"
+name: "execute-and-lint"
+description: "Execute and lint"
 inputs:
   script-name:
     description: "Script to execute"
@@ -44,3 +44,22 @@ runs:
       uses: michijs/.github/.github/actions/run@main
       with: 
         command: ${{ inputs.script-name }}
+          
+    - name: Run formatter
+      uses: michijs/.github/.github/actions/run-linter@main
+
+    # Linter
+    - name: Run linter
+      uses: michijs/.github/.github/actions/run-linter@main
+      with:
+        command: check --apply . || true
+
+    # Commit changes
+    - name: Commit changes
+      uses: michijs/.github/.github/actions/commit-if-changes@main
+      with:
+        message: "Updated generated types"
+        
+    # Push repository changes
+    - name: Push changes
+      uses: michijs/.github/.github/actions/pull-and-push@main

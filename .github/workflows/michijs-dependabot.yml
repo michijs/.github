@@ -115,7 +115,7 @@ jobs:
 
       - name: Create new PR
         if: ${{ env.CHANGES_DETECTED == 'true' }}
-        uses: michijs/.github/.github/actions/execute-javascript@main
+        uses: michijs/.github/.github/actions/execute-typescript-file@main
         with:
           script: https://raw.githubusercontent.com/michijs/.github/refs/heads/main/.github/workflows/michijs-dependabot.js
           params: |

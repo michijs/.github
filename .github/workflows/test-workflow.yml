@@ -1,0 +1,26 @@
+name: Test
+on:
+  workflow_dispatch:
+    inputs:
+      params:
+        description: 'Params'
+        required: false
+        default: "{}"
+jobs:  
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up environment
+        uses: michijs/.github/.github/actions/setup@main
+      - name: Setup credentials
+        id: setup-credentials
+        uses: michijs/.github/.github/actions/setup-credentials@main
+        with:
+          michijs_bot_app_id: ${{ vars.MICHIJS_BOT_APP_ID }}
+          michijs_bot_private_key: ${{ secrets.MICHIJS_BOT_PRIVATE_KEY }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: execute
+        uses: michijs/.github/.github/actions/tsscript@main
+        with:
+          script: |
+            console.log({env, github, params, inputs})

@@ -1,0 +1,14 @@
+name: "Execute typescript"
+description: "Execute typescript in the selected repository"
+inputs:
+  script:
+    description: "Script to execute"
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Execute ts
+      shell: bash
+      run: |
+        echo "${{ inputs.script }}" | bun run -

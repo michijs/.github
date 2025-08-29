@@ -3,7 +3,8 @@ description: "Pull and push changes"
 inputs:
   branch:
     description: "Branch name"
-    required: true
+    required: false
+    default: master
   tags:
     description: "Tags"
     required: false
