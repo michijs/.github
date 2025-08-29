@@ -23,6 +23,6 @@ jobs:
         uses: michijs/.github/.github/actions/tsscript@main
         with:
           script: |
-            import { $ } from "bun";
+            import { $ } from 'bun';
 
-            await $`gh pr create -B main -H lint/main --title 'test' --body "test."`
+            await $`gh pr create -B main -H lint/main --title 'test' --body 'test.'`
