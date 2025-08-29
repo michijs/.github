@@ -23,4 +23,15 @@ jobs:
         uses: michijs/.github/.github/actions/tsscript@main
         with:
           script: |
-            console.log({env, github, params, inputs})
+            try{
+              console.log({process})
+            }catch{}
+            try{
+              console.log({github})
+            }catch{}
+            try{
+              console.log({inputs})
+            }catch{}
+            try{
+              console.log({params})
+            }catch{}
