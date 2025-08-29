@@ -10,11 +10,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v5
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          persist-credentials: false
       - name: Set up environment
         uses: michijs/.github/.github/actions/setup@main
       - name: Setup credentials
@@ -28,6 +23,7 @@ jobs:
         uses: michijs/.github/.github/actions/tsscript@main
         with:
           script: |
-            import { $ } from 'bun';
-
-            await $`gh pr create -B main -H lint/main --title 'test' --body 'test.'`
+            try{
+              const github = ${{ toJson(github) }};
+              console.log({github});
+            }catch{}
