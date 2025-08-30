@@ -32,6 +32,6 @@ export interface Workflow<P> {
 }
 export interface WorkflowParams<P> {
   params: P,
-  importScriptFromUrl<V extends Workflow<any>>(url: string): V,
+  importScriptFromUrl<P>(url: string): Workflow<P>,
   runGroup<T>(name: string, callback: () => T): T
 }

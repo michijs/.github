@@ -6,10 +6,11 @@ export default async ({ params: { updatedPackages, oldPackageJson, githubReposit
   const REPO = githubRepository.split('/');
   const OWNER = REPO[0];
   const REPO_NAME = REPO[1];
-  const ghHeaders = '-H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28"';
+  console.log({env: process.env})
+  const ghHeaders = `-H 'Accept: application/vnd.github+json' -H 'X-GitHub-Api-Version: 2022-11-28'`;
 
   async function getPublicRepoInfo(pkgName: string) {
-    const repoInfo = await $`bunx --silent npm view "${pkgName}" --json repository`.json() as NpmRepositoryInfo;
+    const repoInfo = await $`bunx --silent npm view ${pkgName} --json repository`.json() as NpmRepositoryInfo;
     const url = (repoInfo.url || '').replace(/^git\+/, '').replace(/\.git$/, '');
     const parts = url.split('/');
     const owner = parts[parts.length - 2];
@@ -35,7 +36,7 @@ export default async ({ params: { updatedPackages, oldPackageJson, githubReposit
 
   async function isValid(v1: string, v2: string) {
     try {
-      await $`bunx semver "${cleanVersion(v1)}" -r ">=${cleanVersion(v2)}"`.text();
+      await $`bunx semver '${cleanVersion(v1)}' -r '>=${cleanVersion(v2)}'`.text();
       return true;
     } catch {
       return false;
