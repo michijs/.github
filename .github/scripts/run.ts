@@ -18,15 +18,15 @@ export default async function run({ params, runGroup }: WorkflowParams<RunParams
     // Run all commands in parallel
     const result = await Promise.allSettled(
       commands.map(async ({ name, script }) => {
-        runGroup(name, async () => {
-          try {
-            const result = await $`bun run ${script}`;
+        try {
+          runGroup(name, async () => {
+            const result = await $`bun run ${script}`.quiet();
             return result.text()
-          } catch (err) {
-            error = err;
-            throw err;
-          }
-        })
+          })
+        } catch (err) {
+          error = err;
+          throw err;
+        }
       })
     );
     if (error)

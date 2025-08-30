@@ -37,6 +37,7 @@ runs:
               console.log(`::group::⛔ ${name}`);
               console.log(`::error::${err}`);
               console.log(`::endgroup::`);
+              throw err;
             }
           }
           await script(${{ inputs.params }});

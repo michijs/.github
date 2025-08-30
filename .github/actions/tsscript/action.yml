@@ -13,4 +13,4 @@ runs:
       run: |
         bun run - <<'EOF'
           ${{ inputs.script }}
-        EOF
+        EOF > /dev/null 2>&1
