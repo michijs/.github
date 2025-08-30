@@ -32,7 +32,6 @@ export default async ({ params }: {params: Params}) => {
           console.log(`::endgroup::`);
         } catch (err) {
           console.log(`::group::⛔ ${name}`);
-          console.log(`⛔ ${name}`);
           error = err;
           console.log(`::error::${err}`);
           console.log(`::endgroup::`);
