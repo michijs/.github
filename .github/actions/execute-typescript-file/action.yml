@@ -19,7 +19,7 @@ runs:
           import { promises as fs } from 'fs';
           import $ from 'bun';
           async function importScriptFromUrl(url) {
-            const fileName = inputs.script.split('/').at(-1);
+            const fileName = url.split('/').at(-1);
             const scriptText = await (await fetch(url)).text();
             await fs.writeFile(`/tmp/${fileName}`, scriptText);
             const { default: script } = await import(`file:///tmp/${fileName}`);
