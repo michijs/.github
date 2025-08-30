@@ -31,7 +31,7 @@ runs:
             const scriptText = buffer.toString("utf8");
 
             // Write to file
-            await writeFile(`/tmp/${fileName}`, scriptText, "utf8");
+            await fs.writeFile(`/tmp/${fileName}`, scriptText, "utf8");
             const { default: script } = await import(`file:///tmp/${fileName}`);
             return (params) => script({ params, github, runGroup });
           }
