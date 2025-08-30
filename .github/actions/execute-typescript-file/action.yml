@@ -20,6 +20,7 @@ runs:
           import $ from 'bun';
           async function importScriptFromUrl(url) {
             const fileName = url.split('/').at(-1);
+            console.log({url, fileName})
             const scriptText = await (await fetch(url)).text();
             if(!scriptText)
               throw `${url} does not exists`;
