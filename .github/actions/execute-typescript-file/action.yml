@@ -22,12 +22,21 @@ runs:
             const fileName = inputs.script.split('/').at(-1);
             const scriptText = await (await fetch(url)).text();
             await fs.writeFile(`/tmp/${fileName}`, scriptText);
-            return await import(`file:///tmp/${fileName}`);
+            const { default } = await import(`file:///tmp/${fileName}`);
+            return (params) => default({params, github, runGroup});
           }
           const github = ${{ toJson(github) }};
-          const { default: script } = await importScriptFromUrl('${{ inputs.script }}');
-          await script(
-          { 
-            github, 
-            params: ${{ inputs.params }},
-          });
+          const script = await importScriptFromUrl('${{ inputs.script }}');
+          async function runGroup(name, callback){
+            try {
+              const result = await callback();
+              console.log(`::group::✅ ${name}`);
+              console.log(result);
+              console.log(`::endgroup::`);
+            } catch (err) {
+              console.log(`::group::⛔ ${name}`);
+              console.log(`::error::${err}`);
+              console.log(`::endgroup::`);
+            }
+          }
+          await script(${{ inputs.params }});
