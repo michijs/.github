@@ -28,14 +28,22 @@ runs:
           const github = ${{ toJson(github) }};
           const script = await importScriptFromUrl('${{ inputs.script }}');
           async function runGroup(name, callback){
+            const consoleCalls = [];
             try {
+              originalConsoleLog = console.log
+              console.log = (...args) => {
+                consoleCalls.push(args)
+              };
               const result = await callback();
+              console.log = originalConsoleLog;
               console.log(`::group::✅ ${name}`);
-              console.log(result);
+              consoleCalls.forEach(console.log);
               console.log(`::endgroup::`);
               return result;
             } catch (err) {
+              console.log = originalConsoleLog;
               console.log(`::group::⛔ ${name}`);
+              consoleCalls.forEach(console.log);
               console.log(`::error::${err}`);
               console.log(`::endgroup::`);
               throw err;

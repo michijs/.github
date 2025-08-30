@@ -1,12 +1,11 @@
 import { $ } from 'bun';
 import type { NpmRepositoryInfo, MichijsDependabotParams, WorkflowParams } from './types';
 import type { paths } from '@octokit/openapi-types'
-export default async ({ params: {updatedPackages, oldPackageJson, githubRepository, ref}, runGroup }: WorkflowParams<MichijsDependabotParams>) => {
+export default async ({ params: { updatedPackages, oldPackageJson, githubRepository, ref }, runGroup }: WorkflowParams<MichijsDependabotParams>) => {
 
   const REPO = githubRepository.split('/');
   const OWNER = REPO[0];
   const REPO_NAME = REPO[1];
-  let updatedPackagesString = "";
   const ghHeaders = '-H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28"';
 
   async function getPublicRepoInfo(pkgName: string) {
@@ -84,9 +83,13 @@ export default async ({ params: {updatedPackages, oldPackageJson, githubReposito
     return clearBody(commits.map(c => `<li><a href="${c.html_url}"><code>${c.sha.slice(0, 6)}</code></a> ${c.commit.message}</li>`)?.join(''))
   }
 
-  const comments = await Promise.all(Object.entries(updatedPackages).map(async ([pkgName, newVersion]) => {
+  let updatedPackagesString = "";
+  let comments: string[] = [];
+  await runGroup('Get information about the releases', async () => await Promise.all(Object.entries(updatedPackages).map(async ([pkgName, newVersion]) => {
     const [resultPublic, result] = await Promise.allSettled([getPublicRepoInfo(pkgName), getRepoInfo(pkgName)]);
+    console.log(pkgName, { resultPublic, result });
     const { owner, repo } = resultPublic.status === 'fulfilled' ? resultPublic.value : (result.status === 'fulfilled' ? result.value : {});
+    console.log(pkgName, { owner, repo });
     if (!owner || !repo) return;
 
     const oldVersion =
@@ -97,6 +100,8 @@ export default async ({ params: {updatedPackages, oldPackageJson, githubReposito
       oldPackageJson.packageManager?.split('@')?.[1] ||
       'Not found';
 
+    console.log(pkgName, { oldVersion });
+
     const idBump = `bump-${pkgName}`
     const bumpLabel = `Bump <a href="https://redirect.github.com/${owner}/${repo}">${clearBody(pkgName)}</a> from <a href="#user-content-${idBump}">${oldVersion} to ${newVersion}</a>`;
     updatedPackagesString += `<li>${bumpLabel}</li>`;
@@ -105,14 +110,16 @@ export default async ({ params: {updatedPackages, oldPackageJson, githubReposito
       getChangelog(owner, repo, oldVersion),
       getCommitHistory(owner, repo, oldVersion, newVersion)
     ]);
+    console.log(pkgName, { changelog, commitHistory });
 
-    return `<h3 id=${idBump}>${bumpLabel}</h3>${changelog}${commitHistory ? `<details><summary>Commit history:</summary><ul>${commitHistory}</ul></details>` : ''}`
-  }));
+    comments.push(`<h3 id=${idBump}>${bumpLabel}</h3>${changelog}${commitHistory ? `<details><summary>Commit history:</summary><ul>${commitHistory}</ul></details>` : ''}`)
 
+  })));
 
-  const pr = await $`gh api --method POST ${ghHeaders} repos/${OWNER}/${REPO_NAME}/pulls -f 'title=[${ref}] Michijs Dependabot changes' -f 'body=## Updated Packages\n\n<ul>${updatedPackagesString}</ul>' -f 'head=michijs-dependabot' -f 'base=${ref}'`.json() as paths['/repos/{owner}/{repo}/pulls']['post']['responses']['201']['content']['application/json'];
-
-  await Promise.all(comments.filter(Boolean).map(comment =>
+  const pr = await runGroup('Create PR', () => $`gh api --method POST ${ghHeaders} repos/${OWNER}/${REPO_NAME}/pulls -f 'title=[${ref}] Michijs Dependabot changes' -f 'body=## Updated Packages\n\n<ul>${updatedPackagesString}</ul>' -f 'head=michijs-dependabot' -f 'base=${ref}'`.json() as Promise<paths['/repos/{owner}/{repo}/pulls']['post']['responses']['201']['content']['application/json']>);
+  
+  await runGroup('Add comments regarding each update', () => Promise.all(comments.map(comment =>
     $`gh api --method POST ${ghHeaders} repos/${OWNER}/${REPO_NAME}/issues/${pr.number}/comments -f 'body=${comment}'`
-  ));
+  )));
+  
 }

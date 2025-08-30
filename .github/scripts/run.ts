@@ -20,8 +20,10 @@ export default async function run({ params, runGroup }: WorkflowParams<RunParams
       commands.map(async ({ name, script }) => {
         try {
           runGroup(name, async () => {
-            const result = await $`bun run ${script}`.quiet();
-            return result.text()
+            const command = `bun run ${script}`;
+            console.log(command);
+            const result = await $`${command}`.quiet();
+            console.log(result.text());
           })
         } catch (err) {
           error = err;
