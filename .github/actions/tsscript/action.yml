@@ -16,4 +16,4 @@ runs:
         cat <<'EOF' > "$tmpfile"
         ${{ inputs.script }}
         EOF
-            bun run "$tmpfile" > /dev/null 2>&1
+            bun run "$tmpfile"
