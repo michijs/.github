@@ -3,8 +3,28 @@ export interface Command {
   name: string,
   script: string
 }
+
 export interface RunParams {
   command: string | Command[]
+}
+
+export interface NpmRepositoryInfo {
+  type?: string;
+  url?: string;
+  directory?: string;
+}
+
+export interface MichijsDependabotParams {
+  githubRepository: string;
+  updatedPackages: [string, string];
+  ref: string;
+  oldPackageJson: {
+    dependencies?: Record<string, string>;
+    devDependencies?: Record<string, string>;
+    optionalDependencies?: Record<string, string>;
+    peerDependencies?: Record<string, string>;
+    packageManager?: string
+  }
 }
 
 export interface Workflow<P> {
@@ -13,5 +33,5 @@ export interface Workflow<P> {
 export interface WorkflowParams<P> {
   params: P,
   importScriptFromUrl<V extends Workflow<any>>(url: string): V,
-  runGroup(name: string, callback: () => any | Promise<any>)
+  runGroup<T>(name: string, callback: () => T): T
 }

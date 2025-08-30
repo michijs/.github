@@ -33,6 +33,7 @@ runs:
               console.log(`::group::✅ ${name}`);
               console.log(result);
               console.log(`::endgroup::`);
+              return result;
             } catch (err) {
               console.log(`::group::⛔ ${name}`);
               console.log(`::error::${err}`);

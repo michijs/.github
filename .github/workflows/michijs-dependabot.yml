@@ -48,7 +48,7 @@ jobs:
 
       - name: Get previous package.json state
         shell: bash
-        run: echo "OLD_JSON=$(jq -c . package.json)" >> $GITHUB_ENV
+        run: echo "OLD_PACKAGE_JSON=$(jq -c . package.json)" >> $GITHUB_ENV
 
       - name: Set up environment
         uses: michijs/.github/.github/actions/setup@main
@@ -123,7 +123,7 @@ jobs:
               ref: "${{ matrix.repository.default_branch || 'master' }}",
               githubRepository: "${{ matrix.repository.full_name || env.GITHUB_REPOSITORY }}",
               updatedPackages: {...JSON.parse(process.env.UPDATED_PACKAGES), ...JSON.parse(process.env.UPDATED_BETA_PACKAGES)},
-              oldJson: process.env.OLD_JSON
+              oldPackageJson: JSON.parse(process.env.OLD_PACKAGE_JSON)
             }
 
               
