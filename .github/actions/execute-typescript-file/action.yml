@@ -16,10 +16,10 @@ runs:
       uses: michijs/.github/.github/actions/tsscript@main
       with:
         script: |
-          import { promises as fs } from 'fs';
-          import $ from 'bun';
+          import { promises as fs } from "fs";
+          import $ from "bun";
           async function importScriptFromUrl(url) {
-            const fileName = url.split('/').at(-1);
+            const fileName = url.split("/").at(-1);
             console.log({ url, fileName })
             const scriptText = await (await fetch(url)).text();
             if (!scriptText)
@@ -29,10 +29,10 @@ runs:
             return (params) => script({ params, github, runGroup });
           }
           const github = ${{ toJson(github) }};
-          const script = await importScriptFromUrl('${{ inputs.script }}');
+          const script = await importScriptFromUrl("${{ inputs.script }}");
           async function runGroup(name, callback) {
             const consoleCalls = [];
-              const originalConsoleLog = console.log
+            const originalConsoleLog = console.log
             try {
               console.log = (...args) => consoleCalls.push(args);
               const result = await callback();

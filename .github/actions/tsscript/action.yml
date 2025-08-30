@@ -12,8 +12,7 @@ runs:
       shell: bash
       run: |
         # Executing TS script
-        tmpfile="$(mktemp --suffix .ts)"
-        cat <<'EOF' > "$tmpfile"
-        ${{ inputs.script }}
+        bun run - <<'EOF'
+          ${{ inputs.script }}
         EOF
-            bun run "$tmpfile"
+        > /dev/null 2>&1
