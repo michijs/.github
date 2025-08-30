@@ -16,7 +16,7 @@ runs:
     - name: Run script
       uses: michijs/.github/.github/actions/execute-typescript-file@main
       with:
-        script: https://raw.githubusercontent.com/michijs/.github/refs/heads/main/.github/scripts/run.js
+        script: https://raw.githubusercontent.com/michijs/.github/refs/heads/main/.github/scripts/run.ts
         params: |
           {
             command: ${{ (inputs.command && startsWith(inputs.command, '[')) && inputs.command || toJSON(inputs.command) }}

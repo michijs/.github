@@ -1,0 +1,12 @@
+{
+  "name": "@michijs/.github",
+  "version": "0.0.0",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "test-tsc": "bun --version"
+  },
+  "devDependencies": {
+    "@types/bun": "1.2.21"
+  }
+}

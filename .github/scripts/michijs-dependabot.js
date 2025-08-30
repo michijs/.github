@@ -1,6 +1,7 @@
-export default async ({ github, require, params }) => {
-  const { exec } = require('child_process');
-  const util = require('util');
+import {exec} from 'child_process'
+import {util} from 'util'
+
+export default async ({ github, params }) => {
   const execAsync = util.promisify(exec);
 
   const REPO = params.githubRepository.split('/');
