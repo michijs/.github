@@ -11,7 +11,7 @@ runs:
     - name: Execute ts
       shell: bash
       run: |
-        // Executing ${{ inputs.script }}
+        // Executing TS script
         bun run - <<'EOF'
           ${{ inputs.script }}
         EOF

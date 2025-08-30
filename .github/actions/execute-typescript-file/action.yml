@@ -21,6 +21,8 @@ runs:
           async function importScriptFromUrl(url) {
             const fileName = url.split('/').at(-1);
             const scriptText = await (await fetch(url)).text();
+            if(!scriptText)
+              throw `${url} does not exists`;
             await fs.writeFile(`/tmp/${fileName}`, scriptText);
             const { default: script } = await import(`file:///tmp/${fileName}`);
             return (params) => script({params, github, runGroup});
