@@ -6,8 +6,8 @@ export default async ({ params: { updatedPackages, oldPackageJson, githubReposit
   const REPO = githubRepository.split("/");
   const OWNER = REPO[0];
   const REPO_NAME = REPO[1];
-  console.log({env: process.env})
-  const ghHeaders = `-H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28"`;
+  // const ghHeaders = `-H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28"`;
+  const ghHeaders = ``;
 
   async function getPublicRepoInfo(pkgName: string) {
     const repoInfo = await $`bunx --silent npm view ${pkgName} --json repository`.json() as NpmRepositoryInfo;
