@@ -20,11 +20,18 @@ runs:
           import $ from "bun";
           async function importScriptFromUrl(url) {
             const fileName = url.split("/").at(-1);
-            console.log({ url, fileName })
-            const scriptText = await (await fetch(url)).text();
-            if (!scriptText)
-              throw `${url} does not exists`;
-            await fs.writeFile(`/tmp/${fileName}`, scriptText);
+            // Fetch the script
+            const res = await fetch(url);
+            if (!res.ok) throw new Error(`${url} does not exist (status: ${res.status})`);
+
+            // Convert response to arrayBuffer
+            const buffer = Buffer.from(await res.arrayBuffer());
+
+            // Decode explicitly as UTF-8
+            const scriptText = buffer.toString("utf8");
+
+            // Write to file
+            await writeFile(`/tmp/${fileName}`, scriptText, "utf8");
             const { default: script } = await import(`file:///tmp/${fileName}`);
             return (params) => script({ params, github, runGroup });
           }
