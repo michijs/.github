@@ -15,8 +15,7 @@ runs:
     - name: Execute TS file
       uses: michijs/.github/.github/actions/tsscript@main
       with:
-        script: michijs/.github/.github/actions/tsscript@main
-        params: |
+        script: |
           import { promises as fs } from 'fs';
           import $ from 'bun';
           const scriptText = await (await fetch('${{ inputs.script }}')).text();
