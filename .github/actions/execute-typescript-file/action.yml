@@ -22,8 +22,8 @@ runs:
             const fileName = inputs.script.split('/').at(-1);
             const scriptText = await (await fetch(url)).text();
             await fs.writeFile(`/tmp/${fileName}`, scriptText);
-            const { default } = await import(`file:///tmp/${fileName}`);
-            return (params) => default({params, github, runGroup});
+            const { default: script } = await import(`file:///tmp/${fileName}`);
+            return (params) => script({params, github, runGroup});
           }
           const github = ${{ toJson(github) }};
           const script = await importScriptFromUrl('${{ inputs.script }}');
