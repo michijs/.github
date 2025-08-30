@@ -1,12 +1,5 @@
 import { $ } from "bun";
-
-interface Command {
-  name: string,
-  script: string
-}
-interface Params {
-  command: string | Command[]
-}
+import type { Command, Params } from "./types";
 
 function normalizeCommands(command: Params['command']): Command[] {
   // Normalize to array of {name, script}
@@ -28,7 +21,7 @@ export default async ({ params }: {params: Params}) => {
         try {
           const result = await $`bun run ${script}`;
           console.log(`::group::✅ ${name}`);
-          console.log(result);
+          console.log(result.text());
           console.log(`::endgroup::`);
         } catch (err) {
           console.log(`::group::⛔ ${name}`);

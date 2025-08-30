@@ -2,7 +2,7 @@ name: "Execute typescript file"
 description: "Execute typescript file in the selected repository"
 inputs:
   params:
-    description: 'Params'
+    description: "Params"
     required: false
     default: "{}"
   script:
@@ -18,14 +18,16 @@ runs:
         script: |
           import { promises as fs } from 'fs';
           import $ from 'bun';
-          const scriptText = await (await fetch('${{ inputs.script }}')).text();
-          await fs.writeFile('/tmp/temp-script.ts', scriptText);
-          const { default: script } = await import('file:///tmp/temp-script.ts');
+          async function importScriptFromUrl(url) {
+            const fileName = inputs.script.split('/').at(-1);
+            const scriptText = await (await fetch(url)).text();
+            await fs.writeFile(`/tmp/${fileName}`, scriptText);
+            return await import(`file:///tmp/${fileName}`);
+          }
           const github = ${{ toJson(github) }};
+          const { default: script } = await importScriptFromUrl('${{ inputs.script }}');
           await script(
           { 
             github, 
             params: ${{ inputs.params }},
           });
-
-            
