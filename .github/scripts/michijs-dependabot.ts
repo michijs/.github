@@ -10,7 +10,7 @@ export default async ({ params: { updatedPackages, oldPackageJson, githubReposit
   const ghHeaders = ``;
 
   async function getPublicRepoInfo(pkgName: string) {
-    const repoInfo = await $`bunx --silent npm view ${pkgName} --json repository`.json() as NpmRepositoryInfo;
+    const repoInfo = await $`bunx --silent npm view ${pkgName} --json repository`.quiet().json() as NpmRepositoryInfo;
     const url = (repoInfo.url || "").replace(/^git\+/, "").replace(/\.git$/, "");
     const parts = url.split("/");
     const owner = parts[parts.length - 2];
@@ -36,7 +36,7 @@ export default async ({ params: { updatedPackages, oldPackageJson, githubReposit
 
   async function isValid(v1: string, v2: string) {
     try {
-      await $`bunx semver "${cleanVersion(v1)}" -r ">=${cleanVersion(v2)}"`.text();
+      await $`bunx semver "${cleanVersion(v1)}" -r ">=${cleanVersion(v2)}"`.quiet().text();
       return true;
     } catch {
       return false;
@@ -49,7 +49,7 @@ export default async ({ params: { updatedPackages, oldPackageJson, githubReposit
 
   async function getChangelog(owner: string, repo: string, oldVersion: string) {
     try {
-      const releases = await $`gh api ${ghHeaders} repos/${owner}/${repo}/releases`.json() as paths["/repos/{owner}/{repo}/releases"]["get"]["responses"]["200"]["content"]["application/json"];
+      const releases = await $`gh api ${ghHeaders} repos/${owner}/${repo}/releases`.quiet().json() as paths["/repos/{owner}/{repo}/releases"]["get"]["responses"]["200"]["content"]["application/json"];
       const changelog = (
         await Promise.all(
           releases.map(async r => {
@@ -70,8 +70,8 @@ export default async ({ params: { updatedPackages, oldPackageJson, githubReposit
   }
 
   async function getCommitHistory(owner: string, repo: string, oldVersion: string, newVersion: string): Promise<string | undefined> {
-    const compareCommitsRequest = $`gh api ${ghHeaders} repos/${owner}/${repo}/compare/v${oldVersion}...v${newVersion} --jq ".commits"`;
-    const listCommitsRequest = $`gh api ${ghHeaders} repos/${owner}/${repo}/commits`;
+    const compareCommitsRequest = $`gh api ${ghHeaders} repos/${owner}/${repo}/compare/v${oldVersion}...v${newVersion} --jq ".commits"`.quiet();
+    const listCommitsRequest = $`gh api ${ghHeaders} repos/${owner}/${repo}/commits`.quiet();
     const [comparePromise, listCommits] = await Promise.allSettled([compareCommitsRequest, listCommitsRequest]);
     let commits: paths["/repos/{owner}/{repo}/commits"]["get"]["responses"]["200"]["content"]["application/json"];
 
@@ -116,10 +116,10 @@ export default async ({ params: { updatedPackages, oldPackageJson, githubReposit
 
   })));
 
-  const pr = await runGroup("Create PR", () => $`gh api --method POST ${ghHeaders} repos/${OWNER}/${REPO_NAME}/pulls -f "title=[${ref}] Michijs Dependabot changes" -f "body=## Updated Packages\n\n<ul>${updatedPackagesString}</ul>" -f "head=michijs-dependabot" -f "base=${ref}"`.json() as Promise<paths["/repos/{owner}/{repo}/pulls"]["post"]["responses"]["201"]["content"]["application/json"]>);
+  const pr = await runGroup("Create PR", () => $`gh api --method POST ${ghHeaders} repos/${OWNER}/${REPO_NAME}/pulls -f "title=[${ref}] Michijs Dependabot changes" -f "body=## Updated Packages\n\n<ul>${updatedPackagesString}</ul>" -f "head=michijs-dependabot" -f "base=${ref}"`.quiet().json() as Promise<paths["/repos/{owner}/{repo}/pulls"]["post"]["responses"]["201"]["content"]["application/json"]>);
   
   await runGroup("Add comments regarding each update", () => Promise.all(comments.map(comment =>
-    $`gh api --method POST ${ghHeaders} repos/${OWNER}/${REPO_NAME}/issues/${pr.number}/comments -f "body=${comment}"`
+    $`gh api --method POST ${ghHeaders} repos/${OWNER}/${REPO_NAME}/issues/${pr.number}/comments -f "body=${comment}"`.quiet()
   )));
   
 }
