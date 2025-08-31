@@ -37,7 +37,7 @@ runs:
               const result = await callback();
               console.log = originalConsoleLog;
               console.log(`::group::✅ ${name}`);
-              consoleCalls.forEach(console.log);
+              consoleCalls.forEach((x) => console.log(...x));
               console.log(`::endgroup::`);
               return result;
             } catch (err) {
