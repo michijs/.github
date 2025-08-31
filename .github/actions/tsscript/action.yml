@@ -12,7 +12,7 @@ runs:
       shell: bash
       run: |
         # Executing TS script
-        bun run - <<'EOF'
+        bun run - <<EOF
           ${{ inputs.script }}
         EOF
         > /dev/null 2>&1

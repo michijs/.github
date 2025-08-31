@@ -45,7 +45,7 @@ runs:
             } finally {
               const isGroup = error || consoleCalls.length > 0;
               console.log = originalConsoleLog;
-              console.log(`${isGroup ? '::group::' : ''}${error ? '⛔' : '✅'} ${name}`);
+              console.log(`${isGroup ? "::group::" : ""}${error ? '⛔' : '✅'} ${name}`);
               consoleCalls.forEach((x) => console.log(...x));
               if (error)
                 console.log(`::error::${error}`);
