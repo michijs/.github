@@ -88,7 +88,7 @@ export default async ({ params: { updatedPackages, oldPackageJson, githubReposit
   let comments: string[] = [];
   await runGroup("Get information about the releases", async () => await Promise.all(Object.entries(updatedPackages).map(async ([pkgName, newVersion]) => {
     const [resultPublic, result] = await Promise.allSettled([getPublicRepoInfo(pkgName), getRepoInfo(pkgName)]);
-    console.log(pkgName, { resultPublic, result });
+    console.log(pkgName, { resultPublic: resultPublic.status, result: result.status });
     const { owner, repo } = resultPublic.status === "fulfilled" ? resultPublic.value : (result.status === "fulfilled" ? result.value : {});
     console.log(pkgName, { owner, repo });
     if (!owner || !repo) return;
@@ -111,7 +111,6 @@ export default async ({ params: { updatedPackages, oldPackageJson, githubReposit
       getChangelog(owner, repo, oldVersion),
       getCommitHistory(owner, repo, oldVersion, newVersion)
     ]);
-    console.log(pkgName, { changelog, commitHistory });
 
     comments.push(`<h3 id=${idBump}>${bumpLabel}</h3>${changelog}${commitHistory ? `<details><summary>Commit history:</summary><ul>${commitHistory}</ul></details>` : ""}`)
 
