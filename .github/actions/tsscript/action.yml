@@ -12,7 +12,10 @@ runs:
       shell: bash
       run: |
         # Executing TS script
-        bun run - <<EOF
+        if [[ "${{ inputs.script }}" == *"'"* ]]; then
+          echo "::error::Single quotes are not supported yet (')."
+          exit 1
+        fi
+        bun run - <<'EOF'
           ${{ inputs.script }}
         EOF
-        > /dev/null 2>&1
