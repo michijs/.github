@@ -12,8 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       repositories: ${{ steps.list-repositories.outputs.repositories }}
-      name: ${{ steps.setup-credentials.outputs.name}}
-      email: ${{ steps.setup-credentials.outputs.email}}
     steps:
       - name: List org repositories
         id: list-repositories
