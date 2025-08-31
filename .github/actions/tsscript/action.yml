@@ -9,7 +9,7 @@ runs:
   using: "composite"
   steps:
     - name: Fail if script contains single quotes
-      if: ${{ contains(inputs.script, '"'"') }}
+      if: contains(inputs.script, '''')
       shell: bash
       run: |
         echo "::error::Single quotes are not supported yet (')."
