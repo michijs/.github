@@ -12,6 +12,9 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Mask not relevant objects
+      shell: bash
+      run: echo "::add-mask::${{ toJson(github) }}"
     - name: Execute TS file
       uses: michijs/.github/.github/actions/tsscript@main
       with:
