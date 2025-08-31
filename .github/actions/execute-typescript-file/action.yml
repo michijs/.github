@@ -29,24 +29,28 @@ runs:
           }
           const github = ${{ toJson(github) }};
           const script = await importScriptFromUrl("${{ inputs.script }}");
-          async function runGroup(name, callback) {
-            const consoleCalls = [];
+          async function runGroup(name: string, callback: () => Promise<any>) {
+            const consoleCalls: Array<any[]> = [];
             const originalConsoleLog = console.log
+            let error;
+            let result;
             try {
               console.log = (...args) => consoleCalls.push(args);
-              const result = await callback();
+              result = await callback();
+            } catch (e) {
+              error = e;
+            } finally {
+              const isGroup = error || consoleCalls.length > 0;
               console.log = originalConsoleLog;
-              console.log(`::group::✅ ${name}`);
+              console.log(`${isGroup ? '::group::' : ''}${error ? '⛔' : '✅'} ${name}`);
               consoleCalls.forEach((x) => console.log(...x));
-              console.log(`::endgroup::`);
+              if (error)
+                console.log(`::error::${error}`);
+              if (isGroup)
+                console.log(`::endgroup::`);
+              if (error)
+                throw error;
               return result;
-            } catch (err) {
-              console.log = originalConsoleLog;
-              console.log(`::group::⛔ ${name}`);
-              consoleCalls.forEach(console.log);
-              console.log(`::error::${err}`);
-              console.log(`::endgroup::`);
-              throw err;
             }
           }
           await script(${{ inputs.params }});
