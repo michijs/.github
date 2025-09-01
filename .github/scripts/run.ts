@@ -22,6 +22,7 @@ export default async function run({ params, runGroup }: WorkflowParams<RunParams
           runGroup(name, async () => {
             const command = `bun run ${script}`;
             console.log(command);
+            // Do not replace with command. For some reason it fails
             const result = await $`bun run ${script}`.quiet();
             console.log(result.text());
           })
