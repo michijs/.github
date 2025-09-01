@@ -22,7 +22,7 @@ export default async function run({ params, runGroup }: WorkflowParams<RunParams
           runGroup(name, async () => {
             const command = `bun run ${script}`;
             console.log(command);
-            const result = await $`${command}`.quiet();
+            const result = await $`bun run ${script}`.quiet();
             console.log(result.text());
           })
         } catch (err) {
