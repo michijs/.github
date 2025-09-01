@@ -53,7 +53,8 @@ export default async ({ params: { updatedPackages, oldPackageJson, githubReposit
       const changelog = (
         await Promise.all(
           releases.map(async r => {
-            return await isValid(r.tag_name, oldVersion) ? `\n### ${r.tag_name}\n\n${r.body || ""}\n\n` : ""
+            return await isValid(r.tag_name, oldVersion) ? `
+            ### ${r.tag_name}${r.body || ""}\n\n` : ""
           })
         )
       ).join("");
@@ -116,7 +117,8 @@ export default async ({ params: { updatedPackages, oldPackageJson, githubReposit
 
   })));
 
-  const pr = await runGroup("Create PR", () => $`gh api --method POST ${ghHeaders} repos/${OWNER}/${REPO_NAME}/pulls -f "title=[${ref}] Michijs Dependabot changes" -f "body=## Updated Packages\n\n<ul>${updatedPackagesString}</ul>" -f "head=michijs-dependabot" -f "base=${ref}"`.quiet().json() as Promise<paths["/repos/{owner}/{repo}/pulls"]["post"]["responses"]["201"]["content"]["application/json"]>);
+  const pr = await runGroup("Create PR", () => $`gh api --method POST ${ghHeaders} repos/${OWNER}/${REPO_NAME}/pulls -f "title=[${ref}] Michijs Dependabot changes" -f "body=## Updated Packages
+  <ul>${updatedPackagesString}</ul>" -f "head=michijs-dependabot" -f "base=${ref}"`.quiet().json() as Promise<paths["/repos/{owner}/{repo}/pulls"]["post"]["responses"]["201"]["content"]["application/json"]>);
   
   await runGroup("Add comments regarding each update", () => Promise.all(comments.map(comment =>
     $`gh api --method POST ${ghHeaders} repos/${OWNER}/${REPO_NAME}/issues/${pr.number}/comments -f "body=${comment}"`.quiet()

@@ -8,6 +8,6 @@
   },
   "devDependencies": {
     "@octokit/openapi-types": "^25.1.0",
-    "@types/bun": "1.2.21"
+    "bun-types": "1.2.21"
   }
 }
