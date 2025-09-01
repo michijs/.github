@@ -17,7 +17,7 @@ runs:
       with:
         script: |
           import { file as BunFile } from "bun";
-          import { tmpdir } from 'os';
+          import { tmpdir } from "os";
 
           async function importScriptFromUrl(url: string) {
             const fileName = url.split("/").at(-1);
