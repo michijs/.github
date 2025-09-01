@@ -16,15 +16,19 @@ runs:
       uses: michijs/.github/.github/actions/tsscript@main
       with:
         script: |
-          import { write } from "bun";
-          async function importScriptFromUrl(url) {
+          import { file as BunFile } from "bun";
+          import { tmpdir } from 'os';
+
+          async function importScriptFromUrl(url: string) {
             const fileName = url.split("/").at(-1);
+            const file = BunFile(`${tmpdir()}/${fileName}`)
             // Fetch the script
             const res = await fetch(url);
             if (!res.ok) throw new Error(`${url} does not exist (status: ${res.status})`);
+
             // Write to file
-            await write(`/tmp/${fileName}`, await res.blob());
-            const { default: script } = await import(`file:///tmp/${fileName}`);
+            await file.write(await res.arrayBuffer())
+            const { default: script } = await import(`${tmpdir()}/${fileName}`);
             return (params) => script({ params, github, runGroup });
           }
           const github = ${{ toJson(github) }};
