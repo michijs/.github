@@ -5,7 +5,7 @@ inputs:
     description: |
       Command(s) to run.
       Examples:
-        "build"
+        build
         ["build","test","lint"]
         [{"name":"run typescript tests","script":"test-tsc"}]
     required: true
@@ -17,7 +17,4 @@ runs:
       uses: michijs/.github/.github/actions/execute-typescript-file@main
       with:
         script: https://raw.githubusercontent.com/michijs/.github/refs/heads/main/.github/scripts/run.ts
-        params: |
-          {
-            command: ${{ inputs.command }}
-          }
+        params: '{command: ${{ inputs.command }}}'
