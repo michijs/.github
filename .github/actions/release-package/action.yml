@@ -54,7 +54,7 @@ runs:
     - name: Build
       uses: michijs/.github/.github/actions/run@main
       with:
-        command: "${{ inputs.dist-script }}"
+        command: ${{ inputs.dist-script }}
 
     - name: Bump package version
       uses: michijs/.github/.github/actions/bump-version@main

@@ -43,7 +43,7 @@ runs:
     - name: Run script
       uses: michijs/.github/.github/actions/run@main
       with: 
-        command: "${{ inputs.script-name }}"
+        command: ${{ inputs.script-name }}
           
     - name: Run formatter
       uses: michijs/.github/.github/actions/run-linter@main
