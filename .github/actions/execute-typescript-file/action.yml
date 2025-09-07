@@ -57,4 +57,4 @@ runs:
               return result;
             }
           }
-          await script(${{ inputs.params }});
+          await script(${{ fromJSON(inputs.params) }});
