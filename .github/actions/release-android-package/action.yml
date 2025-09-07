@@ -26,7 +26,7 @@ inputs:
     description: "Release notes"
   dist-script:
     description: "Build script to execute"
-    default: "build"
+    default: build
   deploy-to-play-store:
     description: "Deploy to Play Store"
     default: "true"
@@ -102,7 +102,7 @@ runs:
     - name: Build
       uses: michijs/.github/.github/actions/run@main
       with:
-        command: ${{ inputs.dist-script }}
+        command: "${{ inputs.dist-script }}"
 
     # Cargo dependency
     - name: Install system dependencies
@@ -131,7 +131,7 @@ runs:
     - name: Build app APK
       uses: michijs/.github/.github/actions/run@main
       with:
-        command: tauri android build --target aarch64
+        command: "tauri android build --target aarch64"
         github_token: ${{ inputs.github_token }}
 
     - name: Extract Android signing key from env
