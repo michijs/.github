@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: List org repositories
         id: list-repositories
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.PAT }}
           result-encoding: string
